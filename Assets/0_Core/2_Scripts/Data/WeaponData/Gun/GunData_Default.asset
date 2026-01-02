@@ -1,0 +1,26 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 517cbbab9f8ce5a4f85fdbd50e3fd6ae, type: 3}
+  m_Name: GunData_Default
+  m_EditorClassIdentifier: Assembly-CSharp::GunData
+  Name: Gun_Default
+  Damage: 10
+  Range: 30
+  EnemyCount: 3
+  CountPerSecond: 1.5
+  Icon: {fileID: 0}
+  projectileEffect: {fileID: 1964577959459748387, guid: aa4445101d6138b4a9ab85f6e2f14c7a, type: 3}
+  muzzleEffect: {fileID: 0}
+  shotEffect: {fileID: 0}
+  muzzleSfx: {fileID: 0}
+  shotSfx: {fileID: 0}
+  BulletSpeed: 30

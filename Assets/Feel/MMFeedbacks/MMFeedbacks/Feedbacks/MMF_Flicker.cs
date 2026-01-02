@@ -14,6 +14,7 @@ namespace MoreMountains.Feedbacks
 	[AddComponentMenu("")]
 	[FeedbackHelp("This feedback lets you flicker the color of a specified renderer (sprite, mesh, etc) for a certain duration, at the specified octave, and with the specified color. Useful when a character gets hit, for example (but so much more!).")]
 	[MovedFrom(false, null, "MoreMountains.Feedbacks")]
+	[System.Serializable]
 	[FeedbackPath("Renderer/Flicker")]
 	public class MMF_Flicker : MMF_Feedback
 	{
@@ -73,7 +74,7 @@ namespace MoreMountains.Feedbacks
 		/// the duration of this feedback is the duration of the flicker
 		public override float FeedbackDuration { get { return ApplyTimeMultiplier(FlickerDuration); } set { FlickerDuration = value; } }
 
-		protected const string _colorPropertyName = "_Color";
+		protected const string _colorPropertyName = "_BaseColor";
         
 		protected int[] _propertyIDs;
 		protected bool[] _propertiesFound;

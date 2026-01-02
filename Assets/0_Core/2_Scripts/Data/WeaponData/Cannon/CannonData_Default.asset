@@ -1,0 +1,28 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d304d69453ef7c14a9e5c7c73f99afd9, type: 3}
+  m_Name: CannonData_Default
+  m_EditorClassIdentifier: Assembly-CSharp::CannonData
+  Name: Cannon_Default
+  Damage: 20
+  Range: 40
+  EnemyCount: 10
+  CountPerSecond: 0.8
+  Icon: {fileID: 0}
+  projectileEffect: {fileID: 8839502570319217225, guid: 9b6b4e7a62699f9458a6976fbf74436a, type: 3}
+  muzzleEffect: {fileID: 0}
+  shotEffect: {fileID: 0}
+  muzzleSfx: {fileID: 0}
+  shotSfx: {fileID: 0}
+  explosionRadius: 10
+  projectileSpeed: 20
+  arcHeight: 10

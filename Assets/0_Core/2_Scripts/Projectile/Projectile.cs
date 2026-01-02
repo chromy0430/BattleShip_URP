@@ -1,0 +1,250 @@
+﻿using UnityEngine;
+using Cysharp.Threading.Tasks; 
+using System.Threading;
+using DG.Tweening;
+using System; 
+
+[RequireComponent(typeof(Rigidbody))]
+[RequireComponent(typeof(Collider))]
+public class Projectile : MonoBehaviour
+{
+    private BaseWeaponData _data;
+    private IEnemy _target;
+    private Rigidbody _rb;
+    private CancellationTokenSource _lifeTimeCts;
+    private bool debug = false;
+    private void Awake()
+    {
+        _rb = GetComponent<Rigidbody>();
+        _rb.useGravity = false;
+        debug = DebugManager.instance.IsDebug;
+    }
+
+    /// <summary>
+    /// WeaponMount에서 호출되어 투사체 발사
+    /// </summary>
+    public void Launch(BaseWeaponData data, IEnemy target)
+    {
+        this._data = data;
+        this._target = target;
+
+        // 이전의 비행 로직(DOTween, UniTask)이 남아있다면 취소
+        _lifeTimeCts?.Cancel();
+        _lifeTimeCts = new CancellationTokenSource();
+        transform.DOKill(); // DOTween 중지
+
+        // 10초 후 자동 파괴(풀 반환) 로직 시작
+        StartLifetimeLimit(3.0f, _lifeTimeCts.Token).Forget();
+        //DelayDestroy(2.5f, _lifeTimeCts.Token).Forget();
+
+        // --- 데이터 타입별 비행 로직 분기 ---
+
+        if (_data is GunData gun)
+        {
+            _rb.AddForce(Vector3.forward * gun.BulletSpeed, ForceMode.VelocityChange);
+            //_rb.isKinematic = false;
+            //_rb.linearVelocity = transform.forward * gun.BulletSpeed; // [수정] linearVelocity
+        }
+        else if (_data is CannonData cannon)
+        {
+            // [Cannon] 포물선 비행 (기획서 우선순위)
+            if (_target != null && _target.IsAlive)
+            {
+                Vector3 targetPos = _target.TargetTransform.position;
+                // 중간 정점 계산 (포물선 높이 적용)
+                Vector3 midPoint = (transform.position + targetPos) / 2f + (Vector3.up * cannon.arcHeight);
+                Vector3[] path = { midPoint, targetPos };
+
+                //_rb.isKinematic = true; // DOPath 사용 시 물리 비활성화
+
+                // [수정] OnComplete가 파라미터 없는 'OnCannonHitTarget'를 호출하도록 변경
+                transform.DOPath(path, cannon.projectileSpeed, PathType.CatmullRom)
+                    .SetSpeedBased()
+                    .SetEase(Ease.Linear)
+                    .OnComplete(OnCannonHitTarget); // <-- [수정] '메서드 그룹' 오류 해결
+            }
+            else
+            {
+                //Disable();
+                ReturnToPool(); // 타겟이 없으면 즉시 반환
+            }
+        }
+        else if (_data is MissileData missile)
+        {
+            //_rb.AddForce(Vector3.forward * missile.projectileSpeed, ForceMode.VelocityChange);
+            HomingLoop(missile, _lifeTimeCts.Token).Forget(); // 유도 루프 시작
+        }
+    }
+
+    /// <summary>
+    /// [Missile] 타겟을 추적하는 비동기 루프
+    /// </summary>
+    private async UniTaskVoid HomingLoop(MissileData missileData, CancellationToken token)
+    {
+        float currentSpeed = missileData.projectileSpeed;
+
+        var rb = _rb;
+        var tr = transform;
+
+        try
+        {
+            // 토큰이 취소(충돌 또는 수명 종료)될 때까지 반복
+            while (!token.IsCancellationRequested)
+            {                
+
+                if (rb == null || tr == null) break;
+
+                if (_target != null && _target.IsAlive && _target.TargetTransform != null)
+                {
+                    // 타겟을 향한 방향 계산
+                    Vector3 direction = (_target.TargetTransform.position - rb.position).normalized;
+                    Quaternion lookRotation = Quaternion.LookRotation(direction);
+
+                    rb.rotation = Quaternion.Slerp(rb.rotation, lookRotation, missileData.homingTurnSpeed * Time.fixedDeltaTime);
+
+                    // 가속도 적용
+                    currentSpeed += missileData.acceleration * Time.fixedDeltaTime;
+                }
+
+                rb.linearVelocity = tr.forward * currentSpeed;
+
+                // 물리 프레임마다 대기
+                await UniTask.Yield(PlayerLoopTiming.FixedUpdate, token);
+            }
+        }
+        catch (OperationCanceledException)
+        {
+            Debug.Log("끝");
+        }
+        catch (Exception ex)
+        {
+            // 기타 예외 로깅 (디버그용)
+            Debug.LogException(ex);
+        }
+    }
+
+    private async UniTaskVoid DelayDestroy(float duration, CancellationToken token)
+    {
+        bool isCanceled = await UniTask.Delay(TimeSpan.FromSeconds(duration), cancellationToken: token)
+                                       .SuppressCancellationThrow();
+
+        if (!isCanceled)
+        {
+            Disable();
+        }
+    }
+
+
+    /// <summary>
+    /// 투사체 수명 제한
+    /// </summary>
+    private async UniTaskVoid StartLifetimeLimit(float duration, CancellationToken token)
+    {
+        // Delay가 (충돌 등으로) 취소되지 않고 정상적으로 완료되었다면 풀에 반환
+        if (!await UniTask.Delay(System.TimeSpan.FromSeconds(duration), cancellationToken: token).SuppressCancellationThrow())
+        {
+            try
+            {
+                Disable(); //ReturnToPool();
+            }
+            catch (Exception ex)
+            {
+                Debug.Log("미사일 발사 중에 종료 되었음 = " + ex);
+            }
+        }
+    }
+
+    /// <summary>
+    /// 충돌 감지 
+    /// </summary>
+    private void OnTriggerEnter(Collider other)
+    {
+        if (_data is CannonData) return;
+
+        if (other.TryGetComponent<IEnemy>(out var enemy))
+        {
+            if (enemy == _target)
+            {
+                OnHitTarget(enemy);
+                Debug.Log($"1 = {other.gameObject.layer}");
+            }
+            //OnHitTarget(enemy);
+        }
+        else if (other.gameObject.layer == LayerMask.NameToLayer("Water"))
+        {
+            OnHitTarget(null);
+        }
+
+        
+    }
+
+    /// <summary>
+    /// DOPath.OnComplete를 위한 파라미터 없는 콜백
+    /// </summary>
+    private void OnCannonHitTarget()
+    {
+        if (!this.gameObject.activeSelf) return;
+        OnHitTarget(_target);
+    }
+
+    /// <summary>
+    /// 타겟에 명중 (OnTriggerEnter 또는 OnCannonHitTarget에서 호출됨)
+    /// </summary>
+    private void OnHitTarget(IEnemy enemy) // [수정] enemy = null 기본값 제거
+    {
+        if (enemy != null && enemy.IsAlive)
+        {
+            if (debug)
+            {
+                enemy.TakeDamage(1);
+            }
+            else
+            {
+                enemy.TakeDamage(_data.Damage);
+            }
+        }
+
+        // 피격 이펙트 (shotEffect) 생성
+        if (_data.shotEffect != null)
+        {
+            var hitEffect = ObjectPoolManager.Instance.Get(_data.shotEffect);
+            if (hitEffect != null)
+            {
+                hitEffect.transform.position = transform.position;
+            }
+        }
+
+        Disable();  
+    }
+
+    /// <summary>
+    /// 모든 작업을 중지하고 오브젝트 풀에 반환
+    /// </summary>
+    private void ReturnToPool()
+    {
+        if (_lifeTimeCts == null) return;
+
+        _lifeTimeCts?.Cancel();
+        _lifeTimeCts = null;
+
+        transform.DOKill();
+
+        ObjectPoolManager.Instance.Return(this.gameObject);
+    }
+
+
+    private void Disable()
+    {
+        _rb.linearVelocity = Vector3.zero;
+        ReturnToPool();
+    }
+
+    private void OnDisable()
+    {
+        _lifeTimeCts?.Cancel();
+        _lifeTimeCts?.Dispose();
+        _lifeTimeCts = null;
+
+        transform.DOKill();
+    }
+}

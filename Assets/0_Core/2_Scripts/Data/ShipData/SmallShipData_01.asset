@@ -1,0 +1,27 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 684eb7e0a7a35e041a866e59b6e0e2aa, type: 3}
+  m_Name: SmallShipData_01
+  m_EditorClassIdentifier: Assembly-CSharp::SmallShipData
+  shipID: DefaultSmall_01
+  ShipName: "\uAE30\uBCF8 \uC18C\uD615\uC120"
+  ShipDescription: "\uAE30\uBCF8\uC73C\uB85C \uC8FC\uC5B4\uC9C0\uB294 \uC18C\uD615\uC120"
+  BaseHP: 300
+  BaseDEF: 5
+  baseSpeed: 5
+  baseMinSpeed: 4
+  baseMaxSpeed: 6
+  baseTurnSpeed: 10
+  BaseSPR: 0
+  ShopCost: 0
+  shipVisual: {fileID: 0}
+  shipIcon: {fileID: 0}
