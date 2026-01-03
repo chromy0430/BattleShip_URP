@@ -15,7 +15,7 @@ MonoBehaviour:
   Name: Missile_Default
   Damage: 25
   Range: 50
-  EnemyCount: 5
+  EnemyCount: 20
   CountPerSecond: 2.5
   Icon: {fileID: 0}
   projectileEffect: {fileID: 1885573495547289161, guid: 8d09c2caabdf46e4a8c7353cbf061d19, type: 3}

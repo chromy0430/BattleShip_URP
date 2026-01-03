@@ -11,6 +11,7 @@
 /[Ll]ogs/
 /[Uu]ser[Ss]ettings/
 *.log
+/[Pr]ofilerCaptures/
 
 # MemoryCaptures can get excessive in size.
 # They also could contain extremely sensitive data
@@ -73,3 +74,11 @@ crashlytics-build.properties
 # Temporary auto-generated Android Assets
 /[Aa]ssets/[Ss]treamingAssets/aa.meta
 /[Aa]ssets/[Ss]treamingAssets/aa/*
+ProfilerCaptures/BattleShip_URP_2026-01-03_13-18-02.bc7
+ProfilerCaptures/BattleShip_URP_2026-01-03_13-18-02.png
+ProfilerCaptures/BattleShip_URP_2026-01-03_13-18-59.bc7
+ProfilerCaptures/BattleShip_URP_2026-01-03_13-18-59.png
+ProfilerCaptures/BattleShip_URP_2026-01-03_13-18-02.data
+ProfilerCaptures/BattleShip_URP_2026-01-03_13-18-59.data
+ProfilerCaptures/BattleShip_URP_2026-01-03_13-18-02.highlights
+ProfilerCaptures/BattleShip_URP_2026-01-03_13-18-59.highlights

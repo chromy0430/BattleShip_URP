@@ -130,7 +130,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: sc.stylizedwater3.runtime::StylizedWater3.AlignToWater
   heightInterface:
-    method: 1
+    method: 0
     waterObject: {fileID: 0}
     autoFind: 1
     waveProfile: {fileID: 11400000, guid: 343e9ebae18bc0f48811edac300d64d0, type: 2}

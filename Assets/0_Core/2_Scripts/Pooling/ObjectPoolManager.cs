@@ -29,7 +29,7 @@ public class ObjectPoolManager : MonoBehaviour
 
     [Header("풀 설정")]
     [Tooltip("풀을 미리 생성할 때 사용할 기본 크기")]
-    [SerializeField] private int _initialPoolSize = 10;
+    [SerializeField] private int _initialPoolSize = 500;
 
     private readonly Dictionary<GameObject, Queue<GameObject>> _pools =
         new Dictionary<GameObject, Queue<GameObject>>();

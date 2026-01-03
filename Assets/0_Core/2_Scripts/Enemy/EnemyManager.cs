@@ -3,6 +3,8 @@ using System.Collections.Generic;
 
 public class EnemyManager : MonoBehaviour
 {
+    [SerializeField] private GameObject m_EnemyDropPrefab;
+
     #region 싱글톤   
     public static EnemyManager Instance { get; private set; }
     private void Awake()
@@ -17,6 +19,8 @@ public class EnemyManager : MonoBehaviour
             Destroy(gameObject);
         }
 
+        // 드랍물 오브젝트풀링 시작
+        InitDrop();
     }
     #endregion
     public IReadOnlyList<IEnemy> ActiveEnemies => _activeEnemies;
@@ -47,7 +51,16 @@ public class EnemyManager : MonoBehaviour
         }
     }
 #endif
+    public void InitDrop()
+    {
+        ObjectPoolManager.Instance.CreatePool(m_EnemyDropPrefab, 500);
+    }
 
+    public GameObject GetDrop()
+    {
+        var dropitem = ObjectPoolManager.Instance.Get(m_EnemyDropPrefab);
+        return dropitem;
+    }
     public void RegisterEnemy(IEnemy enemy)
     {
         if (enemy != null && !_activeEnemies.Contains(enemy))

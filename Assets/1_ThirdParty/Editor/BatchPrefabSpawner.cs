@@ -6,7 +6,7 @@ public class BatchPrefabSpawner : EditorWindow
     private GameObject _targetPrefab;
     private bool _resetTransform = true;
 
-    [MenuItem("Tools/Batch Prefab Spawner")]
+    [MenuItem("Tools/JJ Chronicle/Batch Prefab Spawner")]
     public static void ShowWindow()
     {
         GetWindow<BatchPrefabSpawner>("Batch Spawner");
@@ -14,6 +14,7 @@ public class BatchPrefabSpawner : EditorWindow
 
     private void OnGUI()
     {
+        EditorGUILayout.HelpBox($"하이어라키에서 누른 다수 오브젝트에 \n본인이 원하는 프리펩을 넣을 수 있는 기능", MessageType.Info);
         GUILayout.Label("Batch Spawn Settings", EditorStyles.boldLabel);
         EditorGUILayout.Space();
 

@@ -163,12 +163,16 @@ public class Projectile : MonoBehaviour
 
         if (other.TryGetComponent<IEnemy>(out var enemy))
         {
-            if (enemy == _target)
+            /*if (enemy == _target)
             {
                 OnHitTarget(enemy);
                 Debug.Log($"1 = {other.gameObject.layer}");
+            }*/
+
+            if (enemy != null && enemy.IsAlive)
+            {
+                OnHitTarget(enemy);
             }
-            //OnHitTarget(enemy);
         }
         else if (other.gameObject.layer == LayerMask.NameToLayer("Water"))
         {

@@ -19,11 +19,14 @@ public class AutoAttackController : MonoBehaviour
     private float _maxDetectionRange = 100f;
     private float _maxDetectionRangeSqr; 
     private readonly List<IEnemy> _targetList = new List<IEnemy>();
-    private readonly List<(float distanceSqr, IEnemy enemy)> _candidateList = new List<(float, IEnemy)>();
+    private TargetScanner _scanner;
 
     private void Start()
     {
-        // 최대 탐지 범위의 제곱값을 미리 계산 (Vector3.sqrMagnitude 비교용)
+        _scanner = GetComponent<TargetScanner>();
+        if (_scanner == null) _scanner = gameObject.AddComponent<TargetScanner>();
+
+        // 최대 탐지 범위의 제곱값을 미리 계산
         _maxDetectionRangeSqr = _maxDetectionRange * _maxDetectionRange;
 
         // 모든 무기 마운트 초기화
@@ -58,6 +61,10 @@ public class AutoAttackController : MonoBehaviour
             SyncDebugView();
         }
 #endif
+        if (EnemyManager.Instance != null)
+        {
+            _scanner.UpdateScanner(transform.position, EnemyManager.Instance.ActiveEnemies);
+        }
 
         // 모든 무기 마운트의 쿨타임 업데이트
         foreach (var mount in _weaponMounts)
@@ -70,8 +77,12 @@ public class AutoAttackController : MonoBehaviour
                 int enemyCount = mount.WeaponData.EnemyCount;
                 if (enemyCount <= 0) enemyCount = 1;
 
-                // 발사 준비가 되었다면, 해당 무기의 사거리 내 적 탐색
-                FindClosestEnemiesInRange(mount.WeaponData.Range, enemyCount, _targetList);
+                _scanner.GetTargets(
+                    mount.WeaponData.Range,
+                    enemyCount,
+                    _targetList,
+                    EnemyManager.Instance.ActiveEnemies
+                );
 
                 // 타겟이 1명이라도 있으면 리스트를 통째로 전달하여 발사
                 if (_targetList.Count > 0)
@@ -81,68 +92,4 @@ public class AutoAttackController : MonoBehaviour
             }
         }
     }
-
-    /// <summary>
-    /// 지정된 사거리(range) 내에서 가장 가까운 적을 'count'만큼 찾아
-    /// 'out_targets' 리스트에 채워넣습니다.
-    /// </summary>
-    private void FindClosestEnemiesInRange(float range, int count, List<IEnemy> out_targets)
-    {
-        // 1. 캐시된 리스트들을 비웁니다. (메모리 재할당 없음)
-        _candidateList.Clear();
-        out_targets.Clear();
-
-        IReadOnlyList<IEnemy> enemies = EnemyManager.Instance.ActiveEnemies;
-        if (enemies.Count == 0)
-        {
-            return;
-        }
-
-        float rangeSqr = range * range; // 무기 사거리 제곱
-        Vector3 myPosition = transform.position;
-
-        // 2. 사거리 내의 모든 적을 후보 리스트(_candidateList)에 추가
-        for (int i = 0; i < enemies.Count; i++)
-        {
-            IEnemy enemy = enemies[i];
-
-            if (enemy == null || !enemy.IsAlive)
-            {
-                continue;
-            }
-
-            float dSqrToTarget = (enemy.TargetTransform.position - myPosition).sqrMagnitude;
-
-            // (최적화) 1차로 최대 탐지 범위(_maxDetectionRangeSqr)보다 멀면 무시
-            if (dSqrToTarget > _maxDetectionRangeSqr)
-            {
-                continue;
-            }
-
-            // 2차로 이 무기의 유효 사거리(rangeSqr)보다 가까운지 확인
-            if (dSqrToTarget < rangeSqr)
-            {
-                _candidateList.Add((dSqrToTarget, enemy));
-                
-            }
-        }
-
-        // 3. 후보 리스트가 비어있으면 종료
-        if (_candidateList.Count == 0)
-        {
-            return;
-        }
-
-        // 4. 후보 리스트를 '가까운 순'으로 정렬 (Sort는 GC를 발생시키지 않음)
-        _candidateList.Sort((a, b) => a.distanceSqr.CompareTo(b.distanceSqr));
-
-        // 5. 정렬된 후보 중 최대 'count'만큼만 최종 'out_targets' 리스트에 복사
-        int numToTake = Mathf.Min(_candidateList.Count, count);
-        for (int i = 0; i < numToTake; i++)
-        {
-            out_targets.Add(_candidateList[i].enemy);
-            SyncDebugView();
-        }
-    }
-
 }
