@@ -22,22 +22,25 @@ public class Enemy : MonoBehaviour, IEnemy
     }
 
     private void Start()
+    {      
+        CurrentHealth = maxHealth;
+        _isAlive = true;
+    }
+
+    private void OnEnable()
     {
         if (EnemyManager.Instance != null)
         {
             EnemyManager.Instance.RegisterEnemy(this);
-            Debug.Log("enemy 리스트에 추가");
         }
-
-        CurrentHealth = maxHealth;
-        _isAlive = true;
     }
+
     private void OnDisable()
     {
         if (EnemyManager.Instance != null)
         {
             EnemyManager.Instance.UnregisterEnemy(this);
-            Debug.Log("enemy 리스트에서 제외");
+            //Debug.Log("enemy 리스트에서 제외");
         }
     }
 
@@ -48,20 +51,26 @@ public class Enemy : MonoBehaviour, IEnemy
         flickerFeedback?.PlayFeedbacks();
 
         CurrentHealth -= damage;
-        Debug.Log($"{name}이(가) {damage} 데미지를 받음. 남은 체력: {CurrentHealth}");
+        //Debug.Log($"{name}이(가) {damage} 데미지를 받음. 남은 체력: {CurrentHealth}");
         if (CurrentHealth <= 0)
         {
             Die();
         }
     }
 
+    public void InstantKill()
+    {
+        if (!_isAlive) return;
+
+        Die();
+    }
+
     private void Die()
     {
         _isAlive = false;
-        Debug.Log($"{name} 사망");
-        var item = EnemyManager.Instance.GetDrop();
-        item.transform.position = this.transform.position;
-        Debug.Log("드랍물 생성");
+        //Debug.Log($"{name} 사망");
+        var item = EnemyManager.Instance.GetDrop(this.transform.position);
+        //Debug.Log("드랍물 생성");
 
         // 오브젝트 풀을 사용하므로 Destroy 대신 비활성화
         gameObject.SetActive(false); // OnDisable이 자동으로 호출됨

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using StylizedWater3;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class PlayerExpManager : MonoBehaviour
@@ -48,6 +49,7 @@ public class PlayerExpManager : MonoBehaviour
     }
     public void RegisterCoin(EnemyDrop coin)
     {
+
         if (!_allCoins.Contains(coin))
         {
             _allCoins.Add(coin);
@@ -56,9 +58,25 @@ public class PlayerExpManager : MonoBehaviour
 
     public void UnregisterCoin(EnemyDrop coin)
     {
-        if (_allCoins.Contains(coin)) _allCoins.Remove(coin);
+        if (_allCoins.Contains(coin))
+        {
+            foreach (EnemyDrop coinItem in _allCoins)
+            {
+                coinItem.GetComponent<AlignToWater>().enabled = false;
+            }
 
-        if (_magnetTargetCoins.Contains(coin)) _magnetTargetCoins.Remove(coin);
+            _allCoins.Remove(coin);
+        }
+
+        if (_magnetTargetCoins.Contains(coin))
+        {
+            foreach (EnemyDrop coinItem in _allCoins)
+            {
+                coinItem.GetComponent<AlignToWater>().enabled = false;
+            }
+
+            _magnetTargetCoins.Remove(coin);
+        }
     }
     public void ActivateGlobalMagnet()
     {
@@ -74,9 +92,13 @@ public class PlayerExpManager : MonoBehaviour
 
     private void PullAllCoins()
     {
+        //PlayerManager.Instance.Doingmagnet = true;
+
         for (int i = _magnetTargetCoins.Count - 1; i >= 0; i--)
         {
             EnemyDrop coin = _magnetTargetCoins[i];
+
+            coin.GetComponent<AlignToWater>().enabled = false;
 
             // 방어 코드
             if (coin == null || !coin.gameObject.activeInHierarchy)
@@ -95,9 +117,11 @@ public class PlayerExpManager : MonoBehaviour
         if (_magnetTargetCoins.Count == 0)
         {
             _isGlobalMagnetActive = false;
+
+            //PlayerManager.Instance.Doingmagnet = false;
             Debug.Log("자석 모드 종료");
         }
-    }
+    }    
 
     public void GetExp(int amount = 1)
     {

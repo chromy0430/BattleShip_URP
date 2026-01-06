@@ -51,22 +51,13 @@ public class EnemyManager : MonoBehaviour
         }
     }
 #endif
-    public void InitDrop()
-    {
-        ObjectPoolManager.Instance.CreatePool(m_EnemyDropPrefab, 500);
-    }
-
-    public GameObject GetDrop()
-    {
-        var dropitem = ObjectPoolManager.Instance.Get(m_EnemyDropPrefab);
-        return dropitem;
-    }
+    #region 적 리스트 관련
+    // 적 리스트 등록 및 제거
     public void RegisterEnemy(IEnemy enemy)
     {
         if (enemy != null && !_activeEnemies.Contains(enemy))
         {
-            _activeEnemies.Add(enemy);
-            Debug.Log("enemy 추가");
+            _activeEnemies.Add(enemy);           
         }
     }
 
@@ -75,7 +66,6 @@ public class EnemyManager : MonoBehaviour
         if (enemy != null)
         {
             _activeEnemies.Remove(enemy);
-            Debug.Log("enemy 삭제");
         }
     }
     public void CleanUpDeadEnemies()
@@ -95,4 +85,46 @@ public class EnemyManager : MonoBehaviour
 
         _enemiesToRemove.Clear();
     }
+    #endregion
+
+    #region 아이템 드랍
+    // 아이템 풀링 생성
+    public void InitDrop()
+    {
+        ObjectPoolManager.Instance.CreatePool(m_EnemyDropPrefab, 1000);
+    }
+    
+    // 아이템 드랍 함수
+    public GameObject GetDrop(Vector3 deathPos)
+    {
+        Vector3 dropPos = deathPos;
+        dropPos.y += 0.5f;
+        var dropitem = ObjectPoolManager.Instance.Get(m_EnemyDropPrefab);
+        dropitem.transform.position = dropPos;
+        return dropitem;
+    }
+    #endregion
+
+    #region 올 킬 아이템 로직
+    public void KillAllEnemies()
+    {
+        for (int i = _activeEnemies.Count - 1; i >= 0; i--)
+        {
+            var enemy = _activeEnemies[i];
+
+            if (enemy is Enemy concreteEnemy)
+            {
+                if (concreteEnemy.IsAlive)
+                {
+                    concreteEnemy.InstantKill();
+                }
+            }
+            else
+            {
+                enemy.TakeDamage(7777);
+            }
+        }
+    }
+    #endregion
+
 }

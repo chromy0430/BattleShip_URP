@@ -114,7 +114,6 @@ public class ObjectPoolManager : MonoBehaviour
         }
         else
         {
-            // [수정] 문자열 보간법 적용
             Debug.LogWarning($"풀에 등록되지 않은 오브젝트({obj.name}) 반환 시도. Destroy합니다.");
             Destroy(obj);
         }

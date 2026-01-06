@@ -7,6 +7,8 @@ public class Magnet : MonoBehaviour
         if (other.CompareTag("Player"))
         {
             PlayerExpManager.Instance.ActivateGlobalMagnet();
+
+            ObjectPoolManager.Instance.Return(this.gameObject);
         }
     }
 }

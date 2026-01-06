@@ -16,6 +16,7 @@ GameObject:
   - component: {fileID: 1416067811673937586}
   - component: {fileID: 7056665536012515985}
   - component: {fileID: 4002769699586786137}
+  - component: {fileID: 5895034854558281223}
   m_Layer: 0
   m_Name: Enemy
   m_TagString: Untagged
@@ -462,6 +463,26 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Enemy
   maxHealth: 100
   flickerFeedback: {fileID: 7056665536012515985}
+--- !u!114 &5895034854558281223
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1439743017183963828}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c9d7e975fafe5a74383059dd84be33a1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::EnemyChaser
+  moveSpeed: 20
+  turnSpeed: 2
+  stopDistance: 5
+  rb: {fileID: 0}
+  atw: {fileID: 0}
+  status: {fileID: 0}
+  currentRotationVelocity: 0
+  cachedTransform: {fileID: 0}
 --- !u!1001 &2240929934877943823
 PrefabInstance:
   m_ObjectHideFlags: 0

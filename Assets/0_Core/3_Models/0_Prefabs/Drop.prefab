@@ -121,7 +121,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3148682760232343163}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 95144392e6eede14cafa2d339e5c1ee9, type: 3}
   m_Name: 
@@ -130,14 +130,14 @@ MonoBehaviour:
     method: 0
     waterObject: {fileID: 0}
     autoFind: 1
-    waveProfile: {fileID: 0}
+    waveProfile: {fileID: 11400000, guid: 1ca4610f5bf9e2f4bb39535503a79eeb, type: 2}
     waterLevelSource: 1
     waterLevelTransform: {fileID: 0}
     waterLevel: 0
   surfaceSize: {x: 1, y: 1}
   followTarget: {fileID: 0}
   heightOffset: -0.1
-  rollAmount: 8
+  rollAmount: 0
   rotation: 0
   smoothing: 0.1
   heightValue: 0
@@ -154,3 +154,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6742ded55ae2e7745a112ee645a9e2c8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyDrop
+  heightOffset: -0.1
+  surfaceSize: 0.5

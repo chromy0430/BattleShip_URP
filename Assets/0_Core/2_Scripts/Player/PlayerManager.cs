@@ -3,7 +3,7 @@
 public class PlayerManager : MonoBehaviour
 {
     public static PlayerManager Instance { get; private set; }
-    public Transform PlayerTransform;//{ get; private set; }
+    public Transform PlayerTransform { get; set; }
 
     private Collider[] _coinBuffer = new Collider[50];
     [Header("Local Magnet Settings")]
@@ -11,16 +11,36 @@ public class PlayerManager : MonoBehaviour
     [SerializeField] private float _moveSpeed = 30.0f;
     [SerializeField] private LayerMask _coinLayer;
 
+    public bool Doingmagnet = false;
+
+    private void Awake()
+    {
+        if (Instance == null)
+        {
+            Instance = this;
+        }
+        else
+        {
+            Destroy(Instance);
+        }
+
+        PlayerTransform = this.transform;
+    }
+
     void Update()
     {
         if (PlayerTransform == null) return;
 
         // 평상시 근거리 자석 로직 (기존 유지)
-        PullNearbyCoins();
+        PullNearbyItems();
     }
 
-    private void PullNearbyCoins()
+    #region 아이템 줍기
+
+    private void PullNearbyItems()
     {
+        if (Doingmagnet) return;
+
         int count = Physics.OverlapSphereNonAlloc(
             PlayerTransform.position,
             _magnetRadius,
@@ -41,21 +61,5 @@ public class PlayerManager : MonoBehaviour
             );
         }
     }
-
-    #region 싱글톤
-
-    private void Awake()
-    {
-        if (Instance == null)
-        {
-            Instance = this;
-            return;
-        }
-        else
-        {
-            Destroy(Instance);
-        }
-
-    }
-    #endregion    
+    #endregion
 }
