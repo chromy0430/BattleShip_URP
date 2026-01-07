@@ -32,11 +32,11 @@ public class WaterBatchManager : MonoBehaviour
             if (!target.IsActive) continue;
 
             // 물 오브젝트 가져옴
-            heightInterface.GetWaterObject(target.Transform.position);
+            //heightInterface.GetWaterObject(target.Transform.position);
 
             // 없으면 패스
-            if (heightInterface.HasMissingReferences())
-                continue;
+            //if (heightInterface.HasMissingReferences())
+            //   continue;
 
             // 타겟의 샘플 위치 계산 - 부력을 받는 기준
             UpdateSamplePositions(target);
@@ -93,13 +93,37 @@ public class WaterBatchManager : MonoBehaviour
     // 리스트에 등록
     public void Register(IWaterFloatTarget target)
     {
-        if (!_targets.Contains(target))
-            _targets.Add(target);
+        if (_targets.Contains(target))
+            return;
+
+        heightInterface.GetWaterObject(target.Transform.position);
+
+        if (heightInterface.HasMissingReferences())
+        {
+            Debug.LogWarning($"[WaterBatchManager] No WaterObject found for {target}");
+            return;
+        }
+
+        // 타겟에 WaterObject 캐싱
+        target.SetWaterObject(heightInterface);
+
+        _targets.Add(target);
+
     }
 
     // 리스트에서 해제
     public void Unregister(IWaterFloatTarget target)
     {
         _targets.Remove(target);
+    }
+
+    public void RefreshWaterObject(IWaterFloatTarget target)
+    {
+        heightInterface.GetWaterObject(target.Transform.position);
+
+        if (!heightInterface.HasMissingReferences())
+        {
+            target.SetWaterObject(heightInterface);
+        }
     }
 }

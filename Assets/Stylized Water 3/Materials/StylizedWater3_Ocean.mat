@@ -14,7 +14,7 @@ Material:
   m_ValidKeywords:
   - _ADVANCED_SHADING
   - _DISTANCE_NORMALS
-  - _INTERSECTION_FOAM
+  - _ENVIRONMENTREFLECTIONS_OFF
   - _NORMALMAP
   - _REFRACTION
   - _SURFACE_FOAM_SINGLE
@@ -38,7 +38,7 @@ Material:
   - _ZCLIP_ON
   - _ZWRITE_ON
   m_LightmapFlags: 4
-  m_EnableInstancingVariants: 0
+  m_EnableInstancingVariants: 1
   m_DoubleSidedGI: 0
   m_CustomRenderQueue: -1
   stringTagMap: {}
@@ -178,10 +178,10 @@ Material:
     - _EdgeFade: 7
     - _EnableDirectionalCaustics: 0
     - _EnvironmentReflections: 1
-    - _EnvironmentReflectionsOn: 1
+    - _EnvironmentReflectionsOn: 0
     - _FlatShadingOn: 0
     - _FlowSpeed: 1
-    - _FoamBaseAmount: 0
+    - _FoamBaseAmount: 0.12
     - _FoamBubblesSpread: 1
     - _FoamBubblesStrength: 0.232
     - _FoamClipping: 0
@@ -193,7 +193,7 @@ Material:
     - _FoamSize: 0.314
     - _FoamSpeed: -0.5
     - _FoamSpeedDynamic: 0.1
-    - _FoamStrength: 1.34
+    - _FoamStrength: 0.7
     - _FoamSubSpeed: 0
     - _FoamSubSpeedDynamic: -0.1
     - _FoamSubTiling: 2
@@ -208,14 +208,14 @@ Material:
     - _Glossiness: 0
     - _GlossyReflections: 0
     - _HorizonDistance: 32
-    - _IntersectionClipping: 0.583
-    - _IntersectionDistortion: 0.2
+    - _IntersectionClipping: 1
+    - _IntersectionDistortion: 0
     - _IntersectionFalloff: 1
-    - _IntersectionFoamOn: 1
-    - _IntersectionLength: 1
+    - _IntersectionFoamOn: 0
+    - _IntersectionLength: 2
     - _IntersectionRippleDist: 20
     - _IntersectionRippleSpeed: 2
-    - _IntersectionRippleStrength: 0.53
+    - _IntersectionRippleStrength: 0
     - _IntersectionSharp: 1
     - _IntersectionSize: 0.944
     - _IntersectionSource: 0
@@ -281,7 +281,7 @@ Material:
     - _SparkleSize: 0.155
     - _SpecularHighlights: 1
     - _SpecularReflectionsOn: 1
-    - _Speed: 1
+    - _Speed: 1.2
     - _SrcBlend: 1
     - _SunReflectionDistortion: 1
     - _SunReflectionPerturbance: 1
@@ -310,11 +310,11 @@ Material:
     - _VertexColorWaveFlattening: 0
     - _WaveDistance: 0.97
     - _WaveDistortion: 0.5
-    - _WaveFrequency: 1.2
+    - _WaveFrequency: 1.5
     - _WaveHeight: 0.5
-    - _WaveMaxLayers: 64
+    - _WaveMaxLayers: 32
     - _WaveNormalStr: 0.6
-    - _WaveSpeed: 0.75
+    - _WaveSpeed: 0.8
     - _WaveSteepness: 1.56
     - _WaveTint: 0
     - _WavesOn: 1
@@ -323,7 +323,7 @@ Material:
     - _ZClip: 1
     - _ZWrite: 1
     m_Colors:
-    - _BaseColor: {r: 0.018111428, g: 0.18358402, b: 0.3490566, a: 1}
+    - _BaseColor: {r: 0.0843152, g: 0.5248227, b: 0.66203046, a: 1}
     - _Color: {r: 0.5, g: 0.5, b: 0.5, a: 1}
     - _DepthMapBounds: {r: -402.3, g: -459.43, b: 0.0012693577, a: 0}
     - _Direction: {r: 1, g: 1, b: 0, a: 0}
@@ -334,7 +334,7 @@ Material:
     - _FoamCrestMinMaxHeight: {r: 0.5837838, g: 0.8046726, b: 0, a: 0}
     - _FoamTiling: {r: 0.089999974, g: 0.089999974, b: 0, a: 0}
     - _HorizonColor: {r: 0.50953066, g: 5.8970256, b: 6.3541465, a: 0}
-    - _IntersectionColor: {r: 1, g: 1, b: 1, a: 1}
+    - _IntersectionColor: {r: 2.828427, g: 2.828427, b: 2.828427, a: 1}
     - _NormalTiling: {r: 0.020000014, g: 0.020000014, b: 0, a: 0}
     - _RimColor: {r: 1, g: 1, b: 1, a: 1}
     - _ShallowColor: {r: 0, g: 1, b: 0.8273995, a: 1}

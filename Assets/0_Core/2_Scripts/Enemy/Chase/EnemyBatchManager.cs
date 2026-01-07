@@ -11,10 +11,17 @@ public class EnemyBatchManager : MonoBehaviour
     private void Awake()
     {
         Instance = this;
-        if (PlayerManager.Instance != null)
+
+        // 레이스 컨디션 발생 - 후에 로직 변경
+        /*if (PlayerManager.Instance != null)
         {
             _playerTransform = PlayerManager.Instance.PlayerTransform;
         }
+        else
+        {
+            Debug.Log("플레이어매니저 작동 안됌");
+            _playerTransform = FindAnyObjectByType<PlayerManager>().PlayerTransform;
+        }*/
     }
 
 

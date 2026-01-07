@@ -114,7 +114,6 @@ public class Projectile : MonoBehaviour
         }
         catch (OperationCanceledException)
         {
-            Debug.Log("끝");
         }
         catch (Exception ex)
         {

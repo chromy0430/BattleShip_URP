@@ -73,6 +73,7 @@ public class Enemy : MonoBehaviour, IEnemy
         //Debug.Log("드랍물 생성");
 
         // 오브젝트 풀을 사용하므로 Destroy 대신 비활성화
-        gameObject.SetActive(false); // OnDisable이 자동으로 호출됨
+        // gameObject.SetActive(false); // OnDisable이 자동으로 호출됨
+        ObjectPoolManager.Instance.Return(this.gameObject);
     }
 }

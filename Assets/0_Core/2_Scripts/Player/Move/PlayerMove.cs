@@ -16,7 +16,7 @@ public class PlayerMove : MonoBehaviour
     [SerializeField] private float currentSpeed;
 
     private Rigidbody rb;
-    private AlignToWater atw;
+    [SerializeField] private AlignToWater atw;
     private float moveInput;
     private float turnInput;
 
@@ -41,7 +41,7 @@ public class PlayerMove : MonoBehaviour
     private void Awake()
     {
         rb = GetComponent<Rigidbody>();
-        atw = GetComponent<AlignToWater>();       
+        //atw = GetComponent<AlignToWater>();       
     }
 
     private void Start()
