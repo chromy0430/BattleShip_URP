@@ -26,6 +26,14 @@ public class EnemyChaser : MonoBehaviour
         status = GetComponent<Enemy>();
     }
 
+    private void Start()
+    {
+        if (EnemyBatchManager.Instance != null)
+        {
+            EnemyBatchManager.Instance.Register(this);
+        }
+    }
+
     private void OnEnable()
     {
         if (EnemyBatchManager.Instance != null)

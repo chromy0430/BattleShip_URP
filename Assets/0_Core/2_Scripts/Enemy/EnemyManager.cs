@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
+using MoreMountains.Feedbacks;
 
 public class EnemyManager : MonoBehaviour
 {
@@ -26,6 +27,8 @@ public class EnemyManager : MonoBehaviour
     public IReadOnlyList<IEnemy> ActiveEnemies => _activeEnemies;
     private readonly List<IEnemy> _activeEnemies = new List<IEnemy>(); 
     private readonly List<IEnemy> _enemiesToRemove = new List<IEnemy>();
+
+    private bool _isBombKill = false;
 
 #if UNITY_EDITOR
     [SerializeField, Header("Debug View (Editor Only)")]
@@ -65,6 +68,8 @@ public class EnemyManager : MonoBehaviour
     {
         if (enemy != null)
         {
+            if (_isBombKill) return;
+
             _activeEnemies.Remove(enemy);
         }
     }
@@ -108,7 +113,30 @@ public class EnemyManager : MonoBehaviour
     #region 올 킬 아이템 로직
     public void KillAllEnemies()
     {
+        _isBombKill = true;
+
         for (int i = _activeEnemies.Count - 1; i >= 0; i--)
+        {
+            var enemy = _activeEnemies[i];
+
+            if(enemy is Enemy aliveEnemy)
+            {
+                if (aliveEnemy.IsAlive)
+                {
+                    aliveEnemy.InstantKill();
+                }
+            }
+            else
+            {
+                enemy.TakeDamage(7777);
+            }
+        }
+
+        _activeEnemies.Clear();
+
+        _isBombKill = false;
+
+        /*for (int i = _activeEnemies.Count - 1; i >= 0; i--)
         {
             var enemy = _activeEnemies[i];
 
@@ -123,7 +151,7 @@ public class EnemyManager : MonoBehaviour
             {
                 enemy.TakeDamage(7777);
             }
-        }
+        }*/
     }
     #endregion
 

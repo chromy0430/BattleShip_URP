@@ -56,7 +56,15 @@ public class PlayerMove : MonoBehaviour
     private void Update()
     {
         turnInput = moveAction.action.ReadValue<Vector2>().x; // A, D 키, 회전
-        moveInput = moveAction.action.ReadValue<Vector2>().y; // W, S 키, 직진                                                              
+        moveInput = moveAction.action.ReadValue<Vector2>().y; // W, S 키, 직진
+                                                               
+        if (Keyboard.current.kKey.wasPressedThisFrame)
+        {
+            if (EnemyManager.Instance != null)
+            {
+                EnemyManager.Instance.KillAllEnemies();
+            }
+        }
     }
 
     private void FixedUpdate()
@@ -69,7 +77,15 @@ public class PlayerMove : MonoBehaviour
     private void Move()
     {
         // 배의 정면을 향해서 직진하도록만 설정
-        rb.linearVelocity = (moveInput * transform.forward) * currentSpeed;
+        if (Mathf.Abs(moveInput) > 0.01f)
+        {            
+            rb.linearVelocity = (moveInput * transform.forward) * currentSpeed;
+        }
+        else
+        {
+            rb.linearVelocity = Vector3.zero;
+            rb.angularVelocity = Vector3.zero;
+        }
     }
 
     private void Dash()

@@ -25,8 +25,17 @@ public class EnemyBatchManager : MonoBehaviour
     }
 
 
-    public void Register(EnemyChaser enemy) => _enemies.Add(enemy);
-    public void Unregister(EnemyChaser enemy) => _enemies.Remove(enemy);
+    public void Register(EnemyChaser enemy)
+    {
+        if (enemy != null && !_enemies.Contains(enemy))
+        {
+            _enemies.Add(enemy);
+        }
+    }
+    public void Unregister(EnemyChaser enemy)
+    {
+        if (enemy != null) _enemies.Remove(enemy);
+    }
 
     private void FixedUpdate()
     {
