@@ -1,16 +1,37 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
+using StylizedWater3;
 
 public class EnemyBatchManager : MonoBehaviour
 {
     public static EnemyBatchManager Instance { get; private set; }
 
     private readonly List<EnemyChaser> _enemies = new List<EnemyChaser>(1000);
+    
     [SerializeField] private Transform _playerTransform;
 
+    [Header("Water System Settings")]
+    [SerializeField] private HeightQuerySystem.Interface heightInterface;
+    [SerializeField] private WaveProfile waveProfile;
+    private HeightQuerySystem.Sampler _sampler;
+
+    [Header("Optimization Settings")]
+    [SerializeField] private float highQualityDistSqr = 30f * 30f; // 30m 이내는 고품질
+    [SerializeField] private float lowQualityDistSqr = 80f * 80f;  // 80m 이내는 저품질
+    
+    [Header("Buoyancy Update")]
+    [SerializeField] private int buoyancyFrameInterval = 4;
+    private bool shouldUpdateBuoyancy = false;
     private void Awake()
     {
         Instance = this;
+
+        _sampler = new HeightQuerySystem.Sampler();
+        _sampler.SetSampleCount(4); 
+
+        if (heightInterface == null) heightInterface = new HeightQuerySystem.Interface();
+
+        if (waveProfile != null) heightInterface.waveProfile = waveProfile;
 
         // 레이스 컨디션 발생 - 후에 로직 변경
         /*if (PlayerManager.Instance != null)
@@ -30,6 +51,8 @@ public class EnemyBatchManager : MonoBehaviour
         if (enemy != null && !_enemies.Contains(enemy))
         {
             _enemies.Add(enemy);
+            if (heightInterface != null)
+                heightInterface.GetWaterObject(enemy.cachedTransform.position);
         }
     }
     public void Unregister(EnemyChaser enemy)
@@ -44,42 +67,146 @@ public class EnemyBatchManager : MonoBehaviour
         Vector3 playerPos = _playerTransform.position;
         float deltaTime = Time.fixedDeltaTime;
 
-        // 700마리의 루프를 단 한 번의 FixedUpdate에서 수행
         for (int i = 0; i < _enemies.Count; i++)
         {
             var e = _enemies[i];
-            if (!e.status.IsAlive)
+
+            // 1. 적 생존 여부 확인
+            if (e == null || !e.status.IsAlive)
             {
-                e.rb.linearVelocity = Vector3.Lerp(e.rb.linearVelocity, Vector3.zero, deltaTime * 2f);
+                if (e != null) e.rb.linearVelocity = Vector3.Lerp(e.rb.linearVelocity, Vector3.zero, deltaTime * 2f);
                 continue;
             }
 
-            Vector3 enemyPos = e.cachedTransform.position;
-            Vector3 diff = playerPos - enemyPos;
-            float distSqr = diff.sqrMagnitude;
+            Vector3 currentPos = e.rb.position;
+            Vector3 diff = playerPos - currentPos;
             diff.y = 0;
+            float distSqr = diff.sqrMagnitude;
 
-            // 회전 - AlignToWater
-            if (diff != Vector3.zero)
+            shouldUpdateBuoyancy = ((Time.frameCount + e.buoyancyFrameOffset) % buoyancyFrameInterval) == 0;
+
+            if (shouldUpdateBuoyancy)
             {
-                float targetYAngle = Quaternion.LookRotation(diff).eulerAngles.y;
-                e.atw.rotation = Mathf.SmoothDampAngle(
-                    e.atw.rotation,
-                    targetYAngle,
-                    ref e.currentRotationVelocity,
-                    0.5f / e.turnSpeed
-                );
+                HandleBuoyancy(e, currentPos, distSqr);
             }
 
-            // 이동 - Rigidbody
-            if (distSqr > e.stopDistance * e.stopDistance)
-            {
-                e.rb.linearVelocity = e.cachedTransform.forward * e.moveSpeed;
-            }
-            else
-            {
-                e.rb.linearVelocity = Vector3.MoveTowards(e.rb.linearVelocity, Vector3.zero, deltaTime * 10f);
-            }
+            // 2. 부력 처리 (Y축 제어)
+            //HandleBuoyancy(e, currentPos, distSqr);
+
+            // 3. 이동 및 회전 처리 (X, Z축 제어)
+            HandleMovement(e, playerPos, deltaTime);
         }
+    }
+
+    /// <summary>
+    /// 물 높이를 계산하고 Y축 속도를 제어
+    /// </summary>
+    private void HandleBuoyancy(EnemyChaser e, Vector3 currentPos, float distSqr)
+    {
+        if (!shouldUpdateBuoyancy)
+        {
+            Vector3 vel = e.rb.linearVelocity;
+            vel.y = Mathf.Lerp(vel.y, 0f, 0.05f);
+            e.rb.linearVelocity = vel;
+            return;
+        }
+
+        /*if (distSqr > lowQualityDistSqr)
+        {
+            Vector3 vel = e.rb.linearVelocity;
+            vel.y = Mathf.Lerp(vel.y, 0f, 0.1f);
+            e.rb.linearVelocity = vel;
+            return;
+        }*/
+
+        // 현재 몇 개의 샘플을 썼는지 기록할 지역 변수
+        int currentSampleCount = 1;
+
+        if (distSqr < highQualityDistSqr)
+        {
+            // [High Quality] 4점 샘플링
+            currentSampleCount = 4;
+            _sampler.SetSampleCount(4);
+
+            float halfSize = e.surfaceSize * 0.5f;
+            _sampler.SetSamplePosition(0, currentPos + new Vector3(-halfSize, 0, 0));
+            _sampler.SetSamplePosition(1, currentPos + new Vector3(halfSize, 0, 0));
+            _sampler.SetSamplePosition(2, currentPos + new Vector3(0, 0, -halfSize));
+            _sampler.SetSamplePosition(3, currentPos + new Vector3(0, 0, halfSize));
+        }
+        else
+        {
+            // [Low Quality] 1점 샘플링
+            currentSampleCount = 1;
+            _sampler.SetSampleCount(1);
+            _sampler.SetSamplePosition(0, currentPos);
+        }
+
+        Gerstner.ComputeHeight(_sampler, heightInterface);
+
+        float avgHeight = 0f;
+
+        if (currentSampleCount == 4)
+        {
+            // 4개 점의 평균
+            avgHeight = (_sampler.heightValues[0] + _sampler.heightValues[1] +
+                         _sampler.heightValues[2] + _sampler.heightValues[3]) * 0.25f;
+        }
+        else
+        {
+            // 1개 점 (중심)
+            avgHeight = _sampler.heightValues[0];
+        }
+
+        // 5. 부력 물리 적용
+        float targetY = avgHeight + e.heightOffset;
+        float heightDiff = targetY - currentPos.y;
+
+        Vector3 velFinal = e.rb.linearVelocity;
+        velFinal.y = heightDiff * 10.0f; // 10.0f는 부력 강도 (필요 시 조절)
+        e.rb.linearVelocity = velFinal;
+    }
+
+    /// <summary>
+    /// 플레이어를 추적하고 회전
+    /// </summary>
+    private void HandleMovement(EnemyChaser e, Vector3 playerPos, float deltaTime)
+    {
+        e.rb.angularVelocity = Vector3.zero;
+
+        Vector3 currentPos = e.rb.position;
+        Vector3 diff = playerPos - currentPos;
+        diff.y = 0; // 높이 차 무시
+        float distSqr = diff.sqrMagnitude;
+
+        // 회전
+        if (distSqr > 1.0f)
+        {
+            Quaternion targetRot = Quaternion.LookRotation(diff);
+
+            // Slerp로 부드럽게 회전
+            Quaternion nextRot = Quaternion.Slerp(e.rb.rotation, targetRot, deltaTime * e.turnSpeed);
+            e.rb.MoveRotation(nextRot);
+        }
+
+        // 이동
+        Vector3 currentVelocity = e.rb.linearVelocity;
+
+        if (distSqr > e.stopDistance * e.stopDistance)
+        {            
+            Vector3 moveDir = diff.normalized * e.moveSpeed;
+
+            currentVelocity.x = moveDir.x;
+            currentVelocity.z = moveDir.z;
+        }
+        else
+        {
+            // 정지 시 감속
+            currentVelocity.x = Mathf.MoveTowards(currentVelocity.x, 0, deltaTime * 10f);
+            currentVelocity.z = Mathf.MoveTowards(currentVelocity.z, 0, deltaTime * 10f);
+        }
+
+        // 최종 속도 적용
+        e.rb.linearVelocity = currentVelocity;
     }
 }

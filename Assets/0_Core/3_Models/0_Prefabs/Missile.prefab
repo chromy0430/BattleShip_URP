@@ -153,3 +153,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 42bdb3045f4a61849b684bc9f0935d5c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Projectile
+  waterLayer:
+    serializedVersion: 2
+    m_Bits: 16

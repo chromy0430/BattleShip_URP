@@ -13,6 +13,9 @@ public class Projectile : MonoBehaviour
     private Rigidbody _rb;
     private CancellationTokenSource _lifeTimeCts;
     private bool debug = false;
+
+    [SerializeField] private LayerMask waterLayer;
+
     private void Awake()
     {
         _rb = GetComponent<Rigidbody>();
@@ -90,22 +93,32 @@ public class Projectile : MonoBehaviour
         {
             // 토큰이 취소(충돌 또는 수명 종료)될 때까지 반복
             while (!token.IsCancellationRequested)
-            {                
-
+            {      
                 if (rb == null || tr == null) break;
 
-                if (_target != null && _target.IsAlive && _target.TargetTransform != null)
+                bool isTargetActive = _target != null && _target.IsAlive && _target.TargetTransform.gameObject.activeInHierarchy;
+
+                if (!isTargetActive)
                 {
-                    // 타겟을 향한 방향 계산
-                    Vector3 direction = (_target.TargetTransform.position - rb.position).normalized;
-                    Quaternion lookRotation = Quaternion.LookRotation(direction);
+                    // [변경 2] 추적 실패 시 물리 낙하 로직 적용
+                    rb.useGravity = true; // 중력을 켜서 아래로 떨어지게 함
 
-                    rb.rotation = Quaternion.Slerp(rb.rotation, lookRotation, missileData.homingTurnSpeed * Time.fixedDeltaTime);
-
-                    // 가속도 적용
-                    currentSpeed += missileData.acceleration * Time.fixedDeltaTime;
+                    // 현재 속도(관성)는 유지하되, 이후 궤적은 물리 엔진(중력)에 맡김
+                    // 루프를 break하여 더 이상 강제로 linearVelocity를 세팅하지 않음
+                    break;
                 }
 
+                // --- 유도 로직 ---
+                // 타겟을 향한 방향 계산
+                Vector3 direction = (_target.TargetTransform.position - rb.position).normalized;
+                Quaternion lookRotation = Quaternion.LookRotation(direction);
+
+                rb.rotation = Quaternion.Slerp(rb.rotation, lookRotation, missileData.homingTurnSpeed * Time.fixedDeltaTime);
+
+                // 가속도 적용
+                currentSpeed += missileData.acceleration * Time.fixedDeltaTime;
+
+                // 강제 속도 적용 (유도 중일 때만)
                 rb.linearVelocity = tr.forward * currentSpeed;
 
                 // 물리 프레임마다 대기
@@ -167,10 +180,12 @@ public class Projectile : MonoBehaviour
                 OnHitTarget(enemy);
             }
         }
-        else if (other.gameObject.layer == LayerMask.NameToLayer("Water"))
+
+        if ((waterLayer.value & (1 << other.gameObject.layer)) != 0)
         {
+            Debug.Log("바다에 닿음");
             OnHitTarget(null);
-        }        
+        }
     }
 
     /// <summary>
