@@ -1,10 +1,11 @@
 ﻿using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
 public class StageRestart : MonoBehaviour
 {    
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.F1))
+        if (Keyboard.current.f1Key.wasPressedThisFrame)
         {
             SceneManager.LoadScene(0);
         }
