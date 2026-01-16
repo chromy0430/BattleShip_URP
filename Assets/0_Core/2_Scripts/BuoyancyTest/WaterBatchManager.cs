@@ -126,4 +126,9 @@ public class WaterBatchManager : MonoBehaviour
             target.SetWaterObject(heightInterface);
         }
     }
+
+    private void OnDestroy()
+    {
+        _sampler?.Dispose();
+    }
 }

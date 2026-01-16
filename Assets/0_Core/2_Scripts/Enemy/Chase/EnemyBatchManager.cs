@@ -13,7 +13,10 @@ public class EnemyBatchManager : MonoBehaviour
     [Header("Water System Settings")]
     [SerializeField] private HeightQuerySystem.Interface heightInterface;
     [SerializeField] private WaveProfile waveProfile;
-    private HeightQuerySystem.Sampler _sampler;
+    //private HeightQuerySystem.Sampler _sampler;
+
+    private HeightQuerySystem.Sampler _samplerHigh; // 고품질용 (4개)
+    private HeightQuerySystem.Sampler _samplerLow;
 
     [Header("Optimization Settings")]
     [SerializeField] private float highQualityDistSqr = 30f * 30f; // 30m 이내는 고품질
@@ -26,8 +29,11 @@ public class EnemyBatchManager : MonoBehaviour
     {
         Instance = this;
 
-        _sampler = new HeightQuerySystem.Sampler();
-        _sampler.SetSampleCount(4); 
+        _samplerHigh = new HeightQuerySystem.Sampler();
+        _samplerHigh.SetSampleCount(4);
+
+        _samplerLow = new HeightQuerySystem.Sampler();
+        _samplerLow.SetSampleCount(1);
 
         if (heightInterface == null) heightInterface = new HeightQuerySystem.Interface();
 
@@ -45,6 +51,11 @@ public class EnemyBatchManager : MonoBehaviour
         }*/
     }
 
+    private void OnDestroy()
+    {
+        _samplerHigh?.Dispose();
+        _samplerLow?.Dispose();
+    }
 
     public void Register(EnemyChaser enemy)
     {
@@ -111,51 +122,40 @@ public class EnemyBatchManager : MonoBehaviour
             return;
         }
 
-        /*if (distSqr > lowQualityDistSqr)
-        {
-            Vector3 vel = e.rb.linearVelocity;
-            vel.y = Mathf.Lerp(vel.y, 0f, 0.1f);
-            e.rb.linearVelocity = vel;
-            return;
-        }*/
-
-        // 현재 몇 개의 샘플을 썼는지 기록할 지역 변수
-        int currentSampleCount = 1;
+        HeightQuerySystem.Sampler currentSampler;
+        int currentSampleCount;
 
         if (distSqr < highQualityDistSqr)
         {
-            // [High Quality] 4점 샘플링
+            currentSampler = _samplerHigh;
             currentSampleCount = 4;
-            _sampler.SetSampleCount(4);
 
             float halfSize = e.surfaceSize * 0.5f;
-            _sampler.SetSamplePosition(0, currentPos + new Vector3(-halfSize, 0, 0));
-            _sampler.SetSamplePosition(1, currentPos + new Vector3(halfSize, 0, 0));
-            _sampler.SetSamplePosition(2, currentPos + new Vector3(0, 0, -halfSize));
-            _sampler.SetSamplePosition(3, currentPos + new Vector3(0, 0, halfSize));
+            currentSampler.SetSamplePosition(0, currentPos + new Vector3(-halfSize, 0, 0));
+            currentSampler.SetSamplePosition(1, currentPos + new Vector3(halfSize, 0, 0));
+            currentSampler.SetSamplePosition(2, currentPos + new Vector3(0, 0, -halfSize));
+            currentSampler.SetSamplePosition(3, currentPos + new Vector3(0, 0, halfSize));
         }
         else
         {
             // [Low Quality] 1점 샘플링
+            currentSampler = _samplerLow;
             currentSampleCount = 1;
-            _sampler.SetSampleCount(1);
-            _sampler.SetSamplePosition(0, currentPos);
+            currentSampler.SetSamplePosition(0, currentPos);
         }
 
-        Gerstner.ComputeHeight(_sampler, heightInterface);
+        Gerstner.ComputeHeight(currentSampler, heightInterface);
 
         float avgHeight = 0f;
 
         if (currentSampleCount == 4)
         {
-            // 4개 점의 평균
-            avgHeight = (_sampler.heightValues[0] + _sampler.heightValues[1] +
-                         _sampler.heightValues[2] + _sampler.heightValues[3]) * 0.25f;
+            avgHeight = (currentSampler.heightValues[0] + currentSampler.heightValues[1] +
+                         currentSampler.heightValues[2] + currentSampler.heightValues[3]) * 0.25f;
         }
         else
         {
-            // 1개 점 (중심)
-            avgHeight = _sampler.heightValues[0];
+            avgHeight = currentSampler.heightValues[0];
         }
 
         // 5. 부력 물리 적용
