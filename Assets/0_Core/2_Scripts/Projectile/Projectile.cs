@@ -26,7 +26,7 @@ public class Projectile : MonoBehaviour
     /// <summary>
     /// WeaponMount에서 호출되어 투사체 발사
     /// </summary>
-    public void Launch(BaseWeaponData data, IEnemy target)
+    public void Launch(BaseWeaponData data, IEnemy target, Transform firePoint)
     {
         this._data = data;
         this._target = target;
@@ -37,17 +37,16 @@ public class Projectile : MonoBehaviour
         transform.DOKill(); // DOTween 중지
 
         // 10초 후 자동 파괴(풀 반환) 로직 시작
-        StartLifetimeLimit(3.0f, _lifeTimeCts.Token).Forget();
+        StartLifetimeLimit(2.0f, _lifeTimeCts.Token).Forget();
         //DelayDestroy(2.5f, _lifeTimeCts.Token).Forget();
 
         // --- 데이터 타입별 비행 로직 분기 ---
 
         if (_data is GunData gun)
         {
-            _rb.linearVelocity = transform.forward * gun.BulletSpeed;
+            //_rb.AddRelativeForce(firePoint.forward * gun.BulletSpeed, ForceMode.VelocityChange);
+            _rb.AddForce(firePoint.forward * gun.BulletSpeed, ForceMode.VelocityChange);
             _rb.useGravity = false;
-
-            //_rb.AddForce(Vector3.forward * gun.BulletSpeed, ForceMode.VelocityChange);
             //_rb.isKinematic = false;
             //_rb.linearVelocity = transform.forward * gun.BulletSpeed; // [수정] linearVelocity
         }
@@ -184,11 +183,11 @@ public class Projectile : MonoBehaviour
             }
         }
 
-        if ((waterLayer.value & (1 << other.gameObject.layer)) != 0)
+        /*if ((waterLayer.value & (1 << other.gameObject.layer)) != 0)
         {
             Debug.Log("바다에 닿음");
             OnHitTarget(null);
-        }
+        }*/
     }
 
     /// <summary>
@@ -199,6 +198,8 @@ public class Projectile : MonoBehaviour
         if (!this.gameObject.activeSelf) return;
         OnHitTarget(_target);
     }
+
+    public GameObject DamageObject;
 
     /// <summary>
     /// 타겟에 명중 (OnTriggerEnter 또는 OnCannonHitTarget에서 호출됨)
@@ -214,6 +215,13 @@ public class Projectile : MonoBehaviour
             else
             {
                 enemy.TakeDamage(_data.Damage);
+                var damageFont = Instantiate(DamageObject);
+                damageFont.GetComponent<DamageTMP>().Initialize
+                    (
+                        Base_Canvas.Instance.transform,
+                        transform.position,
+                        _data.Damage.ToString()
+                    );
             }
         }
 

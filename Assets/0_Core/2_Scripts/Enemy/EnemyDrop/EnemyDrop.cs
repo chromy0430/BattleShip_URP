@@ -31,9 +31,9 @@ public class EnemyDrop : MonoBehaviour, IWaterFloatTarget
     private void OnEnable()
     {
         // 오브젝트 풀에서 꺼내질 때(활성화) 자동 등록
-        if (PlayerExpManager.Instance != null)
+        if (PlayerManager.Instance != null)
         {
-            PlayerExpManager.Instance.RegisterCoin(this);
+            PlayerManager.Instance.RegisterCoin(this);
         }
 
         if (WaterBatchManager.Instance != null)
@@ -44,9 +44,9 @@ public class EnemyDrop : MonoBehaviour, IWaterFloatTarget
     private void OnDisable()
     {
         // 오브젝트 풀로 돌아갈 때(비활성화) 자동 해제
-        if (PlayerExpManager.Instance != null)
+        if (PlayerManager.Instance != null)
         {
-            PlayerExpManager.Instance.UnregisterCoin(this);
+            PlayerManager.Instance.UnregisterCoin(this);
         }
 
         if (WaterBatchManager.Instance != null)

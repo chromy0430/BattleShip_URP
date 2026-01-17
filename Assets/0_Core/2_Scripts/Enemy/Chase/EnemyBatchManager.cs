@@ -20,7 +20,6 @@ public class EnemyBatchManager : MonoBehaviour
 
     [Header("Optimization Settings")]
     [SerializeField] private float highQualityDistSqr = 30f * 30f; // 30m 이내는 고품질
-    [SerializeField] private float lowQualityDistSqr = 80f * 80f;  // 80m 이내는 저품질
     
     [Header("Buoyancy Update")]
     [SerializeField] private int buoyancyFrameInterval = 4;
@@ -37,18 +36,20 @@ public class EnemyBatchManager : MonoBehaviour
 
         if (heightInterface == null) heightInterface = new HeightQuerySystem.Interface();
 
-        if (waveProfile != null) heightInterface.waveProfile = waveProfile;
+        if (waveProfile != null) heightInterface.waveProfile = waveProfile;        
+    }
 
+    private void Start()
+    {
         // 레이스 컨디션 발생 - 후에 로직 변경
-        /*if (PlayerManager.Instance != null)
+        if (PlayerManager.Instance != null)
         {
             _playerTransform = PlayerManager.Instance.PlayerTransform;
         }
         else
         {
-            Debug.Log("플레이어매니저 작동 안됌");
-            _playerTransform = FindAnyObjectByType<PlayerManager>().PlayerTransform;
-        }*/
+            Debug.Log("플레이어매니저 작동 안됌");            
+        }
     }
 
     private void OnDestroy()
@@ -100,9 +101,6 @@ public class EnemyBatchManager : MonoBehaviour
             {
                 HandleBuoyancy(e, currentPos, distSqr);
             }
-
-            // 2. 부력 처리 (Y축 제어)
-            //HandleBuoyancy(e, currentPos, distSqr);
 
             // 3. 이동 및 회전 처리 (X, Z축 제어)
             HandleMovement(e, playerPos, deltaTime);
@@ -163,7 +161,7 @@ public class EnemyBatchManager : MonoBehaviour
         float heightDiff = targetY - currentPos.y;
 
         Vector3 velFinal = e.rb.linearVelocity;
-        velFinal.y = heightDiff * 10.0f; // 10.0f는 부력 강도 (필요 시 조절)
+        velFinal.y = heightDiff * 2.0f; // 10.0f는 부력 강도 (필요 시 조절)
         e.rb.linearVelocity = velFinal;
     }
 

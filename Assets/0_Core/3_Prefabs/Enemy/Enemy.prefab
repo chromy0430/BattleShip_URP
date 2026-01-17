@@ -12,7 +12,6 @@ GameObject:
   - component: {fileID: 5417953537358622481}
   - component: {fileID: 8054757964019768781}
   - component: {fileID: 8492964644438529941}
-  - component: {fileID: 2282836439462080104}
   - component: {fileID: 1416067811673937586}
   - component: {fileID: 7056665536012515985}
   - component: {fileID: 4002769699586786137}
@@ -118,34 +117,6 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 0.8, y: 0.8, z: 0.8}
   m_Center: {x: 0, y: 0, z: 0}
---- !u!114 &2282836439462080104
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1439743017183963828}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 95144392e6eede14cafa2d339e5c1ee9, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: sc.stylizedwater3.runtime::StylizedWater3.AlignToWater
-  heightInterface:
-    method: 0
-    waterObject: {fileID: 0}
-    autoFind: 1
-    waveProfile: {fileID: 11400000, guid: 343e9ebae18bc0f48811edac300d64d0, type: 2}
-    waterLevelSource: 1
-    waterLevelTransform: {fileID: 0}
-    waterLevel: 0
-  surfaceSize: {x: 1, y: 1}
-  followTarget: {fileID: 0}
-  heightOffset: 0
-  rollAmount: 0.1
-  rotation: 0
-  smoothing: 0.1
-  heightValue: 0
-  rigidbody: {fileID: 1416067811673937586}
 --- !u!54 &1416067811673937586
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -461,7 +432,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ac3d7498570073d40bcd1786adcf5707, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Enemy
-  maxHealth: 100
+  maxHealth: 20
   flickerFeedback: {fileID: 7056665536012515985}
 --- !u!114 &5895034854558281223
 MonoBehaviour:
