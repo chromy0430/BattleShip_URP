@@ -44,7 +44,10 @@ public class Projectile : MonoBehaviour
 
         if (_data is GunData gun)
         {
-            _rb.AddForce(Vector3.forward * gun.BulletSpeed, ForceMode.VelocityChange);
+            _rb.linearVelocity = transform.forward * gun.BulletSpeed;
+            _rb.useGravity = false;
+
+            //_rb.AddForce(Vector3.forward * gun.BulletSpeed, ForceMode.VelocityChange);
             //_rb.isKinematic = false;
             //_rb.linearVelocity = transform.forward * gun.BulletSpeed; // [수정] linearVelocity
         }

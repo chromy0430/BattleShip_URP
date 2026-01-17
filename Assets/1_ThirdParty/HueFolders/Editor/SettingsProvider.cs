@@ -9,13 +9,13 @@ using UnityEditorInternal;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
-//  HueFolders © NullTale - https://twitter.com/NullTale/
+//  HueFolders © NullTale - https://x.com/NullTale
 namespace HueFolders
 {
     public class SettingsProvider : UnityEditor.SettingsProvider
     {
         public const  string       k_PrefsFile              = nameof(HueFolders) + "_Prefs.json";
-        public const  string       k_PrefsPath              = "ProjectSettings\\" + k_PrefsFile;
+        public static string       k_PrefsPath              = "ProjectSettings" + Path.DirectorySeparatorChar + k_PrefsFile;
         public const  int          k_GradientWidth          = 16;
         
         public static  EditorOption s_InTreeViewOnly         = new EditorOption(nameof(HueFolders) + "_InTreeViewOnly");
@@ -27,15 +27,11 @@ namespace HueFolders
         public static  EditorOption s_SubFoldersTint         = new EditorOption(nameof(HueFolders) + "_SubFoldersTint");
         private static Color        k_SubFoldersTint_Default = new Color(1, 1, 1, 0.7f);
         
-        
         public static  EditorOption s_GradientScale          = new EditorOption(nameof(HueFolders) + "_GradientScale");
         private static Vector2      k_GradientScale_Default  = new Vector2(0.536f, 1f);
         
         public static  EditorOption s_LabelOverride         = new EditorOption(nameof(HueFolders) + "_LabelOverride");
         private const  bool         k_LabelOverride_Default = true;
-        
-        public static  EditorOption s_SelectionTint         = new EditorOption(nameof(HueFolders) + "_SelectionTint");
-        private static Color        k_SelectionTint_Default = new Color(0.4667f, 0.4f, 1f, 0.0f);
         
         public static Dictionary<string, FolderData> s_FoldersDataDic;
         public static Color                          s_FoldersDefaultTint;
@@ -195,7 +191,34 @@ namespace HueFolders
             // initialize data from json, read editor prefs
             _setProjectDataDefault();
 
-            if (File.Exists(k_PrefsPath))
+            var hasPrefsFile = File.Exists(k_PrefsPath);
+            
+            if (hasPrefsFile == false)
+            {
+                
+                var title = "HueHolders";
+                var message =
+                    "It looks like this is the first launch of HueHolders in this project.\n\n" +
+                    "Project folder colors are configured in:\n" +
+                    "Edit/Preferences/HueFolder\n\n" +
+                    "Would you like to open the settings to configure folder colors now?";
+
+                var openNow = EditorUtility.DisplayDialog(
+                    title,
+                    message,
+                    "Yes",
+                    "No, I will configure it later"
+                );
+
+                if (openNow)
+                {
+                    SettingsService.OpenUserPreferences("Preferences/Hue Folders");
+                    _setProjectDataDefault();
+                    _saveProjectPrefs();
+                }
+            }
+            
+            if (hasPrefsFile)
             {
                 using var file = File.OpenText(k_PrefsPath);
                 try
@@ -222,7 +245,6 @@ namespace HueFolders
             s_GradientScale.Setup(k_GradientScale_Default);
             s_FoldersTint.Setup(k_FoldersTint_Default);
             s_LabelOverride.Setup(k_LabelOverride_Default);
-            s_SelectionTint.Setup(k_SelectionTint_Default);
 
             _updateGradient();
             EditorApplication.projectWindowItemOnGUI += HueFoldersBrowser.FolderColorization;
@@ -243,8 +265,7 @@ namespace HueFolders
             // editor prefs variables
             EditorGUI.BeginChangeCheck();
 
-            //var inTreeViewOnly = EditorGUILayout.Toggle("In Tree View Only", s_InTreeViewOnly.Get<bool>());
-            
+            var inTreeViewOnly = EditorGUILayout.Toggle("In Tree View Only", s_InTreeViewOnly.Get<bool>());
             // project prefs variables
             EditorGUI.BeginChangeCheck();
             
@@ -257,19 +278,16 @@ namespace HueFolders
             }
             var foldersTint    = EditorGUILayout.ColorField("Folders Tint", s_FoldersTint.Get<Color>());
             var subFoldersTint = EditorGUILayout.ColorField("Sub Folders Tint", s_SubFoldersTint.Get<Color>());
-            var labelsTint     = EditorGUILayout.ColorField("Selection Tint", s_SelectionTint.Get<Color>());
             var gradientScale  = s_GradientScale.Get<Vector2>(); 
-            //s_LabelOverride.OnGui<bool>( val => EditorGUILayout.Toggle("Label Override", val));
-            
+            s_LabelOverride.OnGui<bool>( val => EditorGUILayout.Toggle("Label Override", val));
             EditorGUILayout.MinMaxSlider("Gradient Scale", ref gradientScale.x, ref gradientScale.y, 0f, 1f);
             
             if (EditorGUI.EndChangeCheck())
             {
-                //s_InTreeViewOnly.Write(inTreeViewOnly);
+                s_InTreeViewOnly.Write(inTreeViewOnly);
                 s_SubFoldersTint.Write(subFoldersTint);
                 s_GradientScale.Write(gradientScale);
                 s_FoldersTint.Write(foldersTint);
-                s_SelectionTint.Write(labelsTint);
                 
                 EditorApplication.RepaintProjectWindow();
                 _updateGradient();
@@ -378,7 +396,7 @@ namespace HueFolders
             return _foldersList;
         }
         
-        private void _saveProjectPrefs()
+        private static void _saveProjectPrefs()
         {
             s_FoldersDataDic = s_FoldersData
                                .Where(n => n != null && string.IsNullOrEmpty(n._guid) == false && n._guid != Guid.Empty.ToString())

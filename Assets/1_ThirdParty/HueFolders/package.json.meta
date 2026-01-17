@@ -9,6 +9,6 @@ AssetOrigin:
   serializedVersion: 1
   productId: 269371
   packageName: "Hue Folders \u2013 Colored Project View & Hierarchy Tags"
-  packageVersion: 1.2
-  assetPath: Assets/HueFolders/package.json
-  uploadId: 772498
+  packageVersion: 1.2.2
+  assetPath: Assets/1_ThirdParty/HueFolders/package.json
+  uploadId: 842130

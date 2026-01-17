@@ -23,4 +23,4 @@ MonoBehaviour:
   shotEffect: {fileID: 0}
   muzzleSfx: {fileID: 0}
   shotSfx: {fileID: 0}
-  BulletSpeed: 30
+  BulletSpeed: 100

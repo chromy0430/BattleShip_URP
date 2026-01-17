@@ -176,11 +176,13 @@ namespace StylizedWater3.DynamicEffects
             Shader.SetGlobalVector(_WaterDynamicEffectsCoords, Vector4.zero);
         }
         
+        #if !UNITY_6000_4_OR_NEWER
 #pragma warning disable CS0672
 #pragma warning disable CS0618
         public override void Execute(ScriptableRenderContext context, ref RenderingData renderingData) { }
 #pragma warning restore CS0672
 #pragma warning restore CS0618
+        #endif
     }
 }
 #endif

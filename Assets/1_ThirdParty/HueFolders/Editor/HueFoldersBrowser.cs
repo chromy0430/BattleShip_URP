@@ -5,31 +5,26 @@ using System.Linq;
 using UnityEditor;
 using UnityEngine;
 
-//  HueFolders © NullTale - https://twitter.com/NullTale/
+//  HueFolders © NullTale - https://x.com/NullTale
 namespace HueFolders
 {
     public static class HueFoldersBrowser
     {
         private static GUIStyle s_labelNormal;
         private static GUIStyle s_labelSelected;
-        private static string s_pendingSelection;
-        private static bool s_SelectionIn;
         
         // =======================================================================
         public static void FolderColorization(string guid, Rect rect)
         {
-            var inTreeViewOnly = true; //SettingsProvider.s_InTreeViewOnly.Get<bool>();
-            if (inTreeViewOnly && _isTreeView() == false)
+            if (SettingsProvider.s_InTreeViewOnly.Get<bool>() && _isTreeView() == false)
                 return;
             
             var path = AssetDatabase.GUIDToAssetPath(guid);
             if (_isValidFolder(path)) 
                 return;
-            
-            var labelOverride = true; //SettingsProvider.s_LabelOverride.Get<bool>();
 
             // get base color of folder, configure rect
-            var data = _getFolderData(out var isSubFolder);
+            var  data = _getFolderData(out var isSubFolder);
             var baseColor = data == null ? SettingsProvider.s_FoldersDefaultTint : data._color;
             if (baseColor.a <= 0f)
                 return;
@@ -47,44 +42,6 @@ namespace HueFolders
 
             if (_isTreeView() == false)
                 rect.xMin += 3;
-            var bgColor = EditorGUIUtility.isProSkin 
-                ? new Color(0.219f, 0.219f, 0.219f, 1f) // pro skin background
-                : new Color(0.76f, 0.76f, 0.76f, 1f);   // light skin background
-
-            if (Event.current.type == EventType.MouseDown && rect.Contains(Event.current.mousePosition))
-            {
-                s_pendingSelection = guid;
-                GUI.changed = true;
-            }
-            
-            if (labelOverride)
-            {
-                EditorGUI.DrawRect(_iconRect(), bgColor);
-                EditorGUI.DrawRect(_textRectNoFix(), bgColor);
-            }
-
-            var isGuidSelected = Selection.assetGUIDs.Contains(guid);
-            var isSelected = (s_pendingSelection == null && isGuidSelected) || s_pendingSelection == guid;
-            
-            if (isGuidSelected && s_pendingSelection == guid)
-                s_pendingSelection = null;
-
-            if (isSelected && EditorGUIUtility.editingTextField == false)
-            {
-                var selColor = EditorGUIUtility.isProSkin
-                    ? new Color(62 / 255f, 95 / 255f, 150 / 255f)
-                    : new Color(58 / 255f, 121 / 255f, 187 / 255f);
-                
-                var col = SettingsProvider.s_SelectionTint.Get<Color>();
-                selColor = Color.Lerp(selColor, col, col.a);
-                
-                var fullRect = new Rect(rect);
-                fullRect.xMin = 0f;
-                fullRect.xMax = Screen.width;
-
-                GUI.color = selColor;
-                GUI.DrawTexture(fullRect, Texture2D.whiteTexture);
-            }
             
             // draw background, overdraw icon and text
             GUI.color = folderColor;
@@ -93,18 +50,8 @@ namespace HueFolders
             GUI.color = Color.white;
             GUI.DrawTexture(_iconRect(), _folderIcon());
             
-            if (labelOverride)
-            {
-                var textRect = _textRect();
-                GUI.Label(textRect, Path.GetFileName(path), _labelSkin());
-                
-                if (_isTreeView())
-                {
-                    textRect.x += .5f;
-                    textRect.y -= .5f;
-                    GUI.Label(textRect, Path.GetFileName(path), _labelSkin());
-                }
-            }
+            if (SettingsProvider.s_LabelOverride.Get<bool>())
+                GUI.Label(_textRect(), Path.GetFileName(path), _labelSkin());
 
             GUI.color = Color.white;
             
@@ -113,21 +60,6 @@ namespace HueFolders
             {
                 return AssetDatabase.IsValidFolder(path) == false || path.StartsWith("Packages") || path.Equals("Assets");
             }
-            
-            /*bool _isFolderOpened()
-            {
-                if (_isTreeView() == false)
-                    return false;
-
-                if (_isSelected())
-                    return true;
-
-                return SettingsProvider.s_FoldersDataDic.Keys.Any(g =>
-                {
-                    var otherPath = AssetDatabase.GUIDToAssetPath(g);
-                    return otherPath.StartsWith(path + "/");
-                });
-            }*/
             
             SettingsProvider.FolderData _getFolderData(out bool isSubFolder)
             {
@@ -173,22 +105,14 @@ namespace HueFolders
                 return result;
             }
             
-            Rect _textRectNoFix()
-            {
-                var result = new Rect(rect);
-                result.xMin += _iconRect().width;
-
-                return result;
-            }
-            
 			Texture _folderIcon()
 			{
-                if (EditorGUIUtility.isProSkin)
+				if (EditorGUIUtility.isProSkin)
 					return EditorGUIUtility.IconContent(_isFolderEmpty() ? "FolderEmpty Icon" : "Folder Icon").image;
 				else
                 {
                     if (_isSelected())
-                        return EditorGUIUtility.IconContent(_isFolderEmpty() ? "FolderEmpty On Icon" : "Folder On Icon").image;
+					    return EditorGUIUtility.IconContent(_isFolderEmpty() ? "FolderEmpty On Icon" : "Folder On Icon").image;
                     else
 					    return EditorGUIUtility.IconContent(_isFolderEmpty() ? "FolderEmpty Icon" : "Folder Icon").image;
                 }
@@ -240,5 +164,6 @@ namespace HueFolders
                 return SettingsProvider.s_Gradient;
             }
         }
+
     }
 }

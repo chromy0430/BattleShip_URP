@@ -80,7 +80,7 @@ public class TargetScanner : MonoBehaviour
         resultDistArray.Dispose();
     }
 
-    // 정렬된 리스트에서 조건에 맞는 적을 추출 (GC 발생 없음)
+    // 정렬된 리스트에서 조건에 맞는 적을 추출
     public void GetTargets(float range, int count, List<IEnemy> outTargets, IReadOnlyList<IEnemy> originalList)
     {
         outTargets.Clear();

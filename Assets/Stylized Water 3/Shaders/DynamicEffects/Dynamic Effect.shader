@@ -28,10 +28,10 @@
 
 		Blend SrcAlpha One
 		BlendOp Add
-		ZWrite Off	
+		ZWrite Off
 		Cull [_Cull]
 		//ZClip Off
-		ZTest Always
+		//ZTest Always
 		
 		Pass
 		{

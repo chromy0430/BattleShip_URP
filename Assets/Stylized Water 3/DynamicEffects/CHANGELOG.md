@@ -1,4 +1,10 @@
-﻿3.1.0
+﻿3.1.1
+
+Fixed:
+- Pre-emptive fixes for obsolete code warnings/errors in Unity 6.4+
+- Boat Wake (Particle based) prefab, child emitters not being set up correctly.
+
+3.1.0
 Updated to support Stylized Water 3 v3.1.0
 
 Added:

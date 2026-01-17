@@ -105,7 +105,7 @@ public class WeaponMount : MonoBehaviour
             if (projectileGO == null) continue;
 
             projectileGO.transform.position = fp.position;
-            projectileGO.transform.rotation = fp.rotation;
+            //projectileGO.transform.rotation = fp.rotation;
 
             Projectile projectile = projectileGO.GetComponent<Projectile>();
             if (projectile != null)
