@@ -13,8 +13,8 @@ public class InitManager : MonoBehaviour
         {
             foreach (var data in allWeaponDatas)
             {
-                ObjectPoolManager.Instance.CreatePool(data.projectilePrefab, 500);
-                ObjectPoolManager.Instance.CreatePool(data.shotEffect, 500);
+                ObjectPoolManager.Instance.CreatePool(data.ProjectilePrefab, 500);
+                ObjectPoolManager.Instance.CreatePool(data.ShotEffect, 500);
                 Debug.Log("투사체 풀링 생성");
             }
 

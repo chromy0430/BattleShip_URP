@@ -52,6 +52,22 @@ public class WeaponMount : MonoBehaviour
     }
 
     /// <summary>
+    /// FireRate가 강화되었을 때,이미 장착된 무기의 공격 간격 갱신
+    /// </summary>
+    public void InitializeCooldown()
+    {
+        if (_runtimeStat != null && _runtimeStat.FireRate > 0)
+        {
+            // 강화된 FireRate 수치를 실제 시간 간격으로 변환
+            _attackInterval = 1f / _runtimeStat.FireRate;
+        }
+        else
+        {
+            _attackInterval = float.MaxValue; // 발사 불가 상태
+        }
+    }
+
+    /// <summary>
     /// 매 프레임 쿨타임을 감소시킵니다.
     /// </summary>
     /// <returns>발사 준비가 되었는지 여부</returns>

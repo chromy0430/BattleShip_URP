@@ -17,13 +17,12 @@ MonoBehaviour:
   Damage: 20
   Range: 30
   EnemyCount: 1
-  projectileSpeed: 30
+  ProjectileSpeed: 20
   FireRate: 2
-  isHorming: 0
+  IsHorming: 1
   Icon: {fileID: 0}
-  projectilePrefab: {fileID: 1964577959459748387, guid: aa4445101d6138b4a9ab85f6e2f14c7a, type: 3}
-  muzzleEffect: {fileID: 0}
-  shotEffect: {fileID: 1223707457253503544, guid: 70196fc3ea0449948b474b178c20c2c6, type: 3}
-  muzzleSfx: {fileID: 0}
-  shotSfx: {fileID: 0}
-  BulletSpeed: 50
+  ProjectilePrefab: {fileID: 1964577959459748387, guid: aa4445101d6138b4a9ab85f6e2f14c7a, type: 3}
+  MuzzleEffect: {fileID: 0}
+  ShotEffect: {fileID: 1223707457253503544, guid: 70196fc3ea0449948b474b178c20c2c6, type: 3}
+  MuzzleSfx: {fileID: 0}
+  ShotSfx: {fileID: 0}

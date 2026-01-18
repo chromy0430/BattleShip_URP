@@ -42,7 +42,7 @@ public class Projectile : MonoBehaviour
         transform.DOKill(); // DOTween 중지
 
         // 10초 후 자동 파괴(풀 반환) 로직 시작
-        StartLifetimeLimit(2.0f, _lifeTimeCts.Token).Forget();
+        StartLifetimeLimit(3.0f, _lifeTimeCts.Token).Forget();
         //DelayDestroy(2.5f, _lifeTimeCts.Token).Forget();
 
         // --- 데이터 타입별 비행 로직 분기 ---
@@ -107,12 +107,15 @@ public class Projectile : MonoBehaviour
                 break;
             }
 
-            Vector3 direction = (_target.TargetTransform.position - transform.position).normalized; 
+            Vector3 direction = (_target.TargetTransform.position - transform.position).normalized;
+            direction.y += .2f;
             Quaternion lookRotation = Quaternion.LookRotation(direction);
 
-            rb.rotation = Quaternion.Slerp(rb.rotation, lookRotation, _stat.HomingTurnSpeed * Time.fixedDeltaTime);
+            rb.rotation = Quaternion.Slerp(rb.rotation, lookRotation, _stat.HomingTurnSpeed * Time.deltaTime);
 
-            currentSpeed += _stat.Acceleration * Time.fixedDeltaTime;
+            currentSpeed += _stat.Acceleration * Time.deltaTime;
+
+            rb.linearVelocity = tr.forward * currentSpeed;
 
             await UniTask.Yield(PlayerLoopTiming.FixedUpdate);
         }

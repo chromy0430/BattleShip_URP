@@ -35,14 +35,14 @@ public class WeaponStat
         Range = data.Range;
         EnemyCount = data.EnemyCount;
         FireRate = data.FireRate;
-        projectileSpeed = data.projectileSpeed;
-        IsHoming = data.isHorming;
+        projectileSpeed = data.ProjectileSpeed;
+        IsHoming = data.IsHorming;
 
         Icon = data.Icon;
 
-        projectilePrefab = data.projectilePrefab;
-        shotEffect = data.shotEffect;
-        muzzleEffect = data.muzzleEffect;
+        projectilePrefab = data.ProjectilePrefab;
+        shotEffect = data.ShotEffect;
+        muzzleEffect = data.MuzzleEffect;
 
         if (data is HomingWeaponData homingData)
         {
@@ -51,8 +51,8 @@ public class WeaponStat
         }
         else
         {
-            HomingTurnSpeed = 0f;
-            Acceleration = 0f;
+            HomingTurnSpeed = 20f;
+            Acceleration = 30f;
         }
     }
 }

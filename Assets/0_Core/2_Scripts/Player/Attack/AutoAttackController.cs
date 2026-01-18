@@ -12,6 +12,7 @@ public class AutoAttackController : MonoBehaviour
     [Tooltip("이 배에 장착된 모든 WeaponMount 리스트")]
     [SerializeField]
     private List<WeaponMount> _weaponMounts = new List<WeaponMount>();
+    public List<WeaponMount> GetWeaponMounts() => _weaponMounts;
 
     [Header("탐지 설정")]
     [Tooltip("적을 탐지할 최대 범위. 개별 무기 사거리와 별개, 탐색 연산 자체의 최대치")]
