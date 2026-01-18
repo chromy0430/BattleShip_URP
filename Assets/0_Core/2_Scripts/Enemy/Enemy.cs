@@ -11,7 +11,6 @@ public class Enemy : MonoBehaviour, IEnemy
     private bool _isAlive = true;
     public Transform TargetTransform => transform;
     public bool IsAlive => _isAlive;
-
     public MMF_Player flickerFeedback;
 
     private void Awake()

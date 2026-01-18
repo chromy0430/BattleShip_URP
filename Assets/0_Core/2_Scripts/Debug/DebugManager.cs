@@ -10,7 +10,7 @@ public class DebugManager : MonoBehaviour
     private void Awake()
     {
         if (instance == null) instance = this;
-        else Destroy(gameObject);
+        else Destroy(this);
 
         QualitySettings.vSyncCount = 0;
     }

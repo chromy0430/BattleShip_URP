@@ -3,5 +3,5 @@
 [CreateAssetMenu(fileName = "GunData_", menuName = "BattleShip/Weapon Data/Gun", order = 1)]
 public class GunData : BaseWeaponData
 {
-    public float BulletSpeed; // 투사체 속도
+
 }

@@ -11205,17 +11205,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 42757c1606a60244a94f26b38062a7b4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::WeaponMount
---- !u!114 &306332474 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 3027726063150322345, guid: cae5f9a344f3b9146aa3a4b34bccb45a, type: 3}
-  m_PrefabInstance: {fileID: 4192573773343360437}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 42757c1606a60244a94f26b38062a7b4, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::WeaponMount
 --- !u!1001 &306688345
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -29188,6 +29177,55 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 1148554341317851285, guid: 4a8280c5be5e1fc4fa9bbf1c2817ae1b, type: 3}
   m_PrefabInstance: {fileID: 811813307}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &814857557
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 814857558}
+  - component: {fileID: 814857559}
+  m_Layer: 0
+  m_Name: InitManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &814857558
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 814857557}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1535669014}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &814857559
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 814857557}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bce3cea1d09ded64f8bc9b5cf2908556, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::InitManager
+  allWeaponDatas:
+  - {fileID: 11400000, guid: 368dcd4904e79ed4b872444dcdede41b, type: 2}
+  - {fileID: 11400000, guid: 1ec069f228a32b548bec3f6eb77b43d2, type: 2}
+  allEnemyPrefabs:
+  - {fileID: 3148682760232343163, guid: 0f5ddf61e6a3be54dba62e9f783aed4e, type: 3}
 --- !u!1001 &817107234
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -51152,6 +51190,7 @@ Transform:
   - {fileID: 2142865}
   - {fileID: 1923404386}
   - {fileID: 752125758}
+  - {fileID: 814857558}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &1540374525
@@ -67021,7 +67060,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 42757c1606a60244a94f26b38062a7b4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::WeaponMount
-  WeaponData: {fileID: 11400000, guid: 368dcd4904e79ed4b872444dcdede41b, type: 2}
+  _weaponData: {fileID: 0}
   firePoint: {fileID: 1176198834}
 --- !u!114 &1974846159
 MonoBehaviour:
@@ -67051,7 +67090,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 42757c1606a60244a94f26b38062a7b4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::WeaponMount
-  WeaponData: {fileID: 11400000, guid: adefb8ded8e3b9e4b9b9f19173f079ee, type: 2}
+  _weaponData: {fileID: 0}
   firePoint: {fileID: 309957515}
 --- !u!114 &1974846161
 MonoBehaviour:
@@ -69306,7 +69345,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 42757c1606a60244a94f26b38062a7b4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::WeaponMount
-  WeaponData: {fileID: 11400000, guid: adefb8ded8e3b9e4b9b9f19173f079ee, type: 2}
+  _weaponData: {fileID: 0}
   firePoint: {fileID: 708617717}
 --- !u!114 &2035314816
 MonoBehaviour:
@@ -69320,7 +69359,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 42757c1606a60244a94f26b38062a7b4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::WeaponMount
-  WeaponData: {fileID: 11400000, guid: 368dcd4904e79ed4b872444dcdede41b, type: 2}
+  _weaponData: {fileID: 0}
   firePoint: {fileID: 1001684988}
 --- !u!114 &2035314817
 MonoBehaviour:
@@ -72872,7 +72911,7 @@ PrefabInstance:
     - target: {fileID: 1947661086921078455, guid: cae5f9a344f3b9146aa3a4b34bccb45a, type: 3}
       propertyPath: '_weaponMounts.Array.data[0]'
       value: 
-      objectReference: {fileID: 306332474}
+      objectReference: {fileID: 306332468}
     - target: {fileID: 1947661086921078455, guid: cae5f9a344f3b9146aa3a4b34bccb45a, type: 3}
       propertyPath: '_weaponMounts.Array.data[1]'
       value: 
@@ -72945,6 +72984,10 @@ PrefabInstance:
       propertyPath: moveAction
       value: 
       objectReference: {fileID: 1647338411}
+    - target: {fileID: 4694292039443448324, guid: cae5f9a344f3b9146aa3a4b34bccb45a, type: 3}
+      propertyPath: _weaponData
+      value: 
+      objectReference: {fileID: 11400000, guid: 1ec069f228a32b548bec3f6eb77b43d2, type: 2}
     - target: {fileID: 6355162148084614833, guid: cae5f9a344f3b9146aa3a4b34bccb45a, type: 3}
       propertyPath: m_LocalPosition.y
       value: 0.5

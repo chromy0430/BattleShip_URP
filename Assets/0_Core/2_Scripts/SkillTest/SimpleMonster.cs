@@ -29,7 +29,7 @@ public class MonsterMovement : MonoBehaviour, IKnockbackable, IDamageable
     private void Die()
     {
         // 사망 로직
-        Destroy(gameObject);
+        Destroy(this);
     }
 
     private Rigidbody _rb;
@@ -44,19 +44,18 @@ public class MonsterMovement : MonoBehaviour, IKnockbackable, IDamageable
     }
 
     public void ApplyKnockback(Vector3 sourcePosition, float distance, float duration)
-    {
-        // Fire-and-Forget 방식으로 실행 (UniTaskVoid)
-        // .Forget()은 "이 비동기 작업을 기다리지 않고 그냥 실행하고 넘어가겠다"는 뜻입니다.
+    {        
+        // .Forget() = 비동기 실행
         KnockbackRoutine(sourcePosition, distance, duration).Forget();
     }
 
-    // async UniTaskVoid: 반환값이 없는 비동기 메서드 (코루틴 대체용)
+    // 반환값이 없는 비동기 메서드
     private async UniTaskVoid KnockbackRoutine(Vector3 sourcePosition, float distance, float duration)
     {
         // 이미 넉백 중이면 중복 실행 방지
         if (_isKnockedBack) return;
 
-        // [Safety] 오브젝트가 파괴되면 자동으로 취소되는 토큰 생성
+        // 오브젝트가 파괴되면 자동으로 취소되는 토큰 생성
         var cancellationToken = this.GetCancellationTokenOnDestroy();
 
         _isKnockedBack = true;
@@ -73,8 +72,7 @@ public class MonsterMovement : MonoBehaviour, IKnockbackable, IDamageable
         {
             while (elapsed < duration)
             {
-                // [Sync] 물리 업데이트(FixedUpdate) 타이밍을 기다림
-                // 코루틴의 yield return new WaitForFixedUpdate() 와 동일하지만 GC가 없음
+                // FixedUpdate 타이밍 대기
                 await UniTask.WaitForFixedUpdate(cancellationToken);
 
                 elapsed += Time.fixedDeltaTime;

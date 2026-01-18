@@ -5,7 +5,7 @@ public delegate void OnExpChanged(float exp);
 public class PlayerExpManager : MonoBehaviour
 {
     public static PlayerExpManager Instance { get; private set; }
-    public OnExpChanged onExpChanged;
+    public event OnExpChanged onExpChanged;
 
     private int[] PlayerRequireExp =
     {
@@ -22,7 +22,7 @@ public class PlayerExpManager : MonoBehaviour
         }
         else
         {
-            Destroy(Instance);
+            Destroy(this);
         }
     }
 

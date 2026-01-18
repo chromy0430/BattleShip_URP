@@ -74,11 +74,11 @@ public class AutoAttackController : MonoBehaviour
             // 쿨타임이 다 돌았는지 확인
             if (mount.TickCooldown(Time.deltaTime))
             {
-                int enemyCount = mount.WeaponData.EnemyCount;
+                int enemyCount = mount.RuntimeStat.EnemyCount;
                 if (enemyCount <= 0) enemyCount = 1;
 
                 _scanner.GetTargets(
-                    mount.WeaponData.Range,
+                    mount.RuntimeStat.Range,
                     enemyCount,
                     _targetList,
                     EnemyManager.Instance.ActiveEnemies

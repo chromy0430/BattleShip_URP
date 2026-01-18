@@ -17,7 +17,7 @@ public class EnemyManager : MonoBehaviour
         }
         else
         {
-            Destroy(gameObject);
+            Destroy(this);
         }
 
         // 드랍물 오브젝트풀링 시작

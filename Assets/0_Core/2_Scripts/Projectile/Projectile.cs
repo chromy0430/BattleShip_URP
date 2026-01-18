@@ -8,7 +8,7 @@ using System;
 [RequireComponent(typeof(Collider))]
 public class Projectile : MonoBehaviour
 {
-    private BaseWeaponData _data;
+    private WeaponStat _stat;
     private IEnemy _target;
     private Rigidbody _rb;
     private CancellationTokenSource _lifeTimeCts;
@@ -23,12 +23,17 @@ public class Projectile : MonoBehaviour
         debug = DebugManager.instance.IsDebug;
     }
 
+    public void Initialize(WeaponStat stat)
+    {
+        this._stat = stat;
+    }
+
     /// <summary>
     /// WeaponMount에서 호출되어 투사체 발사
     /// </summary>
-    public void Launch(BaseWeaponData data, IEnemy target, Transform firePoint)
+    public void Launch(WeaponStat data, IEnemy target, Transform firePoint)
     {
-        this._data = data;
+        this._stat = data;
         this._target = target;
 
         // 이전의 비행 로직(DOTween, UniTask)이 남아있다면 취소
@@ -42,15 +47,15 @@ public class Projectile : MonoBehaviour
 
         // --- 데이터 타입별 비행 로직 분기 ---
 
-        if (_data is GunData gun)
+        if (!data.IsHoming)
         {
             //_rb.AddRelativeForce(firePoint.forward * gun.BulletSpeed, ForceMode.VelocityChange);
-            _rb.AddForce(firePoint.forward * gun.BulletSpeed, ForceMode.VelocityChange);
+            _rb.AddForce(firePoint.forward * data.projectileSpeed, ForceMode.VelocityChange);
             _rb.useGravity = false;
             //_rb.isKinematic = false;
             //_rb.linearVelocity = transform.forward * gun.BulletSpeed; // [수정] linearVelocity
         }
-        else if (_data is CannonData cannon)
+        /*else if (_stat is ArcWeaponData cannon)
         {
             // [Cannon] 포물선 비행 (기획서 우선순위)
             if (_target != null && _target.IsAlive)
@@ -73,20 +78,46 @@ public class Projectile : MonoBehaviour
                 //Disable();
                 ReturnToPool(); // 타겟이 없으면 즉시 반환
             }
-        }
-        else if (_data is MissileData missile)
+        }*/
+        else if (data.IsHoming)
         {
-            //_rb.AddForce(Vector3.forward * missile.projectileSpeed, ForceMode.VelocityChange);
-            HomingLoop(missile, _lifeTimeCts.Token).Forget(); // 유도 루프 시작
+            HomingLoop(_lifeTimeCts.Token).Forget();
+            //HomingLoop(data, _lifeTimeCts.Token).Forget(); // 유도 루프 시작
         }
     }
 
     /// <summary>
-    /// [Missile] 타겟을 추적하는 비동기 루프
+    /// 타겟을 추적하는 비동기 루프
     /// </summary>
-    private async UniTaskVoid HomingLoop(MissileData missileData, CancellationToken token)
+    private async UniTaskVoid HomingLoop(CancellationToken token)
     {
-        float currentSpeed = missileData.projectileSpeed;
+        float currentSpeed = _stat.projectileSpeed;
+        var rb = _rb;
+        var tr = transform;
+
+        while (!token.IsCancellationRequested)
+        {
+            if (rb == null || tr == null) break;
+
+            bool isTargetActive = _target != null && _target.IsAlive && _target.TargetTransform.gameObject.activeInHierarchy;
+
+            if (!isTargetActive)
+            {
+                rb.useGravity = true; 
+                break;
+            }
+
+            Vector3 direction = (_target.TargetTransform.position - transform.position).normalized; 
+            Quaternion lookRotation = Quaternion.LookRotation(direction);
+
+            rb.rotation = Quaternion.Slerp(rb.rotation, lookRotation, _stat.HomingTurnSpeed * Time.fixedDeltaTime);
+
+            currentSpeed += _stat.Acceleration * Time.fixedDeltaTime;
+
+            await UniTask.Yield(PlayerLoopTiming.FixedUpdate);
+        }
+
+        /*float currentSpeed = homingData.projectileSpeed;
 
         var rb = _rb;
         var tr = transform;
@@ -115,10 +146,10 @@ public class Projectile : MonoBehaviour
                 Vector3 direction = (_target.TargetTransform.position - rb.position).normalized;
                 Quaternion lookRotation = Quaternion.LookRotation(direction);
 
-                rb.rotation = Quaternion.Slerp(rb.rotation, lookRotation, missileData.homingTurnSpeed * Time.fixedDeltaTime);
+                rb.rotation = Quaternion.Slerp(rb.rotation, lookRotation, homingData.homingTurnSpeed * Time.fixedDeltaTime);
 
                 // 가속도 적용
-                currentSpeed += missileData.acceleration * Time.fixedDeltaTime;
+                currentSpeed += homingData.acceleration * Time.fixedDeltaTime;
 
                 // 강제 속도 적용 (유도 중일 때만)
                 rb.linearVelocity = tr.forward * currentSpeed;
@@ -134,7 +165,7 @@ public class Projectile : MonoBehaviour
         {
             // 기타 예외 로깅 (디버그용)
             Debug.LogException(ex);
-        }
+        }*/
     }
 
     private async UniTaskVoid DelayDestroy(float duration, CancellationToken token)
@@ -173,8 +204,6 @@ public class Projectile : MonoBehaviour
     /// </summary>
     private void OnTriggerEnter(Collider other)
     {
-        if (_data is CannonData) return;
-
         if (other.TryGetComponent<IEnemy>(out var enemy))
         {
             if (enemy != null && enemy.IsAlive)
@@ -214,21 +243,21 @@ public class Projectile : MonoBehaviour
             }
             else
             {
-                enemy.TakeDamage(_data.Damage);
+                enemy.TakeDamage(_stat.Damage);
                 var damageFont = Instantiate(DamageObject);
                 damageFont.GetComponent<DamageTMP>().Initialize
                     (
                         Base_Canvas.Instance.transform,
                         transform.position,
-                        _data.Damage.ToString()
+                        _stat.Damage.ToString()
                     );
             }
         }
 
         // 피격 이펙트 (shotEffect) 생성
-        if (_data.shotEffect != null)
+        if (_stat.shotEffect != null)
         {
-            var hitEffect = ObjectPoolManager.Instance.Get(_data.shotEffect);
+            var hitEffect = ObjectPoolManager.Instance.Get(_stat.shotEffect);
             if (hitEffect != null)
             {
                 hitEffect.transform.position = transform.position;

@@ -10,7 +10,9 @@ public class WeaponMount : MonoBehaviour
 {
     [Header("무기 데이터 (SO)")]
     [Tooltip("장착할 무기의 ScriptableObject 데이터")]
-    public BaseWeaponData WeaponData;
+    [SerializeField] private BaseWeaponData _weaponData;
+    private WeaponStat _runtimeStat;
+    public WeaponStat RuntimeStat => _runtimeStat;
 
     [Header("발사 위치")]
     [Tooltip("발사체가 생성될 위치")]
@@ -18,7 +20,6 @@ public class WeaponMount : MonoBehaviour
 
     // 내부 공격 쿨타임 타이머
     private float _currentCooldown = 0f;
-
     private float _attackInterval = 0f;
     private bool _isReadyToFire = true;
 
@@ -32,25 +33,21 @@ public class WeaponMount : MonoBehaviour
     /// </summary>
     public void Initialize()
     {
-        if (WeaponData == null)
+        if (_weaponData != null)
         {
-            Debug.LogError($"[{this.name}] WeaponData가 할당되지 않았습니다.");
-            this.enabled = false;
-            return;
+            _runtimeStat = new WeaponStat(_weaponData);
+
+            if (_runtimeStat.FireRate > 0)
+            {
+                _attackInterval = 1f / _runtimeStat.FireRate;
+            }
+            else
+            {
+                _attackInterval = float.MaxValue;
+            }
         }
 
-        // CountPerSecond (초당 공격 횟수)를 1회 공격 당 시간(간격)으로 변환
-        // 0으로 나누기 방지
-        if (WeaponData.CountPerSecond > 0)
-        {
-            _attackInterval = 1f / WeaponData.CountPerSecond;
-        }
-        else
-        {
-            _attackInterval = float.MaxValue; // 0이면 발사 불가
-        }
-
-        _currentCooldown = 0f; // 시작 시 즉시 발사 가능
+        _currentCooldown = 0f;
         _isReadyToFire = true;
     }
 
@@ -78,18 +75,8 @@ public class WeaponMount : MonoBehaviour
     /// <param name="target">공격할 대상</param>
     public void Fire(List<IEnemy> targets)
     {
-        if (WeaponData == null || targets == null || targets.Count == 0)
-        {
-            return;
-        }
-
-        if (WeaponData.projectileEffect == null)
-        {
-            Debug.LogError($"{WeaponData.name}에 projectilEffect 프리팹이 할당되지 않았습니다.");
-            return;
-        }
-
-        // 발사 준비 상태 초기화 및 쿨타임 설정
+        if (_runtimeStat == null || targets == null || targets.Count == 0) return;
+        
         _isReadyToFire = false;
         _currentCooldown = _attackInterval;
 
@@ -101,7 +88,7 @@ public class WeaponMount : MonoBehaviour
 
             fp.LookAt(target.TargetTransform);
 
-            GameObject projectileGO = ObjectPoolManager.Instance.Get(WeaponData.projectileEffect);
+            GameObject projectileGO = ObjectPoolManager.Instance.Get(_runtimeStat.projectilePrefab);
             if (projectileGO == null) continue;
 
             projectileGO.transform.position = fp.position;
@@ -110,11 +97,11 @@ public class WeaponMount : MonoBehaviour
             Projectile projectile = projectileGO.GetComponent<Projectile>();
             if (projectile != null)
             {
-                projectile.Launch(WeaponData, target, firePoint);
+                projectile.Launch(_runtimeStat, target, firePoint);
             }
             else
             {
-                Debug.LogError($"{WeaponData.projectileEffect.name} 프리팹에 Projectile.cs 스크립트가 없습니다.");
+                Debug.LogError($"{_runtimeStat.projectilePrefab.name} 프리팹에 Projectile.cs 스크립트가 없습니다.");
                 ObjectPoolManager.Instance.Return(projectileGO);
             }
         }

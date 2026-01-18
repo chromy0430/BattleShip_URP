@@ -57,7 +57,8 @@ public class PlayerMove : MonoBehaviour
     {
         turnInput = moveAction.action.ReadValue<Vector2>().x; // A, D 키, 회전
         moveInput = moveAction.action.ReadValue<Vector2>().y; // W, S 키, 직진
-                                                               
+
+#if UNITY_EDITOR
         if (Keyboard.current.kKey.wasPressedThisFrame)
         {
             if (EnemyManager.Instance != null)
@@ -65,6 +66,7 @@ public class PlayerMove : MonoBehaviour
                 EnemyManager.Instance.KillAllEnemies();
             }
         }
+#endif
     }
 
     private void FixedUpdate()

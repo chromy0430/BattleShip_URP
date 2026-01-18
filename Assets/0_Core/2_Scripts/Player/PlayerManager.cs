@@ -15,7 +15,7 @@ public class PlayerManager : MonoBehaviour
         }
         else
         {
-            Destroy(Instance);
+            Destroy(this);
         }
 
         PlayerTransform = this.transform;

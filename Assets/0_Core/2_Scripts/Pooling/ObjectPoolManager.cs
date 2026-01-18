@@ -21,7 +21,7 @@ public class ObjectPoolManager : MonoBehaviour
         }
         else
         {
-            Destroy(Instance);
+            Destroy(this);
         }
 
     }
@@ -59,8 +59,10 @@ public class ObjectPoolManager : MonoBehaviour
     {
         var obj = Instantiate(prefab, this.transform);
 
+#if UNITY_EDITOR
         // [수정] 문자열 보간법 적용
         obj.name = $"{prefab.name} (Pool)";
+#endif
 
         _prefabLookup.Add(obj, prefab);
         obj.SetActive(false);
