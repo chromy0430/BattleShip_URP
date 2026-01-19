@@ -1,121 +1,89 @@
-using Cysharp.Threading.Tasks;
-using System.Collections.Generic;
-using System.Threading;
+ï»¿using Cysharp.Threading.Tasks;
 using Unity.Collections;
 using UnityEngine;
-using UnityEngine.UIElements;
 
 public class EnemySpawnSystem : MonoBehaviour
 {
     [SerializeField] private PlayTimeUIManager playTime;
 
     [Header("Spawn Settings")]
-    [Tooltip("Å×½ºÆ®¿ë Àû ÇÁ¸®ÆÕ (³ªÁß¿¡ SO µ¥ÀÌÅÍ·Î ±³Ã¼ ¿¹Á¤)")]
+    [Tooltip("í…ŒìŠ¤íŠ¸ìš© ì  í”„ë¦¬íŒ¹ (ë‚˜ì¤‘ì— SO ë°ì´í„°ë¡œ êµì²´ ì˜ˆì •)")]
     [SerializeField] private GameObject testEnemyPrefab;
 
-    [Tooltip("ÀûÀÌ ½ºÆùµÉ ¹İ°æ")]
+    [Tooltip("ì ì´ ìŠ¤í°ë  ë°˜ê²½")]
     [SerializeField] private float maxSpawnRadius = 25f;
 
-    [Header("Base Difficulty")]
-    [Tooltip("ÃÊ±â ½ºÆù ÁÖ±â (ÃÊ)")]
+    [Header("ì›ì„ ëª‡ ë“±ë¶„ ë‚˜ëˆŒ ê²ƒì¸ê°€")]
+    [Tooltip("ì›ì„ ëª‡ ë“±ë¶„ìœ¼ë¡œ ë‚˜ëˆŒ ê²ƒì¸ê°€ (ì˜ˆ: 12 = ì‹œê³„ ë°©í–¥)")]
+    [SerializeField] private int spawnDivisions = 12;
+    [Tooltip("ìŠ¤í° ìœ„ì¹˜ì— ì•½ê°„ì˜ ë¬´ì‘ìœ„ì„±ì„ ë”í•´ ë„ˆë¬´ ê¸°ê³„ì ìœ¼ë¡œ ë³´ì´ì§€ ì•Šê²Œ í•¨ (ê°ë„ ì˜¤ì°¨ ë²”ìœ„)")]
+    [SerializeField] private float angleJitter = 5f;
+    private int currentSpawnIndex = 0;
+
+    [Header("ê¸°ë³¸ ë‚œì´ë„")]
+    [Tooltip("ì´ˆê¸° ìŠ¤í° ì£¼ê¸° (ì´ˆ)")]
     [SerializeField] private float startSpawnInterval = 2.0f;
 
-    [Tooltip("ÃÊ±â ÇÑ ¹ø¿¡ ½ºÆùÇÒ ¸¶¸® ¼ö")]
+    [Tooltip("ì´ˆê¸° í•œ ë²ˆì— ìŠ¤í°í•  ë§ˆë¦¬ ìˆ˜")]
     [SerializeField] private int startSpawnCount = 1;
 
-    [Header("Dynamic Difficulty (Scaling)")]
-    [Tooltip("ÃÖ¼Ò ½ºÆù ÁÖ±â (ÀÌ ÀÌÇÏ·Î´Â ¾È ÁÙ¾îµê)")]
-    [SerializeField] private float minSpawnIntervalLimit = 0.1f;
-
-    [Tooltip("ºĞ´ç ½ºÆù ÁÖ±â °¨¼Ò·® (¿¹: 0.1ÀÌ¸é 1ºĞ¸¶´Ù 0.1ÃÊ¾¿ »¡¶óÁü)")]
-    [SerializeField] private float intervalReductionPerMinute = 0.2f;
-
-    [Tooltip("ÃÖ´ë µ¿½Ã ½ºÆù °³¼ö (ÇÑ ¹ø Æ½¿¡ ÀÌ ÀÌ»óÀº ¾È ³ª¿È)")]
-    [SerializeField] private int maxSpawnCountBatch = 10;
-
-    [Tooltip("ºĞ´ç ½ºÆù °³¼ö Áõ°¡·® (¿¹: 1ÀÌ¸é 1ºĞ¸¶´Ù 1¸¶¸®¾¿ ´õ ³ª¿È)")]
-    [SerializeField] private float countIncreasePerMinute = 1.0f;
-
-    [Tooltip("ÃÖ´ë È°¼º Àû ¼ö")]
-    [SerializeField] private int maxActiveEnemies = 500; // Å×½ºÆ®¸¦ À§ÇØ 100À¸·Î ¼³Á¤
-
+    [Header("ë™ì  ë‚œì´ë„ ìŠ¤ì¼€ì¼ë§")]
+    [SerializeField] private float minSpawnIntervalLimit = 0.3f; // ìµœì†Œ ìŠ¤í° ì£¼ê¸°
+    [SerializeField] private float intervalReductionPerMinute = 0.2f; // ë¶„ë‹¹ ìŠ¤í° ì£¼ê¸° ê°ì†ŒëŸ‰
+    [SerializeField] private int maxSpawnCountBatch = 10; // ìµœëŒ€ ë™ì‹œ ìŠ¤í° ê°œìˆ˜
+    [SerializeField] private float countIncreasePerMinute = 1.0f; // ë¶„ë‹¹ ìŠ¤í° ê°œìˆ˜ ì¦ê°€ëŸ‰ - 1ì´ë©´ 1ë¶„ë§ˆë‹¤ 1ë§ˆë¦¬ì”© ë” ë‚˜ì˜´
+    [SerializeField] private int maxActiveEnemies = 500; // ìµœëŒ€ í™œì„± ê°€ëŠ¥í•œ ì  ìˆ˜
 
     [SerializeField, ReadOnly] private float currentInterval;
     [SerializeField, ReadOnly] private int currentBatchCount;
     [SerializeField, ReadOnly] private float currentPlayTime = 0f;
 
-    [Header("Batch Settings")]
-    [Tooltip("¹èÄ¡ ½ºÆù ½Ã, ¸¶¸®´ç ¼ÒÈ¯ °£°İ (ÃÊ). 0ÀÌ¸é Áï½Ã ¼ÒÈ¯.")]
+    [Header("ìŠ¤í° ì„¤ì •")]
+    [Tooltip("ë°°ì¹˜ ìŠ¤í° ì‹œ, ë§ˆë¦¬ë‹¹ ì†Œí™˜ ê°„ê²© (ì´ˆ). 0ì´ë©´ ì¦‰ì‹œ ì†Œí™˜.")]
     [SerializeField] private float spawnDelayInBatch = 0.1f;
 
-    [Header("Debug")]
-    [SerializeField] private bool showSpawnRadius = true;
 
-    [Header("Spawn Validation")]
-    [Tooltip("½ºÆù À§Ä¡ Áßº¹ Ã¼Å© ¹İ°æ")]
-    [SerializeField] private float spawnMinDistance = 3f;
-
-    [Tooltip("½ºÆù À§Ä¡ Ã£±â ÃÖ´ë ½Ãµµ È½¼ö")]
-    [SerializeField] private int maxSpawnAttempts = 10;
-
-    [Tooltip("Àû ·¹ÀÌ¾î")]
-    [SerializeField] private LayerMask enemyLayer;
 
 
     private Transform playerTransform;
     private float currentSpawnTimer = 0f;
 
-    private CancellationTokenSource cts;
-
     private void Start()
     {
         if (PlayerManager.Instance != null)
-        {
             playerTransform = PlayerManager.Instance.transform;
-        }
-
+        
         if (playTime == null)
             playTime = FindAnyObjectByType<PlayTimeUIManager>();
 
         currentInterval = startSpawnInterval;
         currentBatchCount = startSpawnCount;
-
-        cts = new CancellationTokenSource();
-    }
-
-    private void OnDestroy()
-    {
-        if (cts != null)
-        {
-            cts.Cancel();
-            cts.Dispose();
-        }
     }
 
     private void Update()
     {
         if (playerTransform == null) return;
 
-        if (playTime != null)
+        /*if (playTime != null)
         {
             currentPlayTime = playTime.CurrentPlayTime;
-            CalculateDifficulty(); // ³­ÀÌµµ °»½Å
-        }
+            CalculateDifficulty(); // ë‚œì´ë„ ê°±ì‹ 
+        }*/
 
         SpawnRoutine();
     }
     private void CalculateDifficulty()
     {
-        // ºĞ ´ÜÀ§ °è»ê
+        // ë¶„ ë‹¨ìœ„ ê³„ì‚°
         float minutesPassed = currentPlayTime / 60f;
 
-        // ÁÖ±â °¨¼Ò: ½ÃÀÛ ÁÖ±â - (Áö³­ ºĞ * °¨¼Ò·®)
+        // ì£¼ê¸° ê°ì†Œ: ì‹œì‘ ì£¼ê¸° - (ì§€ë‚œ ë¶„ * ê°ì†ŒëŸ‰)
         float newInterval = startSpawnInterval - (minutesPassed * intervalReductionPerMinute);
-        currentInterval = Mathf.Max(minSpawnIntervalLimit, newInterval); // ÇÏÇÑ¼± Ã¼Å©
+        currentInterval = Mathf.Max(minSpawnIntervalLimit, newInterval); // í•˜í•œì„  ì²´í¬
 
-        // °³¼ö Áõ°¡: ½ÃÀÛ °³¼ö + (Áö³­ ºĞ * Áõ°¡·®)
+        // ê°œìˆ˜ ì¦ê°€: ì‹œì‘ ê°œìˆ˜ + (ì§€ë‚œ ë¶„ * ì¦ê°€ëŸ‰)
         int newCount = startSpawnCount + Mathf.FloorToInt(minutesPassed * countIncreasePerMinute);
-        currentBatchCount = Mathf.Min(maxSpawnCountBatch, newCount); // »óÇÑ¼± Ã¼Å©
+        currentBatchCount = Mathf.Min(maxSpawnCountBatch, newCount); // ìƒí•œì„  ì²´í¬
     }
 
     private void SpawnRoutine()
@@ -124,114 +92,36 @@ public class EnemySpawnSystem : MonoBehaviour
 
         if (currentSpawnTimer >= currentInterval)
         {
-            SpawnBatchAsync(currentBatchCount, cts.Token).Forget();
-
             currentSpawnTimer = 0f;
+            SpawnBatchAsync().Forget();
         }
-
-        /*if (currentSpawnTimer >= currentInterval)
-        {           
-            for (int i = 0; i < currentBatchCount; i++)
-            {
-                if (EnemyManager.Instance != null &&
-                    EnemyManager.Instance.ActiveEnemies.Count >= maxActiveEnemies)
-                    break;
-
-                Vector3 basePos = GetRandomPointOnCircleEdge(playerTransform.position, maxSpawnRadius);
-
-                SpawnEnemy(basePos);
-            }
-
-            currentSpawnTimer = 0f;
-        }*/
     }
-
-    private async UniTaskVoid SpawnBatchAsync(int count, CancellationToken token)
+    private async UniTaskVoid SpawnBatchAsync()
     {
-        Vector3 spawnCenterPos = playerTransform.position;
+        // í˜„ì¬ í”„ë ˆì„ì—ì„œ ì†Œí™˜í•´ì•¼ í•  ë§ˆë¦¬ ìˆ˜ í™•ì • (ë„ì¤‘ì— ë°”ë€Œì§€ ì•Šê²Œ ìº¡ì²˜)
+        int batchCount = currentBatchCount;
 
-        // [Ãß°¡] ÀÌ¹ø ¹èÄ¡¿¡¼­ »ç¿ëÇÑ ½ºÆù À§Ä¡µéÀ» ÀÓ½Ã ÀúÀå
-        List<Vector3> batchSpawnPositions = new List<Vector3>(count);
-
-        for (int i = 0; i < count; i++)
+        for (int i = 0; i < batchCount; i++)
         {
-            if (token.IsCancellationRequested) return;
-
+            // 1. ìµœëŒ€ ë§ˆë¦¬ìˆ˜ ì²´í¬ (ê²Œì„ í„°ì§ ë°©ì§€)
             if (EnemyManager.Instance != null &&
                 EnemyManager.Instance.ActiveEnemies.Count >= maxActiveEnemies)
                 break;
 
-            // [¼öÁ¤] ¹èÄ¡ ³» À§Ä¡ ¸ñ·Ïµµ ÇÔ²² Àü´Ş
-            Vector3 spawnPos = GetValidSpawnPosition(spawnCenterPos, maxSpawnRadius, spawnMinDistance, batchSpawnPositions);
+            // 2. ìœ„ì¹˜ ê³„ì‚° (ì—¬ê¸°ì„œ Indexê°€ 1ì”© ì¦ê°€í•´ì•¼ í•¨!)
+            Vector3 spawnPos = GetClockwiseSpawnPoint(playerTransform.position, maxSpawnRadius);
 
-            // [Ãß°¡] ÀÌ¹ø¿¡ »ç¿ëÇÑ À§Ä¡ ÀúÀå
-            batchSpawnPositions.Add(spawnPos);
-
+            // 3. ì  ì†Œí™˜
             SpawnEnemy(spawnPos);
 
-            await UniTask.Delay((int)(spawnDelayInBatch * 1000), cancellationToken: token);
-        }
-    }
-
-    /// <summary>
-    /// ´Ù¸¥ Àû°ú °ãÄ¡Áö ¾Ê´Â À¯È¿ÇÑ ½ºÆù À§Ä¡¸¦ Ã£½À´Ï´Ù.
-    /// </summary>
-    private Vector3 GetValidSpawnPosition(Vector3 center, float radius, float minDistance, List<Vector3> batchPositions = null)
-    {
-        Vector3 candidatePos;
-        int attempt = 0;
-
-        do
-        {
-            candidatePos = GetRandomPointOnCircleEdge(center, radius);
-            attempt++;
-
-            if (attempt >= maxSpawnAttempts)
-                break;
-
-            bool isTooClose = false;
-
-            // [Ãß°¡] 1. °°Àº ¹èÄ¡ ³»¿¡¼­ ÀÌ¹Ì ½ºÆùµÈ À§Ä¡µé°ú Ã¼Å©
-            if (batchPositions != null)
+            if (spawnDelayInBatch > 0f && i < batchCount - 1)
             {
-                foreach (var pos in batchPositions)
-                {
-                    if (Vector3.Distance(candidatePos, pos) < minDistance)
-                    {
-                        isTooClose = true;
-                        break;
-                    }
-                }
+                await UniTask.Delay(
+                    System.TimeSpan.FromSeconds(spawnDelayInBatch),
+                    cancellationToken: this.GetCancellationTokenOnDestroy()
+                );
             }
-
-            // ÀÌ¹Ì ³Ê¹« °¡±î¿ì¸é ´ÙÀ½ ½Ãµµ
-            if (isTooClose) continue;
-
-            // 2. ±âÁ¸¿¡ È°¼ºÈ­µÈ Àûµé°ú Ã¼Å© (Physics »ç¿ë)
-            Collider[] nearbyColliders = Physics.OverlapSphere(candidatePos, minDistance, enemyLayer);
-
-            if (nearbyColliders.Length == 0)
-                return candidatePos;
-
-        } while (attempt < maxSpawnAttempts);
-
-        return candidatePos;
-    }
-
-    /// <summary>
-    /// ¹èÄ¡ ½ºÆù¿ë À§Ä¡µéÀ» ¹Ì¸® »ı¼ºÇÕ´Ï´Ù.
-    /// </summary>
-    private List<Vector3> GenerateBatchSpawnPositions(Vector3 center, float radius, float minDistance, int count)
-    {
-        List<Vector3> positions = new List<Vector3>(count);
-
-        for (int i = 0; i < count; i++)
-        {
-            Vector3 validPos = GetValidSpawnPosition(center, radius, minDistance, positions);
-            positions.Add(validPos);
         }
-
-        return positions;
     }
 
     private void SpawnEnemy(Vector3 position)
@@ -241,25 +131,31 @@ public class EnemySpawnSystem : MonoBehaviour
         if (enemyObj != null)
         {
             enemyObj.transform.position = position;
-            enemyObj.transform.rotation = Quaternion.identity;
+            enemyObj.transform.rotation = Quaternion.identity;            
         }
     }
 
-    // Å×µÎ¸® Ã£±â
+    Vector3 GetClockwiseSpawnPoint(Vector3 center, float radius)
+    {
+        float angleStep = 360f / spawnDivisions;
+        float currentAngleDeg = currentSpawnIndex * angleStep;
+        float jitter = Random.Range(-angleJitter, angleJitter);
+        float finalAngleDeg = currentAngleDeg + jitter;
+        float angleRad = finalAngleDeg * Mathf.Deg2Rad;
+        float x = Mathf.Cos(angleRad) * radius;
+        float z = Mathf.Sin(angleRad) * radius;
+
+        currentSpawnIndex = (currentSpawnIndex + 1) % spawnDivisions;
+
+        return new Vector3(center.x + x, 0, center.z + z);
+    }
+
+    // í…Œë‘ë¦¬ ì°¾ê¸°
     Vector3 GetRandomPointOnCircleEdge(Vector3 center, float radius)
     {
         float angle = Random.Range(0f, Mathf.PI * 2f);
         float x = Mathf.Cos(angle) * radius;
         float z = Mathf.Sin(angle) * radius;
         return new Vector3(center.x + x, 0, center.z + z);
-    }
-
-    // ¿¡µğÅÍ¿¡¼­ ½ºÆù ¹üÀ§¸¦ ´«À¸·Î È®ÀÎÇÏ±â À§ÇÑ ±âÁî¸ğ
-    private void OnDrawGizmos()
-    {
-        if (!showSpawnRadius || playerTransform == null) return;
-
-        Gizmos.color = Color.red;
-        Gizmos.DrawWireSphere(playerTransform.position, maxSpawnRadius);
     }
 }
