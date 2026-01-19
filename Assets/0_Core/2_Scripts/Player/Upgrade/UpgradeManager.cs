@@ -1,10 +1,13 @@
-﻿using NUnit.Framework;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
+
+public delegate void OnChangedWeaponStat();
 
 public class UpgradeManager : MonoBehaviour
 {
     [SerializeField] private AutoAttackController attackController;
+
+    public event OnChangedWeaponStat onChangedWeaponStat;
 
     private void Start()
     {
@@ -33,6 +36,8 @@ public class UpgradeManager : MonoBehaviour
         {
             UnlockHomingUpgrade();
         }
+
+        onChangedWeaponStat?.Invoke();
     }
 
     private void UpgradeWeaponFireRate(float multiplier)
@@ -50,9 +55,16 @@ public class UpgradeManager : MonoBehaviour
         if (abc[0].RuntimeStat.FireRate > 5.0f) return;
 
         abc[0].RuntimeStat.FireRate = abc[0].RuntimeStat.FireRate + multiplier;
+        WeaponLevelUp(abc[0]);
+
         abc[0].InitializeCooldown();
 
         abc.Clear();
+    }
+
+    private void WeaponLevelUp(WeaponMount stat)
+    {
+        stat.RuntimeStat.WeaponLevel++;
     }
 
     private void UpgradeAllWeaponsDamage(float multiplier)

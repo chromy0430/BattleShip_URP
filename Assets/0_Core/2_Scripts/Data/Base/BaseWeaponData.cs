@@ -4,8 +4,8 @@ using UnityEngine;
 public class BaseWeaponData : ScriptableObject
 {
     [Header("무기 속성")]
-    public string Name; // 무기 이름
-    public string Description; // 무기 설명
+    public string WeaponName; // 무기 이름
+    public string WeaponDescription; // 무기 설명
         
     public int Damage; // 데미지
     public int Range; // 범위
@@ -31,7 +31,6 @@ public class BaseWeaponData : ScriptableObject
     private void OnValidate()
     {
         EditorUtility.SetDirty(this);
-        Debug.Log("BaseWeaponData 변경");
     }
 #endif
 }

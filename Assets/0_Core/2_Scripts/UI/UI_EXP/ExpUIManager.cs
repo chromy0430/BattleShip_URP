@@ -10,6 +10,7 @@ public class ExpUIManager : MonoBehaviour
     private void Start()
     {
         ExpChange(0, 10);
+
         if (PlayerExpManager.Instance != null)
             PlayerExpManager.Instance.onExpChanged += ExpChange;
     }

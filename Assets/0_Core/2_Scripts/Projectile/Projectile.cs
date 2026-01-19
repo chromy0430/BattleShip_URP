@@ -13,6 +13,7 @@ public class Projectile : MonoBehaviour
     private Rigidbody _rb;
     private CancellationTokenSource _lifeTimeCts;
     private bool debug = false;
+    private Vector3 projectileSize;
 
     [SerializeField] private LayerMask waterLayer;
 
@@ -21,6 +22,7 @@ public class Projectile : MonoBehaviour
         _rb = GetComponent<Rigidbody>();
         _rb.useGravity = false;
         debug = DebugManager.instance.IsDebug;
+        projectileSize = this.transform.localScale;
     }
 
     public void Initialize(WeaponStat stat)
@@ -49,11 +51,13 @@ public class Projectile : MonoBehaviour
 
         if (!data.IsHoming)
         {
-            //_rb.AddRelativeForce(firePoint.forward * gun.BulletSpeed, ForceMode.VelocityChange);
-            _rb.AddForce(firePoint.forward * data.projectileSpeed, ForceMode.VelocityChange);
+            Vector3 fireDirection = firePoint.forward;
+            fireDirection.y = 0f;
+            fireDirection.Normalize();
+            _rb.AddForce(fireDirection * data.projectileSpeed, ForceMode.VelocityChange);
+
+            //_rb.AddForce(firePoint.forward * data.projectileSpeed, ForceMode.VelocityChange);
             _rb.useGravity = false;
-            //_rb.isKinematic = false;
-            //_rb.linearVelocity = transform.forward * gun.BulletSpeed; // [수정] linearVelocity
         }
         /*else if (_stat is ArcWeaponData cannon)
         {
@@ -188,17 +192,13 @@ public class Projectile : MonoBehaviour
     /// </summary>
     private async UniTaskVoid StartLifetimeLimit(float duration, CancellationToken token)
     {
-        // Delay가 (충돌 등으로) 취소되지 않고 정상적으로 완료되었다면 풀에 반환
-        if (!await UniTask.Delay(System.TimeSpan.FromSeconds(duration), cancellationToken: token).SuppressCancellationThrow())
+        // duration 만큼 대기
+        bool canceled = await UniTask.Delay(TimeSpan.FromSeconds(duration), cancellationToken: token)
+                                     .SuppressCancellationThrow();
+
+        if (!canceled)
         {
-            try
-            {
-                Disable(); //ReturnToPool();
-            }
-            catch (Exception ex)
-            {
-                Debug.Log("미사일 발사 중에 종료 되었음 = " + ex);
-            }
+            Disable().Forget();
         }
     }
 
@@ -267,7 +267,7 @@ public class Projectile : MonoBehaviour
             }
         }
 
-        Disable();  
+        Disable().Forget();
     }
 
     /// <summary>
@@ -283,12 +283,23 @@ public class Projectile : MonoBehaviour
         transform.DOKill();
 
         ObjectPoolManager.Instance.Return(this.gameObject);
+        transform.localScale = projectileSize;
     }
 
 
-    private void Disable()
+    private async UniTaskVoid Disable()
     {
         _rb.linearVelocity = Vector3.zero;
+        _rb.angularVelocity = Vector3.zero;
+
+        _lifeTimeCts?.Cancel();
+
+        await transform.DOScale(Vector3.zero, 0.5f)
+                       .SetLink(this.gameObject) // 오브젝트 파괴 시 안전장치
+                       .ToUniTask(cancellationToken: this.GetCancellationTokenOnDestroy());
+
+
+        // 3. 애니메이션 종료 후 풀 반환
         ReturnToPool();
     }
 

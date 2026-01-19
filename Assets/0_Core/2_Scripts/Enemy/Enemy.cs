@@ -24,11 +24,6 @@ public class Enemy : MonoBehaviour, IEnemy
     {      
         CurrentHealth = maxHealth;
         _isAlive = true;
-
-        if (EnemyManager.Instance != null)
-        {
-            EnemyManager.Instance.RegisterEnemy(this);
-        }
     }
 
     private void OnEnable()

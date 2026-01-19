@@ -2,9 +2,7 @@
 using UnityEngine;
 
 /// <summary>
-/// 배의 각 무기 슬롯(포탑)에 부착되는 스크립트입니다.
-/// 장착된 무기(ScriptableObject)의 데이터를 가지며,
-/// AutoAttackController로부터 발사 명령을 받습니다.
+/// 배의 각 무기 슬롯(포탑)에 부착되는 스크립트
 /// </summary>
 public class WeaponMount : MonoBehaviour
 {

@@ -1,13 +1,15 @@
 ﻿using System;
 using UnityEngine;
 
-public delegate void OnExpChanged(float currentExp, float maxExp); 
+public delegate void OnExpChanged(float currentExp, float maxExp);
+
 
 public class PlayerExpManager : MonoBehaviour
 {
     public static PlayerExpManager Instance { get; private set; }
     public event OnExpChanged onExpChanged;
     public event Action<int> OnLevelUp;
+    
 
     [Header("경험치 관련")]
     [SerializeField] private int baseExp = 10; // 첫 레벨업 경험치 (1레벨 필요 경험치)

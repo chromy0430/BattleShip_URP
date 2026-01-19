@@ -12,8 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f166144cad8099a43bba2f288916da96, type: 3}
   m_Name: HormingData_Default
   m_EditorClassIdentifier: Assembly-CSharp::MissileData
-  Name: Missile_Default
-  Description: 
+  WeaponName: 
+  WeaponDescription: 
   Damage: 25
   Range: 50
   EnemyCount: 2

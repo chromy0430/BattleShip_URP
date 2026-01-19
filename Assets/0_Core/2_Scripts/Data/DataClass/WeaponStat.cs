@@ -4,6 +4,10 @@
 public class WeaponStat 
 {
     // 기존 무기 스탯
+    public string Name;
+    public string Description;
+
+    public int WeaponLevel;
     public int Damage;
     public int Range;
     public int EnemyCount;
@@ -41,6 +45,9 @@ public class WeaponStat
 
     public WeaponStat(BaseWeaponData data)
     {
+        WeaponLevel = 1;
+        Name = data.WeaponName;
+        Description = data.WeaponDescription;
         Damage = data.Damage;
         Range = data.Range;
         EnemyCount = data.EnemyCount;

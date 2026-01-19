@@ -39,24 +39,46 @@ public class TargetScanner : MonoBehaviour
 
     private NativeArray<EnemyDistData> _sortedEnemies;
     private bool _isAllocated;
+    private int _validCount;
 
     // 매 프레임 적들의 거리 계산 및 정렬
     public void UpdateScanner(Vector3 playerPos, IReadOnlyList<IEnemy> activeEnemies)
     {
         int count = activeEnemies.Count;
-        if (count == 0) return;
+        //if (count == 0) return;
+        if (count == 0)
+        {
+            if (_isAllocated)
+            {
+                _sortedEnemies.Dispose();
+                _isAllocated = false;
+            }
+            _validCount = 0; // 유효 데이터 없음 표시
+            return;
+        }
 
-        // 메모리 할당 (TempJob: 프레임 종료 시 자동 해제되는 빠른 할당)
         NativeArray<float3> enemyPosArray = new NativeArray<float3>(count, Allocator.TempJob);
         NativeArray<EnemyDistData> resultDistArray = new NativeArray<EnemyDistData>(count, Allocator.TempJob);
 
         // 위치 데이터 복사
-        for (int i = 0; i < count; i++)
+        /*for (int i = 0; i < count; i++)
         {
             if (activeEnemies[i] != null && activeEnemies[i].IsAlive)
                 enemyPosArray[i] = activeEnemies[i].TargetTransform.position;
             else
                 enemyPosArray[i] = float3.zero; // 죽은 적 예외처리
+        }*/
+
+        for (int i = 0; i < count; i++)
+        {
+            if (activeEnemies[i] != null && activeEnemies[i].IsAlive)
+            {
+                enemyPosArray[i] = activeEnemies[i].TargetTransform.position;
+            }
+            else
+            {
+                enemyPosArray[i] = new float3(float.MaxValue, float.MaxValue, float.MaxValue);
+            }
         }
 
         // 잡 스케줄링 및 즉시 실행
@@ -68,37 +90,38 @@ public class TargetScanner : MonoBehaviour
         };
         calcJob.Schedule(count, 64).Complete(); // 즉시 완료 대기
 
-        // 고속 정렬 (NativeArray Sort는 매우 빠름)
         resultDistArray.Sort();
 
-        // 결과 캐싱 (이전 프레임 데이터 해제 후 덮어쓰기)
         if (_isAllocated) _sortedEnemies.Dispose();
         _sortedEnemies = new NativeArray<EnemyDistData>(resultDistArray, Allocator.Persistent);
         _isAllocated = true;
+        _validCount = _sortedEnemies.Length;
 
         enemyPosArray.Dispose();
         resultDistArray.Dispose();
     }
 
-    // 정렬된 리스트에서 조건에 맞는 적을 추출
+    // 정렬된 리스트에서 조건에 맞는 적 추출
     public void GetTargets(float range, int count, List<IEnemy> outTargets, IReadOnlyList<IEnemy> originalList)
     {
         outTargets.Clear();
-        if (!_isAllocated || _sortedEnemies.Length == 0) return;
+
+        //if (!_isAllocated || _sortedEnemies.Length == 0) return;
+        if (!_isAllocated || _validCount == 0) return;
+
 
         float rangeSqr = range * range;
         int foundCount = 0;
 
-        for (int i = 0; i < _sortedEnemies.Length; i++)
+        for (int i = 0; i < _validCount; i++)
         {
             if (foundCount >= count) break;
 
             EnemyDistData data = _sortedEnemies[i];
 
-            // 사거리 밖이면 그 뒤는 볼 필요도 없음 (정렬되어 있으므로) -> 최적화 핵심
+            // [핵심] 죽은 적은 거리가 무한대(float.MaxValue)이므로 여기서 무조건 걸러짐
             if (data.distanceSqr > rangeSqr) break;
 
-            // 원본 리스트 유효성 체크
             if (data.index < originalList.Count)
             {
                 IEnemy enemy = originalList[data.index];
@@ -107,6 +130,27 @@ public class TargetScanner : MonoBehaviour
                     outTargets.Add(enemy);
                     foundCount++;
                 }
+
+                /*for (int i = 0; i < _sortedEnemies.Length; i++)
+                {
+                    if (foundCount >= count) break;
+
+                    EnemyDistData data = _sortedEnemies[i];
+
+                    // 사거리 밖이면 그 뒤는 볼 필요도 없음 (정렬되어 있으므로) -> 최적화 핵심
+                    if (data.distanceSqr > rangeSqr) break;
+
+                    // 원본 리스트 유효성 체크
+                    if (data.index < originalList.Count)
+                    {
+                        IEnemy enemy = originalList[data.index];
+                        if (enemy != null && enemy.IsAlive)
+                        {
+                            outTargets.Add(enemy);
+                            foundCount++;
+                        }
+                    }
+                }*/
             }
         }
     }
