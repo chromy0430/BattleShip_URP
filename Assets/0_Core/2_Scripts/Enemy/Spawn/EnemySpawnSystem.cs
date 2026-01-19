@@ -1,3 +1,6 @@
+using Cysharp.Threading.Tasks;
+using System.Collections.Generic;
+using System.Threading;
 using Unity.Collections;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -36,15 +39,33 @@ public class EnemySpawnSystem : MonoBehaviour
     [Tooltip("최대 활성 적 수")]
     [SerializeField] private int maxActiveEnemies = 500; // 테스트를 위해 100으로 설정
 
+
     [SerializeField, ReadOnly] private float currentInterval;
     [SerializeField, ReadOnly] private int currentBatchCount;
-    [SerializeField, ReadOnly] private float currentPlayTime = 0f;    
+    [SerializeField, ReadOnly] private float currentPlayTime = 0f;
+
+    [Header("Batch Settings")]
+    [Tooltip("배치 스폰 시, 마리당 소환 간격 (초). 0이면 즉시 소환.")]
+    [SerializeField] private float spawnDelayInBatch = 0.1f;
 
     [Header("Debug")]
     [SerializeField] private bool showSpawnRadius = true;
 
+    [Header("Spawn Validation")]
+    [Tooltip("스폰 위치 중복 체크 반경")]
+    [SerializeField] private float spawnMinDistance = 3f;
+
+    [Tooltip("스폰 위치 찾기 최대 시도 횟수")]
+    [SerializeField] private int maxSpawnAttempts = 10;
+
+    [Tooltip("적 레이어")]
+    [SerializeField] private LayerMask enemyLayer;
+
+
     private Transform playerTransform;
     private float currentSpawnTimer = 0f;
+
+    private CancellationTokenSource cts;
 
     private void Start()
     {
@@ -58,6 +79,17 @@ public class EnemySpawnSystem : MonoBehaviour
 
         currentInterval = startSpawnInterval;
         currentBatchCount = startSpawnCount;
+
+        cts = new CancellationTokenSource();
+    }
+
+    private void OnDestroy()
+    {
+        if (cts != null)
+        {
+            cts.Cancel();
+            cts.Dispose();
+        }
     }
 
     private void Update()
@@ -91,6 +123,13 @@ public class EnemySpawnSystem : MonoBehaviour
         currentSpawnTimer += Time.deltaTime;
 
         if (currentSpawnTimer >= currentInterval)
+        {
+            SpawnBatchAsync(currentBatchCount, cts.Token).Forget();
+
+            currentSpawnTimer = 0f;
+        }
+
+        /*if (currentSpawnTimer >= currentInterval)
         {           
             for (int i = 0; i < currentBatchCount; i++)
             {
@@ -98,35 +137,101 @@ public class EnemySpawnSystem : MonoBehaviour
                     EnemyManager.Instance.ActiveEnemies.Count >= maxActiveEnemies)
                     break;
 
-                float angleStep = (Mathf.PI * 2f) / currentBatchCount;
-                float randomStartAngle = Random.Range(0f, Mathf.PI * 2f);
+                Vector3 basePos = GetRandomPointOnCircleEdge(playerTransform.position, maxSpawnRadius);
 
-                Vector3 basePos = CalculatePositionFromAngle
-                                    (
-                                        playerTransform.position,
-                                        maxSpawnRadius,
-                                        randomStartAngle
-                                    );
-
-                Vector3 offset = new Vector3
-                (
-                    Random.Range(-1.5f, 1.5f),
-                    0,
-                    Random.Range(-1.5f, 1.5f)
-                );
-
-                SpawnEnemy(basePos + offset);
+                SpawnEnemy(basePos);
             }
 
             currentSpawnTimer = 0f;
+        }*/
+    }
+
+    private async UniTaskVoid SpawnBatchAsync(int count, CancellationToken token)
+    {
+        Vector3 spawnCenterPos = playerTransform.position;
+
+        // [추가] 이번 배치에서 사용한 스폰 위치들을 임시 저장
+        List<Vector3> batchSpawnPositions = new List<Vector3>(count);
+
+        for (int i = 0; i < count; i++)
+        {
+            if (token.IsCancellationRequested) return;
+
+            if (EnemyManager.Instance != null &&
+                EnemyManager.Instance.ActiveEnemies.Count >= maxActiveEnemies)
+                break;
+
+            // [수정] 배치 내 위치 목록도 함께 전달
+            Vector3 spawnPos = GetValidSpawnPosition(spawnCenterPos, maxSpawnRadius, spawnMinDistance, batchSpawnPositions);
+
+            // [추가] 이번에 사용한 위치 저장
+            batchSpawnPositions.Add(spawnPos);
+
+            SpawnEnemy(spawnPos);
+
+            await UniTask.Delay((int)(spawnDelayInBatch * 1000), cancellationToken: token);
         }
     }
 
-    Vector3 CalculatePositionFromAngle(Vector3 center, float radius, float angle)
+    /// <summary>
+    /// 다른 적과 겹치지 않는 유효한 스폰 위치를 찾습니다.
+    /// </summary>
+    private Vector3 GetValidSpawnPosition(Vector3 center, float radius, float minDistance, List<Vector3> batchPositions = null)
     {
-        float x = Mathf.Cos(angle) * radius;
-        float z = Mathf.Sin(angle) * radius;
-        return new Vector3(center.x + x, 0, center.z + z);
+        Vector3 candidatePos;
+        int attempt = 0;
+
+        do
+        {
+            candidatePos = GetRandomPointOnCircleEdge(center, radius);
+            attempt++;
+
+            if (attempt >= maxSpawnAttempts)
+                break;
+
+            bool isTooClose = false;
+
+            // [추가] 1. 같은 배치 내에서 이미 스폰된 위치들과 체크
+            if (batchPositions != null)
+            {
+                foreach (var pos in batchPositions)
+                {
+                    if (Vector3.Distance(candidatePos, pos) < minDistance)
+                    {
+                        isTooClose = true;
+                        break;
+                    }
+                }
+            }
+
+            // 이미 너무 가까우면 다음 시도
+            if (isTooClose) continue;
+
+            // 2. 기존에 활성화된 적들과 체크 (Physics 사용)
+            Collider[] nearbyColliders = Physics.OverlapSphere(candidatePos, minDistance, enemyLayer);
+
+            if (nearbyColliders.Length == 0)
+                return candidatePos;
+
+        } while (attempt < maxSpawnAttempts);
+
+        return candidatePos;
+    }
+
+    /// <summary>
+    /// 배치 스폰용 위치들을 미리 생성합니다.
+    /// </summary>
+    private List<Vector3> GenerateBatchSpawnPositions(Vector3 center, float radius, float minDistance, int count)
+    {
+        List<Vector3> positions = new List<Vector3>(count);
+
+        for (int i = 0; i < count; i++)
+        {
+            Vector3 validPos = GetValidSpawnPosition(center, radius, minDistance, positions);
+            positions.Add(validPos);
+        }
+
+        return positions;
     }
 
     private void SpawnEnemy(Vector3 position)
@@ -139,21 +244,6 @@ public class EnemySpawnSystem : MonoBehaviour
             enemyObj.transform.rotation = Quaternion.identity;
         }
     }
-
-    /*private void SpawnEnemy()
-    {
-        Vector3 spawnPosition = GetRandomPointOnCircleEdge(playerTransform.position, maxSpawnRadius); //GetRandomSpawnPosition();
-
-        GameObject enemyObj = ObjectPoolManager.Instance.Get(testEnemyPrefab);
-
-        if (enemyObj != null)
-        {
-            // 위치 및 회전 설정
-            enemyObj.transform.position = spawnPosition;
-            enemyObj.transform.rotation = Quaternion.identity;
-
-        }
-    }*/
 
     // 테두리 찾기
     Vector3 GetRandomPointOnCircleEdge(Vector3 center, float radius)

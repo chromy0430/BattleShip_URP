@@ -48,6 +48,6 @@ public class DamageTMP : MonoBehaviour
             elapsedTime += Time.deltaTime;
             yield return null;
         }
-        Destroy(this);
+        ObjectPoolManager.Instance.Return(this.gameObject);
     }
 }

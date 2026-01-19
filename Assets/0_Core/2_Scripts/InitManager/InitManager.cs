@@ -11,8 +11,10 @@ public class InitManager : MonoBehaviour
     #region 의존성 주입
     public UpgradeManager upgradeManager;
     public WeaponUIManager weaponUIManager;
-
+    public GameObject DamageFont;
+    public EnemyManager enemyManager;
     #endregion
+
 
     #region 싱글톤
     public static InitManager Instance { get; private set; }
@@ -44,6 +46,13 @@ public class InitManager : MonoBehaviour
             {
                 ObjectPoolManager.Instance.CreatePool(enemy, 1000);
             }
+
+            // 데미지 폰트 풀링
+            ObjectPoolManager.Instance.CreatePool(DamageFont, 2000);
+
+            // 드랍템 풀링
+            if (enemyManager != null)
+                        ObjectPoolManager.Instance.CreatePool(enemyManager.m_EnemyDropPrefab, 1000);
         }
         else
         {

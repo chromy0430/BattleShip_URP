@@ -1,5 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
+using Cysharp.Threading.Tasks;
+using System;
 
 /// <summary>
 /// [수정]
@@ -119,5 +121,19 @@ public class ObjectPoolManager : MonoBehaviour
             Debug.LogWarning($"풀에 등록되지 않은 오브젝트({obj.name}) 반환 시도. Destroy합니다.");
             Destroy(obj);
         }
+    }
+
+    public void Return(GameObject obj, float delay)
+    {
+        ReturnDelayed(obj, delay).Forget();
+    }
+
+    private async UniTaskVoid ReturnDelayed(GameObject obj, float delay)
+    {
+        // 딜레이만큼 기다림 (이 동안 씬이 바뀌거나 오브젝트가 파괴되면 취소)
+        await UniTask.Delay(TimeSpan.FromSeconds(delay), cancellationToken: obj.GetCancellationTokenOnDestroy());
+
+        // 반납 실행
+        Return(obj);
     }
 }

@@ -4,7 +4,7 @@ using MoreMountains.Feedbacks;
 
 public class EnemyManager : MonoBehaviour
 {
-    [SerializeField] private GameObject m_EnemyDropPrefab;
+    public GameObject m_EnemyDropPrefab;
 
     #region 싱글톤   
     public static EnemyManager Instance { get; private set; }
@@ -19,9 +19,6 @@ public class EnemyManager : MonoBehaviour
         {
             Destroy(this);
         }
-
-        // 드랍물 오브젝트풀링 시작
-        InitDrop();
     }
     #endregion
     public IReadOnlyList<IEnemy> ActiveEnemies => _activeEnemies;
@@ -93,11 +90,6 @@ public class EnemyManager : MonoBehaviour
     #endregion
 
     #region 아이템 드랍
-    // 아이템 풀링 생성
-    public void InitDrop()
-    {
-        ObjectPoolManager.Instance.CreatePool(m_EnemyDropPrefab, 1000);
-    }
     
     // 아이템 드랍 함수
     public GameObject GetDrop(Vector3 deathPos)
