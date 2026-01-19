@@ -1,5 +1,6 @@
 using Unity.Collections;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 public class EnemySpawnSystem : MonoBehaviour
 {
@@ -90,23 +91,56 @@ public class EnemySpawnSystem : MonoBehaviour
         currentSpawnTimer += Time.deltaTime;
 
         if (currentSpawnTimer >= currentInterval)
-        {
+        {           
             for (int i = 0; i < currentBatchCount; i++)
             {
-                // 최대 활성 적 수 체크 
-                if (EnemyManager.Instance != null)
-                {
-                    if (EnemyManager.Instance.ActiveEnemies.Count >= maxActiveEnemies) break;
-                }
+                if (EnemyManager.Instance != null &&
+                    EnemyManager.Instance.ActiveEnemies.Count >= maxActiveEnemies)
+                    break;
 
-                SpawnEnemy();
+                float angleStep = (Mathf.PI * 2f) / currentBatchCount;
+                float randomStartAngle = Random.Range(0f, Mathf.PI * 2f);
+
+                Vector3 basePos = CalculatePositionFromAngle
+                                    (
+                                        playerTransform.position,
+                                        maxSpawnRadius,
+                                        randomStartAngle
+                                    );
+
+                Vector3 offset = new Vector3
+                (
+                    Random.Range(-1.5f, 1.5f),
+                    0,
+                    Random.Range(-1.5f, 1.5f)
+                );
+
+                SpawnEnemy(basePos + offset);
             }
 
             currentSpawnTimer = 0f;
         }
     }
 
-    private void SpawnEnemy()
+    Vector3 CalculatePositionFromAngle(Vector3 center, float radius, float angle)
+    {
+        float x = Mathf.Cos(angle) * radius;
+        float z = Mathf.Sin(angle) * radius;
+        return new Vector3(center.x + x, 0, center.z + z);
+    }
+
+    private void SpawnEnemy(Vector3 position)
+    {
+        GameObject enemyObj = ObjectPoolManager.Instance.Get(testEnemyPrefab);
+
+        if (enemyObj != null)
+        {
+            enemyObj.transform.position = position;
+            enemyObj.transform.rotation = Quaternion.identity;
+        }
+    }
+
+    /*private void SpawnEnemy()
     {
         Vector3 spawnPosition = GetRandomPointOnCircleEdge(playerTransform.position, maxSpawnRadius); //GetRandomSpawnPosition();
 
@@ -119,12 +153,12 @@ public class EnemySpawnSystem : MonoBehaviour
             enemyObj.transform.rotation = Quaternion.identity;
 
         }
-    }
+    }*/
 
     // 테두리 찾기
     Vector3 GetRandomPointOnCircleEdge(Vector3 center, float radius)
     {
-        float angle = Random.Range(0.0f, Mathf.PI * 2f);
+        float angle = Random.Range(0f, Mathf.PI * 2f);
         float x = Mathf.Cos(angle) * radius;
         float z = Mathf.Sin(angle) * radius;
         return new Vector3(center.x + x, 0, center.z + z);

@@ -16,7 +16,7 @@ public class Projectile : MonoBehaviour
     private Vector3 projectileSize;
 
     [SerializeField] private LayerMask waterLayer;
-
+    public GameObject DamageObject; // 데미지 폰트
     private void Awake()
     {
         _rb = GetComponent<Rigidbody>();
@@ -107,7 +107,7 @@ public class Projectile : MonoBehaviour
 
             if (!isTargetActive)
             {
-                rb.useGravity = true; 
+                //rb.useGravity = true; 
                 break;
             }
 
@@ -182,7 +182,7 @@ public class Projectile : MonoBehaviour
 
         if (!isCanceled)
         {
-            Disable();
+            Disable().Forget();
         }
     }
 
@@ -230,8 +230,6 @@ public class Projectile : MonoBehaviour
         if (!this.gameObject.activeSelf) return;
         OnHitTarget(_target);
     }
-
-    public GameObject DamageObject;
 
     /// <summary>
     /// 타겟에 명중 (OnTriggerEnter 또는 OnCannonHitTarget에서 호출됨)
@@ -295,6 +293,7 @@ public class Projectile : MonoBehaviour
         _lifeTimeCts?.Cancel();
 
         await transform.DOScale(Vector3.zero, 0.5f)
+                       .SetEase(Ease.OutQuint)
                        .SetLink(this.gameObject) // 오브젝트 파괴 시 안전장치
                        .ToUniTask(cancellationToken: this.GetCancellationTokenOnDestroy());
 

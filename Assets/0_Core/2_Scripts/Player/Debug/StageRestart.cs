@@ -9,5 +9,15 @@ public class StageRestart : MonoBehaviour
         {
             SceneManager.LoadScene(0);
         }
+        
+        if (Keyboard.current.f2Key.wasPressedThisFrame)
+        {
+            Time.timeScale = 10f;
+        }
+
+        if (Keyboard.current.f3Key.wasPressedThisFrame)
+        {
+            Time.timeScale = 1f;
+        }
     }
 }
