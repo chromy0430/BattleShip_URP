@@ -7,7 +7,17 @@ public class WeaponStat
     public int Damage;
     public int Range;
     public int EnemyCount;
-    public float FireRate;
+    [SerializeField] private float _fireRate;
+    public float FireRate 
+    { 
+        get => _fireRate; 
+        set 
+        { 
+            float clampedValue = Mathf.Clamp(value, 0.1f, 5.0f);
+
+            _fireRate = Mathf.Round(clampedValue * 100f) / 100f;
+        } 
+    }
     public float projectileSpeed;
 
     // 유도 타입 무기 스탯

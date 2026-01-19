@@ -4,6 +4,7 @@ public class EnemyDrop : MonoBehaviour, IWaterFloatTarget
 {
     public float heightOffset = 0.1f;
     public float surfaceSize = 0.5f;
+    public int expAmount = 10;
 
     public Transform Transform => transform;
     public float HeightOffset => heightOffset;
@@ -59,7 +60,7 @@ public class EnemyDrop : MonoBehaviour, IWaterFloatTarget
     {
         if (other.CompareTag("Player"))
         {
-            PlayerExpManager.Instance.GetExp(10);
+            PlayerExpManager.Instance.GetExp(expAmount);
             ObjectPoolManager.Instance.Return(this.gameObject);            
         }
     }

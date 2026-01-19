@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using UnityEditor;
+using UnityEngine;
 
 public class BaseWeaponData : ScriptableObject
 {
@@ -25,4 +26,12 @@ public class BaseWeaponData : ScriptableObject
     [Header("무기 사운드")]
     public AudioClip MuzzleSfx; // 발사하는 순간의 사운드
     public AudioClip ShotSfx; // 맞는 순간의 사운드
+
+#if UNITY_EDITOR
+    private void OnValidate()
+    {
+        EditorUtility.SetDirty(this);
+        Debug.Log("BaseWeaponData 변경");
+    }
+#endif
 }

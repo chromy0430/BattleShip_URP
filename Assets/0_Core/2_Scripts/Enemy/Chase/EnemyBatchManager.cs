@@ -161,7 +161,7 @@ public class EnemyBatchManager : MonoBehaviour
         float heightDiff = targetY - currentPos.y;
 
         Vector3 velFinal = e.rb.linearVelocity;
-        velFinal.y = heightDiff * 2.0f; // 10.0f는 부력 강도 (필요 시 조절)
+        velFinal.y = heightDiff * 0.0f; // 10.0f는 부력 강도 (필요 시 조절)
         e.rb.linearVelocity = velFinal;
     }
 
@@ -192,7 +192,7 @@ public class EnemyBatchManager : MonoBehaviour
 
         if (distSqr > e.stopDistance * e.stopDistance)
         {            
-            Vector3 moveDir = diff.normalized * e.moveSpeed;
+            Vector3 moveDir = diff.normalized * e.moveSpeed;            
 
             currentVelocity.x = moveDir.x;
             currentVelocity.z = moveDir.z;

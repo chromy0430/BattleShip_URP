@@ -1,4 +1,6 @@
-﻿using UnityEngine;
+﻿using NUnit.Framework;
+using System.Collections.Generic;
+using UnityEngine;
 
 public class UpgradeManager : MonoBehaviour
 {
@@ -22,13 +24,35 @@ public class UpgradeManager : MonoBehaviour
     {
         // 실제로는 여기서 선택지 UI를 띄워야 하지만,
         // 로직 확인을 위해 모든 무기의 데미지를 10% 올리는 예시를 작성합니다.
-        UpgradeAllWeaponsDamage(1.1f);
+        //UpgradeAllWeaponsDamage(1.1f);
+
+        UpgradeWeaponFireRate(0.1f);
 
         // 5레벨마다 모든 탄환에 유도 기능 부여 (동적 변화 테스트)
         if (newLevel % 5 == 0)
         {
             UnlockHomingUpgrade();
         }
+    }
+
+    private void UpgradeWeaponFireRate(float multiplier)
+    {
+        var mounts = attackController.GetWeaponMounts();
+        if (mounts == null || mounts.Count == 0) return;
+
+        List<WeaponMount> abc = new(4);
+
+        foreach (var item in mounts)
+        {
+            abc.Add(item);
+        }
+
+        if (abc[0].RuntimeStat.FireRate > 5.0f) return;
+
+        abc[0].RuntimeStat.FireRate = abc[0].RuntimeStat.FireRate + multiplier;
+        abc[0].InitializeCooldown();
+
+        abc.Clear();
     }
 
     private void UpgradeAllWeaponsDamage(float multiplier)

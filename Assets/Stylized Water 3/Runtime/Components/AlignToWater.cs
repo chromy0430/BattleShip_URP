@@ -318,6 +318,8 @@ namespace StylizedWater3
                 if (rollAmount > 0)
                 {
                     rigidbody.Move(position, newRotation);
+                    Debug.Log("리지드 바디 기반 회전");
+                    
                 }
                 else
                 {

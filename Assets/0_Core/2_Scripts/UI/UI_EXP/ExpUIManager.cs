@@ -9,23 +9,27 @@ public class ExpUIManager : MonoBehaviour
 
     private void Start()
     {
-        ExpChange(0);
-        PlayerExpManager.Instance.onExpChanged += ExpChange;
+        ExpChange(0, 10);
+        if (PlayerExpManager.Instance != null)
+            PlayerExpManager.Instance.onExpChanged += ExpChange;
     }
     private void OnDestroy()
     {
-        PlayerExpManager.Instance.onExpChanged -= ExpChange;
+        if (PlayerExpManager.Instance != null)
+            PlayerExpManager.Instance.onExpChanged -= ExpChange;
     }
 
-    public void ExpChange(float exp)
+    public void ExpChange(float currentExp, float maxExp)
     {
-        float expPercentage = exp / 100f;
+        if (maxExp == 0) maxExp = 1;
+
+        float expPercentage = currentExp / maxExp;
         ExpFill.fillAmount = expPercentage;
-        LevelText.text = string.Format
-        (
+
+        LevelText.text = string.Format(
             "Lv.{0} <color=#FFFF00>{1:0.0}</color>%",
             (PlayerExpManager.Instance.currentLevel + 1),
-            exp
+            expPercentage * 100f
         );
     }
 }

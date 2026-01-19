@@ -56,21 +56,11 @@ public class PlayerManager : MonoBehaviour
     {
         if (_allCoins.Contains(coin))
         {
-            foreach (EnemyDrop coinItem in _allCoins)
-            {
-                coinItem.GetComponent<AlignToWater>().enabled = false;
-            }
-
             _allCoins.Remove(coin);
         }
 
         if (_magnetTargetCoins.Contains(coin))
         {
-            foreach (EnemyDrop coinItem in _allCoins)
-            {
-                coinItem.GetComponent<AlignToWater>().enabled = false;
-            }
-
             _magnetTargetCoins.Remove(coin);
         }
     }
@@ -93,8 +83,6 @@ public class PlayerManager : MonoBehaviour
         for (int i = _magnetTargetCoins.Count - 1; i >= 0; i--)
         {
             EnemyDrop coin = _magnetTargetCoins[i];
-
-            coin.GetComponent<AlignToWater>().enabled = false;
 
             // 방어 코드
             if (coin == null || !coin.gameObject.activeInHierarchy)

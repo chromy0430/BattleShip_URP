@@ -1,7 +1,7 @@
 ﻿using System;
 using UnityEngine;
 
-public delegate void OnExpChanged(float exp);
+public delegate void OnExpChanged(float currentExp, float maxExp); 
 
 public class PlayerExpManager : MonoBehaviour
 {
@@ -36,19 +36,18 @@ public class PlayerExpManager : MonoBehaviour
     public void GetExp(int amount)
     {
         currentExp += amount;
-        int requiredExp = GetRequiredExp(currentLevel);
+        int requiredExp = GetRequiredExp(currentLevel + 1);
 
         // 레벨업 판단 루프
         while (currentExp >= requiredExp)
         {
-            currentExp -= requiredExp;
+            currentExp = 0;
             currentLevel++;
-            requiredExp = GetRequiredExp(currentLevel); // 다음 레벨 기준 갱신
-
+            requiredExp = GetRequiredExp(currentLevel + 1); // 다음 레벨 기준 갱신            
             OnLevelUp?.Invoke(currentLevel); // 레벨업 알림
         }
 
         // UI 갱신용 데이터 전달
-        onExpChanged?.Invoke(currentExp);
+        onExpChanged?.Invoke(currentExp, requiredExp);
     }
 }

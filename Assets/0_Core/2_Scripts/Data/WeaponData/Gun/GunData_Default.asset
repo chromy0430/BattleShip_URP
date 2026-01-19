@@ -19,7 +19,7 @@ MonoBehaviour:
   EnemyCount: 1
   ProjectileSpeed: 20
   FireRate: 2
-  IsHorming: 1
+  IsHorming: 0
   Icon: {fileID: 0}
   ProjectilePrefab: {fileID: 1964577959459748387, guid: aa4445101d6138b4a9ab85f6e2f14c7a, type: 3}
   MuzzleEffect: {fileID: 0}
