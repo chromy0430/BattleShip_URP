@@ -11,6 +11,7 @@ public class Projectile : MonoBehaviour
     private WeaponStat _stat;
     private IEnemy _target;
     private Rigidbody _rb;
+    private Collider _collider;
     private CancellationTokenSource _lifeTimeCts;
     private bool debug = false;
     private Vector3 projectileSize;
@@ -19,7 +20,8 @@ public class Projectile : MonoBehaviour
     public GameObject DamageObject; // 데미지 폰트
     private void Awake()
     {
-        _rb = GetComponent<Rigidbody>();
+        TryGetComponent<Rigidbody>(out _rb);
+        TryGetComponent<Collider>(out _collider);
         _rb.useGravity = false;
         debug = DebugManager.instance.IsDebug;
         projectileSize = this.transform.localScale;
@@ -35,6 +37,9 @@ public class Projectile : MonoBehaviour
     /// </summary>
     public void Launch(WeaponStat data, IEnemy target, Transform firePoint)
     {
+        if (_collider != null)
+            _collider.enabled = true;
+
         this._stat = data;
         this._target = target;
 
@@ -186,6 +191,9 @@ public class Projectile : MonoBehaviour
     /// </summary>
     private void OnHitTarget(IEnemy enemy) // [수정] enemy = null 기본값 제거
     {
+        if (_collider != null)
+            _collider.enabled = false;
+
         if (enemy != null && enemy.IsAlive)
         {
             if (debug)
@@ -212,7 +220,6 @@ public class Projectile : MonoBehaviour
             if (hitEffect != null)
             {
                 hitEffect.transform.position = transform.position;
-                ObjectPoolManager.Instance.Return(hitEffect);
             } 
         }
 

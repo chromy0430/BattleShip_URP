@@ -131,7 +131,7 @@ public class EnemySpawnSystem : MonoBehaviour
         if (enemyObj != null)
         {
             enemyObj.transform.position = position;
-            enemyObj.transform.rotation = Quaternion.identity;            
+            enemyObj.transform.rotation = Quaternion.identity;
         }
     }
 

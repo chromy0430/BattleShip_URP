@@ -1,4 +1,5 @@
-﻿using MoreMountains.Feedbacks;
+﻿using Cysharp.Threading.Tasks;
+using MoreMountains.Feedbacks;
 using UnityEngine;
 
 public class Enemy : MonoBehaviour, IEnemy
@@ -13,11 +14,14 @@ public class Enemy : MonoBehaviour, IEnemy
     public bool IsAlive => _isAlive;
     public MMF_Player flickerFeedback;
 
+    [SerializeField] private Rigidbody _rb;
+
     private void Awake()
     {
         CurrentHealth = maxHealth;
         _isAlive = true;
         flickerFeedback = GetComponent<MMF_Player>();
+        _rb = GetComponent<Rigidbody>();
     }
 
     private void OnEnable()
@@ -29,6 +33,8 @@ public class Enemy : MonoBehaviour, IEnemy
         {
             EnemyManager.Instance.RegisterEnemy(this);
         }
+
+        EnableInterpolationDelay().Forget();
     }
 
     private void OnDisable()
@@ -36,6 +42,18 @@ public class Enemy : MonoBehaviour, IEnemy
         if (EnemyManager.Instance != null)
         {
             EnemyManager.Instance.UnregisterEnemy(this);
+        }
+    }
+
+    private async UniTaskVoid EnableInterpolationDelay()
+    {
+        if (_rb != null) _rb.interpolation = RigidbodyInterpolation.None;
+
+        await UniTask.WaitForFixedUpdate();
+
+        if (_rb != null && _isAlive)
+        {
+            _rb.interpolation = RigidbodyInterpolation.Interpolate;
         }
     }
 
@@ -62,7 +80,13 @@ public class Enemy : MonoBehaviour, IEnemy
     private void Die()
     {
         _isAlive = false;
-        var item = EnemyManager.Instance.GetDrop(this.transform.position);
+
+        if (_rb != null)
+        {
+            _rb.interpolation = RigidbodyInterpolation.None;
+        }
+
+        var item = EnemyManager.Instance.GetDrop(this.transform.position);        
 
         flickerFeedback?.ResetFeedbacks();
         ObjectPoolManager.Instance.Return(this.gameObject);
