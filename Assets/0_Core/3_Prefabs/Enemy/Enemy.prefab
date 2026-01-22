@@ -433,6 +433,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Enemy
   maxHealth: 20
   flickerFeedback: {fileID: 7056665536012515985}
+  _rb: {fileID: 0}
 --- !u!114 &5895034854558281223
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -446,8 +447,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyChaser
   moveSpeed: 11
-  turnSpeed: 1
-  stopDistance: 5
+  turnSpeed: 5
+  stopDistance: 2
   surfaceSize: 1
   heightOffset: 0
   cachedTransform: {fileID: 0}
