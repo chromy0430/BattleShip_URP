@@ -9,7 +9,7 @@ public class Enemy : MonoBehaviour, IEnemy
     public int CurrentHealth { get; private set; }
     public int MaxHealth => maxHealth; 
 
-    private bool _isAlive = true;
+    private bool _isAlive = false;
     public Transform TargetTransform => transform;
     public bool IsAlive => _isAlive;
     public MMF_Player flickerFeedback;
@@ -19,7 +19,7 @@ public class Enemy : MonoBehaviour, IEnemy
     private void Awake()
     {
         CurrentHealth = maxHealth;
-        _isAlive = true;
+        _isAlive = false;
         flickerFeedback = GetComponent<MMF_Player>();
         _rb = GetComponent<Rigidbody>();
     }
@@ -43,6 +43,7 @@ public class Enemy : MonoBehaviour, IEnemy
         {
             EnemyManager.Instance.UnregisterEnemy(this);
         }
+
     }
 
     private async UniTaskVoid EnableInterpolationDelay()

@@ -60,15 +60,6 @@ public class TargetScanner : MonoBehaviour
         NativeArray<float3> enemyPosArray = new NativeArray<float3>(count, Allocator.TempJob);
         NativeArray<EnemyDistData> resultDistArray = new NativeArray<EnemyDistData>(count, Allocator.TempJob);
 
-        // 위치 데이터 복사
-        /*for (int i = 0; i < count; i++)
-        {
-            if (activeEnemies[i] != null && activeEnemies[i].IsAlive)
-                enemyPosArray[i] = activeEnemies[i].TargetTransform.position;
-            else
-                enemyPosArray[i] = float3.zero; // 죽은 적 예외처리
-        }*/
-
         for (int i = 0; i < count; i++)
         {
             if (activeEnemies[i] != null && activeEnemies[i].IsAlive)
