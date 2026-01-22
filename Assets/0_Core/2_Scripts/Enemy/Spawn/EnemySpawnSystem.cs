@@ -6,9 +6,9 @@ public class EnemySpawnSystem : MonoBehaviour
 {
     [SerializeField] private PlayTimeUIManager playTime;
 
-    [Header("Spawn Settings")]
-    [Tooltip("테스트용 적 프리팹 (나중에 SO 데이터로 교체 예정)")]
-    [SerializeField] private GameObject testEnemyPrefab;
+    //[Header("Spawn Settings")]
+    //[Tooltip("테스트용 적 프리팹 (나중에 SO 데이터로 교체 예정)")]
+    //[SerializeField] private GameObject testEnemyPrefab;
 
     [Tooltip("적이 스폰될 반경")]
     [SerializeField] private float maxSpawnRadius = 25f;
@@ -98,8 +98,10 @@ public class EnemySpawnSystem : MonoBehaviour
     }
     private async UniTaskVoid SpawnBatchAsync()
     {
-        // 현재 프레임에서 소환해야 할 마리 수 확정 (도중에 바뀌지 않게 캡처)
+        // 현재 프레임에서 소환해야 할 마리 수 확정
         int batchCount = currentBatchCount;
+
+        if (AddressableEnemyPoolManager.Instance == null) return;
 
         for (int i = 0; i < batchCount; i++)
         {
@@ -126,13 +128,50 @@ public class EnemySpawnSystem : MonoBehaviour
 
     private void SpawnEnemy(Vector3 position)
     {
-        GameObject enemyObj = ObjectPoolManager.Instance.Get(testEnemyPrefab);
+        EnemyData selectedData = GetWeightedRandomEnemy();
 
-        if (enemyObj != null)
+        if (selectedData == null)
+        {
+            Debug.LogWarning("스폰할 적 데이터가 없습니다. PoolManager의 리스트를 확인하세요.");
+            return;
+        }
+
+        AddressableEnemyPoolManager.Instance.GetEnemy(selectedData, position, Quaternion.identity);
+
+        //GameObject enemyObj = ObjectPoolManager.Instance.Get(testEnemyPrefab);
+
+        /*if (enemyObj != null)
         {
             enemyObj.transform.position = position;
             enemyObj.transform.rotation = Quaternion.identity;
+        }*/
+    }
+
+    private EnemyData GetWeightedRandomEnemy()
+    {
+        var spawnList = AddressableEnemyPoolManager.Instance.stageEnemies;
+
+        if (spawnList == null || spawnList.Count == 0) return null;
+
+        int totalWeight = 0;
+        foreach (var item in spawnList)
+        {
+            totalWeight += item.weight;
         }
+
+        int randomValue = Random.Range(0, totalWeight);
+        int currentWeight = 0;
+
+        foreach (var item in spawnList)
+        {
+            currentWeight += item.weight;
+            if (randomValue < currentWeight)
+            {
+                return item.data;
+            }
+        }
+
+        return spawnList[0].data;
     }
 
     Vector3 GetClockwiseSpawnPoint(Vector3 center, float radius)

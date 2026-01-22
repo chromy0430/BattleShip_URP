@@ -20,7 +20,10 @@ public class EnemyBatchManager : MonoBehaviour
 
     [Header("Optimization Settings")]
     [SerializeField] private float highQualityDistSqr = 30f * 30f; // 30m 이내는 고품질
-    
+    private const float UPDATE_DISTANCE_THRESHOLD = 10.0f;
+    private float _updateDistanceSqr;
+    private Vector3 _lastQueryPosition;
+
     [Header("Buoyancy Update")]
     [SerializeField] private int buoyancyFrameInterval = 4;
     private bool shouldUpdateBuoyancy = false;
@@ -35,8 +38,10 @@ public class EnemyBatchManager : MonoBehaviour
         _samplerLow.SetSampleCount(1);
 
         if (heightInterface == null) heightInterface = new HeightQuerySystem.Interface();
+        if (waveProfile != null) heightInterface.waveProfile = waveProfile;
 
-        if (waveProfile != null) heightInterface.waveProfile = waveProfile;        
+        _updateDistanceSqr = UPDATE_DISTANCE_THRESHOLD * UPDATE_DISTANCE_THRESHOLD;
+        _lastQueryPosition = new Vector3(float.MinValue, float.MinValue, float.MinValue);
     }
 
     private void Start()
@@ -63,8 +68,15 @@ public class EnemyBatchManager : MonoBehaviour
         if (enemy != null && !_enemies.Contains(enemy))
         {
             _enemies.Add(enemy);
-            if (heightInterface != null)
+
+            if (heightInterface.HasMissingReferences() && enemy.cachedTransform != null)
+            {
                 heightInterface.GetWaterObject(enemy.cachedTransform.position);
+                _lastQueryPosition = enemy.cachedTransform.position;
+            }
+
+            //if (heightInterface != null)
+            //    heightInterface.GetWaterObject(enemy.cachedTransform.position);
         }
     }
     public void Unregister(EnemyChaser enemy)
@@ -74,16 +86,27 @@ public class EnemyBatchManager : MonoBehaviour
 
     private void FixedUpdate()
     {
-        if (_playerTransform == null || _enemies.Count == 0) return;
+        if (_playerTransform == null) return;
 
         Vector3 playerPos = _playerTransform.position;
+        float movedDistSqr = (playerPos - _lastQueryPosition).sqrMagnitude;
+
+        if (movedDistSqr > _updateDistanceSqr || heightInterface.HasMissingReferences())
+        {
+            heightInterface.GetWaterObject(playerPos);
+            _lastQueryPosition = playerPos;
+        }
+        if (heightInterface.HasMissingReferences()) return;
+
+        if (_enemies.Count == 0) return;
+
         float deltaTime = Time.fixedDeltaTime;
 
         for (int i = 0; i < _enemies.Count; i++)
         {
             var e = _enemies[i];
 
-            // 1. 적 생존 여부 확인
+            // 적 생존 여부 확인
             if (e == null || !e.status.IsAlive)
             {
                 if (e != null) e.rb.linearVelocity = Vector3.Lerp(e.rb.linearVelocity, Vector3.zero, deltaTime * 2f);
@@ -102,7 +125,7 @@ public class EnemyBatchManager : MonoBehaviour
                 HandleBuoyancy(e, currentPos, distSqr);
             }
 
-            // 3. 이동 및 회전 처리 (X, Z축 제어)
+            // 이동 및 회전 처리 (X, Z축 제어)
             HandleMovement(e, playerPos, deltaTime);
         }
     }
@@ -156,12 +179,12 @@ public class EnemyBatchManager : MonoBehaviour
             avgHeight = currentSampler.heightValues[0];
         }
 
-        // 5. 부력 물리 적용
+        // 부력 물리 적용
         float targetY = avgHeight + e.heightOffset;
         float heightDiff = targetY - currentPos.y;
 
         Vector3 velFinal = e.rb.linearVelocity;
-        velFinal.y = heightDiff * 0.0f; // 10.0f는 부력 강도 (필요 시 조절)
+        velFinal.y = heightDiff * 2.0f; // 10.0f는 부력 강도 (필요 시 조절)
         e.rb.linearVelocity = velFinal;
     }
 

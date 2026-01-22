@@ -5,9 +5,7 @@ public class SmallShipData : BaseShipData
 {
     protected override void ApplyTypeSpecificOverrides()
     {
-        baseSpeed = 5f;
-        baseMinSpeed = 4f;
-        baseMaxSpeed = 6f;
+        baseMoveSpeed = 5f;
         baseTurnSpeed = 10f;
     }
 }

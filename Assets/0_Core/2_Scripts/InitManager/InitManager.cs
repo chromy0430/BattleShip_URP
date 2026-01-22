@@ -6,7 +6,7 @@ public class InitManager : MonoBehaviour
 {
     // 풀링용 리스트
     public List<BaseWeaponData> allWeaponDatas;
-    public List<GameObject> allEnemyPrefabs;
+    //public List<GameObject> allEnemyPrefabs;
 
     #region 의존성 주입
     public UpgradeManager upgradeManager;
@@ -42,10 +42,10 @@ public class InitManager : MonoBehaviour
                 ObjectPoolManager.Instance.CreatePool(data.ShotEffect, 500);
             }
 
-            foreach (var enemy in allEnemyPrefabs)
+            /*foreach (var enemy in allEnemyPrefabs)
             {
                 ObjectPoolManager.Instance.CreatePool(enemy, 1000);
-            }
+            }*/
 
             // 데미지 폰트 풀링
             ObjectPoolManager.Instance.CreatePool(DamageFont, 2000);

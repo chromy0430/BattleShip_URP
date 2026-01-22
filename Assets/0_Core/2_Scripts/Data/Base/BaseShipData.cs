@@ -15,14 +15,10 @@ public class BaseShipData : ScriptableObject
     public float BaseHP; // 배 체력
     public float BaseDEF; // 배 방어력
 
-    public virtual float BaseSpeed => baseSpeed;
-    public virtual float BaseMinSpeed => baseMinSpeed;
-    public virtual float BaseMaxSpeed => baseMaxSpeed;
+    public virtual float BaseMoveSpeed => baseMoveSpeed;
     public virtual float BaseTurnSpeed => baseTurnSpeed;
 
-    [SerializeField] protected float baseSpeed;      // 기본값 설정 가능
-    [SerializeField] protected float baseMinSpeed;
-    [SerializeField] protected float baseMaxSpeed;
+    [SerializeField] protected float baseMoveSpeed;      // 기본값 설정 가능
     [SerializeField] protected float baseTurnSpeed;
 
     public float BaseSPR; // 체력 재생 속도

@@ -198,17 +198,19 @@ public class Projectile : MonoBehaviour
         {
             if (debug)
             {
-                enemy.TakeDamage(1);
+                enemy.TakeDamage(1, out int finalDmg);
             }
             else
             {
-                enemy.TakeDamage(_stat.Damage);
+                //int finalDamage;
+                enemy.TakeDamage(_stat.Damage, out int finalDamage);
                 var damageFont = ObjectPoolManager.Instance.Get(DamageObject);
                 damageFont.GetComponent<DamageTMP>().Initialize
                     (
                         Base_Canvas.Instance.transform,
                         transform.position,
-                        _stat.Damage.ToString()
+                        finalDamage.ToString()
+                    //_stat.Damage.ToString()
                     );
             }
         }

@@ -48,8 +48,8 @@ public class PlayerMove : MonoBehaviour
     {
         if (playerData == null) Debug.LogError("데이터 없음");
 
-        dashSpeed += playerData.shipData.BaseMaxSpeed * .1f;
-        moveSpeed += playerData.shipData.BaseSpeed * .1f;
+        dashSpeed += playerData.shipData.BaseMoveSpeed * .2f;
+        moveSpeed += playerData.shipData.BaseMoveSpeed * .1f;
         turnSpeed += playerData.shipData.BaseTurnSpeed * .1f;
     }
 

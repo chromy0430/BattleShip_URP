@@ -12,7 +12,7 @@ public class WaterBatchManager : MonoBehaviour
     [SerializeField] private WaveProfile waveProfile;
     private readonly List<IWaterFloatTarget> _targets = new();
     private HeightQuerySystem.Sampler _sampler;
-
+    Vector3 queryPos;
     private void Awake()
     {
         Instance = this;
@@ -27,24 +27,28 @@ public class WaterBatchManager : MonoBehaviour
     {
         if (_targets.Count == 0) return;
 
+        queryPos = transform.position;
+        if (PlayerManager.Instance != null && PlayerManager.Instance.PlayerTransform != null)
+        {
+            queryPos = PlayerManager.Instance.PlayerTransform.position;
+        }
+        else if (_targets.Count > 0 && _targets[0] != null)
+        {
+            queryPos = _targets[0].Transform.position;
+        }
+
+        // 위치 갱신
+        heightInterface.GetWaterObject(queryPos);
+        if (heightInterface.HasMissingReferences()) return;
+
         foreach (var target in _targets)
         {
             if (!target.IsActive) continue;
 
-            // 물 오브젝트 가져옴
-            //heightInterface.GetWaterObject(target.Transform.position);
-
-            // 없으면 패스
-            //if (heightInterface.HasMissingReferences())
-            //   continue;
-
-            // 타겟의 샘플 위치 계산 - 부력을 받는 기준
             UpdateSamplePositions(target);
 
-            // 컴퓨트셰이더 계산
             Gerstner.ComputeHeight(_sampler, heightInterface);
 
-            // 높이 적용
             ApplyHeight(target);
         }
     }
@@ -100,8 +104,9 @@ public class WaterBatchManager : MonoBehaviour
 
         if (heightInterface.HasMissingReferences())
         {
-            Debug.LogWarning($"[WaterBatchManager] No WaterObject found for {target}");
-            return;
+            heightInterface.GetWaterObject(queryPos);
+            //Debug.LogWarning($"[WaterBatchManager] No WaterObject found for {target}");
+            //return;
         }
 
         // 타겟에 WaterObject 캐싱

@@ -13,6 +13,11 @@ public class EnemyDrop : MonoBehaviour, IWaterFloatTarget
 
     private HeightQuerySystem.Interface _heightInterface;
 
+    public void Initialize(int exp)
+    {
+        this.expAmount = exp;
+    }
+
     public void SetWaterObject(HeightQuerySystem.Interface heightInterface)
     {
         // 이미 같은 WaterObject면 아무 것도 안 함

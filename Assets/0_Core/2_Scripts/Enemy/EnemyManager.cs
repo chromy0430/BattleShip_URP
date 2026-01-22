@@ -120,7 +120,7 @@ public class EnemyManager : MonoBehaviour
             }
             else
             {
-                enemy.TakeDamage(7777);
+                enemy.TakeDamage(7777, out int dmg);
             }
         }
 
