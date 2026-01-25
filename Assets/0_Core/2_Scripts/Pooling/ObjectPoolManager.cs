@@ -39,6 +39,10 @@ public class ObjectPoolManager : MonoBehaviour
     private readonly Dictionary<GameObject, GameObject> _prefabLookup =
         new Dictionary<GameObject, GameObject>();
 
+    // 프리펩별 활성화된 객체 수
+    private readonly Dictionary<GameObject, int> _activeCounts = new Dictionary<GameObject, int>();
+
+    #region 풀링 관련
     /// <summary>
     /// 풀을 미리 생성하고 채워넣습니다. (Pre-warming)
     /// </summary>
@@ -62,7 +66,7 @@ public class ObjectPoolManager : MonoBehaviour
         var obj = Instantiate(prefab, this.transform);
 
 #if UNITY_EDITOR
-        // [수정] 문자열 보간법 적용
+        // 문자열 보간법 적용
         obj.name = $"{prefab.name} (Pool)";
 #endif
 
@@ -73,7 +77,7 @@ public class ObjectPoolManager : MonoBehaviour
     }
 
     /// <summary>
-    /// 풀에서 오브젝트를 가져옵니다. (Instantiate 대신 사용)
+    /// 풀에서 오브젝트를 가져옵니다.
     /// </summary>
     public GameObject Get(GameObject prefab)
     {
@@ -97,14 +101,21 @@ public class ObjectPoolManager : MonoBehaviour
             Debug.LogWarning($"풀({prefab.name})이 비어있어 확장합니다.");
             obj = AddNewObjectToPool(prefab);
         }
+        else
+        {
+            obj = pool.Dequeue();
+        }
 
-        obj = pool.Dequeue();
+        if (!_activeCounts.ContainsKey(prefab)) _activeCounts[prefab] = 0;
+        _activeCounts[prefab]++;
+
+        //obj = pool.Dequeue();
         obj.SetActive(true);
         return obj;
     }
 
     /// <summary>
-    /// 사용이 끝난 오브젝트를 풀에 반환합니다. (Destroy 대신 사용)
+    /// 사용이 끝난 오브젝트를 풀에 반환합니다.
     /// </summary>
     public void Return(GameObject obj)
     {
@@ -115,12 +126,31 @@ public class ObjectPoolManager : MonoBehaviour
         {
             obj.SetActive(false);
             _pools[prefab].Enqueue(obj);
+
+            if (_activeCounts.ContainsKey(prefab))
+            {
+                _activeCounts[prefab] = Mathf.Max(0, _activeCounts[prefab] - 1);
+            }
         }
         else
         {
             Debug.LogWarning($"풀에 등록되지 않은 오브젝트({obj.name}) 반환 시도. Destroy합니다.");
             Destroy(obj);
         }
+    }
+
+    #endregion
+
+    /// <summary>
+    /// 특정 프리펩으로 생성되어 현재 필드에 활성화된 객체 수를 반환합니다.
+    /// </summary>
+    public int GetActiveCount(GameObject prefab)
+    {
+        if (_activeCounts.TryGetValue(prefab, out int count))
+        {
+            return count;
+        }
+        return 0;
     }
 
     public void Return(GameObject obj, float delay)

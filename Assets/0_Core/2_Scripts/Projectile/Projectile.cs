@@ -1,22 +1,30 @@
-﻿using UnityEngine;
-using Cysharp.Threading.Tasks; 
-using System.Threading;
+﻿using Cysharp.Threading.Tasks; 
 using DG.Tweening;
 using System; 
+using System.Threading;
+using UnityEngine;
 
 [RequireComponent(typeof(Rigidbody))]
 [RequireComponent(typeof(Collider))]
 public class Projectile : MonoBehaviour
 {
-    private WeaponStat _stat;
     private IEnemy _target;
-    private Rigidbody _rb;
-    private Collider _collider;
-    private CancellationTokenSource _lifeTimeCts;
-    private bool debug = false;
-    private Vector3 projectileSize;
 
-    [SerializeField] private LayerMask waterLayer;
+    private static readonly Collider[] _searchBuffer = new Collider[10]; // 검색할 최대 타겟 수 
+
+    private WeaponStat _stat; // 무기 스탯
+    private Rigidbody _rb; // 리지드바디
+    private Collider _collider; // 콜라이더
+    private CancellationTokenSource _lifeTimeCts; // 유니태스크 토큰
+    private Transform _launcher; // 투사체 위치
+    
+    private int _currentTargetId;
+    private bool debug = false;
+
+    private Vector3 projectileSize;
+    [SerializeField] private LayerMask _targetMask;
+
+    
     public GameObject DamageObject; // 데미지 폰트
     private void Awake()
     {
@@ -42,6 +50,13 @@ public class Projectile : MonoBehaviour
 
         this._stat = data;
         this._target = target;
+        this._launcher = firePoint;
+
+        if (target != null)
+        {
+            // 유니티 오브젝트의 고유 ID 혹은 커스텀 ID 저장
+            _currentTargetId = target.TargetTransform.gameObject.GetInstanceID();
+        }
 
         // 이전의 비행 로직(DOTween, UniTask)이 남아있다면 취소
         _lifeTimeCts?.Cancel();
@@ -51,7 +66,7 @@ public class Projectile : MonoBehaviour
         // 10초 후 자동 파괴(풀 반환) 로직 시작
         StartLifetimeLimit(3.0f, _lifeTimeCts.Token).Forget();
 
-        // 데이터 타입별
+        // 비유도 타입
         if (!data.IsHoming)
         {
             Vector3 fireDirection = firePoint.forward;
@@ -61,9 +76,9 @@ public class Projectile : MonoBehaviour
             _rb.linearVelocity = fireDirection * data.projectileSpeed;
             _rb.useGravity = false;
         }
-        else if (data.IsHoming)
+        else //if (data.IsHoming)
         {
-            HomingLoop(_lifeTimeCts.Token).Forget();
+            HomingLoop(_lifeTimeCts.Token).Forget(); // 유도 타입
         }
     }
 
@@ -73,33 +88,97 @@ public class Projectile : MonoBehaviour
     private async UniTaskVoid HomingLoop(CancellationToken token)
     {
         float currentSpeed = _stat.projectileSpeed;
-        var rb = _rb;
-        var tr = transform;
+        float maxRangeSqr = _stat.Range * _stat.Range;
+
+        //var rb = _rb;
+        //var tr = transform;
 
         while (!token.IsCancellationRequested)
         {
-            if (rb == null || tr == null) break;
+            if (_rb == null || _launcher == null) break;
+            //if (rb == null || tr == null) break;
 
-            bool isTargetActive = _target != null && _target.IsAlive && _target.TargetTransform.gameObject.activeInHierarchy;
+            /*bool isTargetActive = _target != null && _target.IsAlive && _target.TargetTransform.gameObject.activeInHierarchy;
 
             if (!isTargetActive)
             {
                 rb.useGravity = true; 
                 break;
+            }*/
+
+            float distFromLauncherSqr = (transform.position - _launcher.position).sqrMagnitude;
+            if (distFromLauncherSqr > maxRangeSqr * 1.44f) // 사거리의 1.2배 지점에서 소멸
+            {
+                Disable().Forget();
+                break;
             }
 
-            Vector3 direction = (_target.TargetTransform.position - transform.position).normalized;
-            direction.y += .2f;
+            bool isTargetValid = _target != null && _target.IsAlive &&
+                                 _target.TargetTransform.gameObject.activeInHierarchy &&
+                                 _target.TargetTransform.gameObject.GetInstanceID() == _currentTargetId;
+
+            if (!isTargetValid) 
+            {
+                _target = FindNewTarget();
+
+                if (_target != null) 
+                {
+                    _currentTargetId = _target.TargetTransform.gameObject.GetInstanceID();
+                }
+                else
+                {
+                    _rb.useGravity = true;
+                    break;
+                }
+            }
+
+
+            //Vector3 direction = (_target.TargetTransform.position - transform.position).normalized;
+            Vector3 toTarget = _target.TargetTransform.position - transform.position;
+            float distance = toTarget.magnitude;
+            Vector3 direction = toTarget / distance;
+            direction.y += 0.2f;
+
             Quaternion lookRotation = Quaternion.LookRotation(direction);
+            float proximityBonus = distance < 3.0f ? 2.0f : 1.0f;
 
-            rb.rotation = Quaternion.Slerp(rb.rotation, lookRotation, _stat.HomingTurnSpeed * Time.deltaTime);
-
+            _rb.rotation = Quaternion.Slerp(_rb.rotation, lookRotation, _stat.HomingTurnSpeed * proximityBonus * Time.deltaTime);
             currentSpeed += _stat.Acceleration * Time.deltaTime;
+            _rb.linearVelocity = transform.forward * currentSpeed;
 
-            rb.linearVelocity = tr.forward * currentSpeed;
-
-            await UniTask.Yield(PlayerLoopTiming.FixedUpdate);
+            await UniTask.Yield(PlayerLoopTiming.FixedUpdate, token);
         }
+    }
+
+    private IEnemy FindNewTarget()
+    {
+        Vector3 searchOrigin = _launcher != null ? _launcher.position : transform.position;
+        float searchRadius = _stat.Range;
+
+        int count = Physics.OverlapSphereNonAlloc
+        (
+            searchOrigin, // 플레이어 중심 기준
+            searchRadius, // 무기 범위
+            _searchBuffer, // 최대 검색할 적 수
+            _targetMask // 타겟 레이어
+        );
+
+        IEnemy closestEnemy = null;
+        float minDistanceSqr = float.MaxValue;
+
+        for (int i = 0; i < count; i++)
+        {
+            if (_searchBuffer[i].TryGetComponent<IEnemy>(out var enemy) && enemy.IsAlive)
+            {
+                float distSqr = (enemy.TargetTransform.position - transform.position).sqrMagnitude;
+                if (distSqr < minDistanceSqr)
+                {
+                    minDistanceSqr = distSqr;
+                    closestEnemy = enemy;
+                }
+            }
+        }
+        return closestEnemy;
     }
 
     /// <summary>
@@ -130,7 +209,6 @@ public class Projectile : MonoBehaviour
             }
         }
     }
-
 
     /// <summary>
     /// 타겟에 명중 (OnTriggerEnter 또는 OnCannonHitTarget에서 호출됨)
@@ -173,6 +251,7 @@ public class Projectile : MonoBehaviour
 
         Disable().Forget();
     }
+
 
     /// <summary>
     /// 모든 작업을 중지하고 오브젝트 풀에 반환
