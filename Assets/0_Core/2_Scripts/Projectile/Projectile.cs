@@ -50,48 +50,20 @@ public class Projectile : MonoBehaviour
 
         // 10초 후 자동 파괴(풀 반환) 로직 시작
         StartLifetimeLimit(3.0f, _lifeTimeCts.Token).Forget();
-        //DelayDestroy(2.5f, _lifeTimeCts.Token).Forget();
 
-        // --- 데이터 타입별 비행 로직 분기 ---
-
+        // 데이터 타입별
         if (!data.IsHoming)
         {
             Vector3 fireDirection = firePoint.forward;
             fireDirection.y = 0f;
             fireDirection.Normalize();
-            _rb.AddForce(fireDirection * data.projectileSpeed, ForceMode.VelocityChange);
-
-            //_rb.AddForce(firePoint.forward * data.projectileSpeed, ForceMode.VelocityChange);
+            //_rb.AddForce(fireDirection * data.projectileSpeed, ForceMode.VelocityChange);
+            _rb.linearVelocity = fireDirection * data.projectileSpeed;
             _rb.useGravity = false;
         }
-        /*else if (_stat is ArcWeaponData cannon)
-        {
-            // [Cannon] 포물선 비행 (기획서 우선순위)
-            if (_target != null && _target.IsAlive)
-            {
-                Vector3 targetPos = _target.TargetTransform.position;
-                // 중간 정점 계산 (포물선 높이 적용)
-                Vector3 midPoint = (transform.position + targetPos) / 2f + (Vector3.up * cannon.arcHeight);
-                Vector3[] path = { midPoint, targetPos };
-
-                //_rb.isKinematic = true; // DOPath 사용 시 물리 비활성화
-
-                // [수정] OnComplete가 파라미터 없는 'OnCannonHitTarget'를 호출하도록 변경
-                transform.DOPath(path, cannon.projectileSpeed, PathType.CatmullRom)
-                    .SetSpeedBased()
-                    .SetEase(Ease.Linear)
-                    .OnComplete(OnCannonHitTarget); // <-- [수정] '메서드 그룹' 오류 해결
-            }
-            else
-            {
-                //Disable();
-                ReturnToPool(); // 타겟이 없으면 즉시 반환
-            }
-        }*/
         else if (data.IsHoming)
         {
             HomingLoop(_lifeTimeCts.Token).Forget();
-            //HomingLoop(data, _lifeTimeCts.Token).Forget(); // 유도 루프 시작
         }
     }
 
@@ -130,18 +102,6 @@ public class Projectile : MonoBehaviour
         }
     }
 
-    private async UniTaskVoid DelayDestroy(float duration, CancellationToken token)
-    {
-        bool isCanceled = await UniTask.Delay(TimeSpan.FromSeconds(duration), cancellationToken: token)
-                                       .SuppressCancellationThrow();
-
-        if (!isCanceled)
-        {
-            Disable().Forget();
-        }
-    }
-
-
     /// <summary>
     /// 투사체 수명 제한
     /// </summary>
@@ -169,22 +129,8 @@ public class Projectile : MonoBehaviour
                 OnHitTarget(enemy);
             }
         }
-
-        /*if ((waterLayer.value & (1 << other.gameObject.layer)) != 0)
-        {
-            Debug.Log("바다에 닿음");
-            OnHitTarget(null);
-        }*/
     }
 
-    /// <summary>
-    /// DOPath.OnComplete를 위한 파라미터 없는 콜백
-    /// </summary>
-    private void OnCannonHitTarget()
-    {
-        if (!this.gameObject.activeSelf) return;
-        OnHitTarget(_target);
-    }
 
     /// <summary>
     /// 타겟에 명중 (OnTriggerEnter 또는 OnCannonHitTarget에서 호출됨)

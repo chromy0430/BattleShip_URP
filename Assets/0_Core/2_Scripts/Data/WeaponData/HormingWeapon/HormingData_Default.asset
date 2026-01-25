@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::MissileData
   WeaponName: 
   WeaponDescription: 
-  Damage: 25
+  Damage: 310
   Range: 50
   EnemyCount: 2
   ProjectileSpeed: 30

@@ -16,7 +16,7 @@ MonoBehaviour:
   WeaponDescription: "\uC5F0\uC0AC\uB825\uC774 \uBE60\uB978 \uAE30\uBCF8 \uBB34\uAE30"
   Damage: 300
   Range: 30
-  EnemyCount: 1
+  EnemyCount: 5
   ProjectileSpeed: 20
   FireRate: 2
   IsHorming: 0

@@ -278,7 +278,8 @@ namespace StylizedWater3
 
         private Vector3 prevNormal = new Vector3(0, 1, 0);
         private float prevHeight;
-        
+
+
         private void ApplyTransform()
         {
             //Smooth transition to new normal of this frame, particularly reduces jittering on rigid bodies
@@ -305,9 +306,10 @@ namespace StylizedWater3
                 position.x = followTarget.position.x;
                 position.z = followTarget.position.z;
             }
-            
+
+
             position.y = m_targetHeight;
-            
+
             //Setting the normal of a transform directly overrides any and all external rotations
             //If the component is attached an object with a mesh, move the mesh into a child object and rotate that instead
             var newRotation = Quaternion.FromToRotation(Vector3.up, m_targetNormal);

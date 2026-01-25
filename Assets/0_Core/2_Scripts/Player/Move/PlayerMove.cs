@@ -12,6 +12,7 @@ public class PlayerMove : MonoBehaviour
     [SerializeField] private float moveSpeed = 30f;
     [SerializeField] private float dashSpeed = 50f;
     [SerializeField] private float turnSpeed = 5f;
+
     [SerializeField] private bool dashOn;
     [SerializeField] private float currentSpeed;
 
@@ -23,10 +24,13 @@ public class PlayerMove : MonoBehaviour
     public InputActionReference moveAction;
     public InputActionReference dashAction;
 
+    public Vector3 shipOffset;
+
     private void OnEnable()
     {
         dashOn = false;
         moveAction.action.Enable();
+
         dashAction.action.started += context => dashOn = true;
         dashAction.action.performed += context => dashOn = true;
         dashAction.action.canceled += context => dashOn = false;
@@ -43,7 +47,6 @@ public class PlayerMove : MonoBehaviour
         rb = GetComponent<Rigidbody>();
         //atw = GetComponent<AlignToWater>();       
     }
-
     private void Start()
     {
         if (playerData == null) Debug.LogError("데이터 없음");
@@ -101,5 +104,11 @@ public class PlayerMove : MonoBehaviour
     {
         // Align Transform To Water 컴포넌트의 Rotation 기능을 통해 회전
         atw.rotation += turnInput * turnSpeed;
+    }
+
+    public LayerMask waterlayer;
+    private bool CheckWater()
+    {
+        return Physics.CheckBox(transform.position + shipOffset, new Vector3(.5f, .5f, .5f), Quaternion.identity, waterlayer);
     }
 }

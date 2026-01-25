@@ -3498,6 +3498,20 @@ MonoBehaviour:
   attackController: {fileID: 1103555383}
   slotParent: {fileID: 2005064513}
   weaponSlotPrefab: {fileID: 513030775287587418, guid: 8740271e0a3d70441a50284121362f22, type: 3}
+--- !u!114 &2124627046
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fc1515ab76e54f068e2f2207940fab32, type: 3}
+  m_Name: Player/Jump
+  m_EditorClassIdentifier: Unity.InputSystem::UnityEngine.InputSystem.InputActionReference
+  m_Asset: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
+  m_ActionId: f1ba0d36-48eb-4cd5-b651-1c94a6531f70
 --- !u!1001 &4192573773343360437
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -3611,9 +3625,21 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 1510298}
     - target: {fileID: 4683933945338407186, guid: cae5f9a344f3b9146aa3a4b34bccb45a, type: 3}
+      propertyPath: jumpAction
+      value: 
+      objectReference: {fileID: 2124627046}
+    - target: {fileID: 4683933945338407186, guid: cae5f9a344f3b9146aa3a4b34bccb45a, type: 3}
       propertyPath: moveAction
       value: 
       objectReference: {fileID: 1647338411}
+    - target: {fileID: 4683933945338407186, guid: cae5f9a344f3b9146aa3a4b34bccb45a, type: 3}
+      propertyPath: shipOffset.y
+      value: -0.3
+      objectReference: {fileID: 0}
+    - target: {fileID: 4683933945338407186, guid: cae5f9a344f3b9146aa3a4b34bccb45a, type: 3}
+      propertyPath: waterlayer.m_Bits
+      value: 16
+      objectReference: {fileID: 0}
     - target: {fileID: 4694292039443448324, guid: cae5f9a344f3b9146aa3a4b34bccb45a, type: 3}
       propertyPath: _weaponData
       value: 
