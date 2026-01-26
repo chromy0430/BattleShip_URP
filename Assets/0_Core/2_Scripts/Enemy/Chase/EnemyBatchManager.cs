@@ -106,12 +106,25 @@ public class EnemyBatchManager : MonoBehaviour
         {
             var e = _enemies[i];
 
+            if (e == null) continue;
+
+            if (!e.status.IsAlive) 
+            {
+                e.rb.linearVelocity = Vector3.Lerp(e.rb.linearVelocity, Vector3.zero, deltaTime * 2f);
+                continue;
+            }
+
+            if (e.status.IsKnockbacked)
+            {
+                continue;
+            }
+
             // 적 생존 여부 확인
-            if (e == null || !e.status.IsAlive)
+            /*if (e == null || !e.status.IsAlive)
             {
                 if (e != null) e.rb.linearVelocity = Vector3.Lerp(e.rb.linearVelocity, Vector3.zero, deltaTime * 2f);
                 continue;
-            }
+            }*/
 
             Vector3 currentPos = e.rb.position;
             Vector3 diff = playerPos - currentPos;

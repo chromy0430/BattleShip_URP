@@ -435,6 +435,7 @@ MonoBehaviour:
   _Shield: 0
   flickerFeedback: {fileID: 7056665536012515985}
   _rb: {fileID: 0}
+  DamageObject: {fileID: 5998229489655625853, guid: 9d2d63e853c5b3449929068d2c01b2ab, type: 3}
 --- !u!114 &5895034854558281223
 MonoBehaviour:
   m_ObjectHideFlags: 0

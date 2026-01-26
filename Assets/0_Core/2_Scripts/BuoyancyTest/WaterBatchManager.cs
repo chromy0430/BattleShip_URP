@@ -72,17 +72,35 @@ public class WaterBatchManager : MonoBehaviour
     private void UpdateSamplePositions(IWaterFloatTarget target)
     {
         var pos = target.Transform.position;
-        float half = target.SurfaceSize * 0.5f;
+        //float half = target.SurfaceSize * 0.5f;
+        var rot = target.Transform.rotation;
+
+        float halfW = target.SurfaceSize.x * 0.5f;
+        float halfL = target.SurfaceSize.y * 0.5f;
 
         // 타겟 기준으로 부력 받는 위치에서 높이 계산
-        _sampler.SetSamplePosition(0, pos + new Vector3(-half, 0, 0));
-        _sampler.SetSamplePosition(1, pos + new Vector3(half, 0, 0));
-        _sampler.SetSamplePosition(2, pos + new Vector3(0, 0, -half));
-        _sampler.SetSamplePosition(3, pos + new Vector3(0, 0, half));
+        _sampler.SetSamplePosition(0, pos + (rot * new Vector3(-halfW, 0, 0))); 
+        _sampler.SetSamplePosition(1, pos + (rot * new Vector3(halfW, 0, 0)));  
+        _sampler.SetSamplePosition(2, pos + (rot * new Vector3(0, 0, -halfL))); 
+        _sampler.SetSamplePosition(3, pos + (rot * new Vector3(0, 0, halfL)));
     }
     private void ApplyHeight(IWaterFloatTarget target)
     {
-        // 계산된 값으로 높이 적용
+        if (target is PlayerFloating player)
+        {
+            player.OnHeightCalculated(_sampler.heightValues);
+        }
+        else
+        {
+            // 일반 오브젝트는 기존처럼 단순 높이 적용
+            float h = (_sampler.heightValues[0] + _sampler.heightValues[1] +
+                       _sampler.heightValues[2] + _sampler.heightValues[3]) * 0.25f;
+            Vector3 pos = target.Transform.position;
+            pos.y = h + target.HeightOffset;
+            target.Transform.position = pos;
+        }
+
+        /*// 계산된 값으로 높이 적용
         float h =
             (_sampler.heightValues[0] +
              _sampler.heightValues[1] +
@@ -91,7 +109,7 @@ public class WaterBatchManager : MonoBehaviour
 
         var pos = target.Transform.position;
         pos.y = h + target.HeightOffset;
-        target.Transform.position = pos;
+        target.Transform.position = pos;*/
     }
 
     // 리스트에 등록

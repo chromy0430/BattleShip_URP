@@ -17,6 +17,8 @@ public class Projectile : MonoBehaviour
     private Collider _collider; // 콜라이더
     private CancellationTokenSource _lifeTimeCts; // 유니태스크 토큰
     private Transform _launcher; // 투사체 위치
+    private int boundValue = 3;
+    private int currentbound = 0;
     
     private int _currentTargetId;
     private bool debug = false;
@@ -25,7 +27,7 @@ public class Projectile : MonoBehaviour
     [SerializeField] private LayerMask _targetMask;
 
     
-    public GameObject DamageObject; // 데미지 폰트
+    
     private void Awake()
     {
         TryGetComponent<Rigidbody>(out _rb);
@@ -51,6 +53,7 @@ public class Projectile : MonoBehaviour
         this._stat = data;
         this._target = target;
         this._launcher = firePoint;
+        this.currentbound = 0;
 
         if (target != null)
         {
@@ -106,6 +109,12 @@ public class Projectile : MonoBehaviour
                 break;
             }*/
 
+            if (currentbound > boundValue)
+            {
+                Disable().Forget();
+                break;
+            }
+
             float distFromLauncherSqr = (transform.position - _launcher.position).sqrMagnitude;
             if (distFromLauncherSqr > maxRangeSqr * 1.44f) // 사거리의 1.2배 지점에서 소멸
             {
@@ -117,8 +126,8 @@ public class Projectile : MonoBehaviour
                                  _target.TargetTransform.gameObject.activeInHierarchy &&
                                  _target.TargetTransform.gameObject.GetInstanceID() == _currentTargetId;
 
-            if (!isTargetValid) 
-            {
+            if (!isTargetValid)            
+            {             
                 _target = FindNewTarget();
 
                 if (_target != null) 
@@ -152,6 +161,7 @@ public class Projectile : MonoBehaviour
 
     private IEnemy FindNewTarget()
     {
+        currentbound++;
         Vector3 searchOrigin = _launcher != null ? _launcher.position : transform.position;
         float searchRadius = _stat.Range;
 
@@ -227,15 +237,7 @@ public class Projectile : MonoBehaviour
             else
             {
                 //int finalDamage;
-                enemy.TakeDamage(_stat.Damage, out int finalDamage);
-                var damageFont = ObjectPoolManager.Instance.Get(DamageObject);
-                damageFont.GetComponent<DamageTMP>().Initialize
-                    (
-                        Base_Canvas.Instance.transform,
-                        transform.position,
-                        finalDamage.ToString()
-                    //_stat.Damage.ToString()
-                    );
+                enemy.TakeDamage(_stat.Damage, out int finalDamage);                
             }
         }
 

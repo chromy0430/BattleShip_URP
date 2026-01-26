@@ -10,12 +10,12 @@ public class EnemyDrop : MonoBehaviour, IWaterFloatTarget
 
     [Header("Floating Settings")]
     public float heightOffset = 0.1f;
-    public float surfaceSize = 0.5f;
+    public Vector2 surfaceSize = new Vector2(.5f, .5f);
     public int expAmount = 10;
 
     public Transform Transform => transform;
     public float HeightOffset => heightOffset;
-    public float SurfaceSize => surfaceSize;
+    public Vector2 SurfaceSize => surfaceSize;
     public bool IsActive => gameObject.activeInHierarchy;
 
     private HeightQuerySystem.Interface _heightInterface;

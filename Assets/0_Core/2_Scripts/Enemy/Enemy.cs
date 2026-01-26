@@ -19,6 +19,9 @@ public class Enemy : MonoBehaviour, IEnemy
     public MMF_Player flickerFeedback;
 
     [SerializeField] private Rigidbody _rb;
+    public GameObject DamageObject; // 데미지 폰트
+    private bool _isKnockbacked = false; // 넉백 상태
+    public bool IsKnockbacked => _isKnockbacked;
 
     public void Initialize(EnemyData data)
     {
@@ -91,6 +94,15 @@ public class Enemy : MonoBehaviour, IEnemy
 
         flickerFeedback?.PlayFeedbacks();
 
+        var damageFont = ObjectPoolManager.Instance.Get(DamageObject);
+        damageFont.GetComponent<DamageTMP>().Initialize
+            (
+                Base_Canvas.Instance.transform,
+                transform.position,
+                finalDamage.ToString()
+            //_stat.Damage.ToString()
+            );
+
         CurrentHealth -= finalDamage;
         //CurrentHealth -= damage;
         if (CurrentHealth <= 0)
@@ -149,5 +161,20 @@ public class Enemy : MonoBehaviour, IEnemy
         }
 
         //ObjectPoolManager.Instance.Return(this.gameObject);
+    }
+
+    public async UniTaskVoid ApplyKnockback(Vector3 force, float duration = 0.2f)
+    {
+        if (!_isAlive || _rb == null) return;
+
+        _isKnockbacked = true;
+        _rb.linearVelocity = Vector3.zero; // 기존 속도 초기화
+        force.y = 0;
+        _rb.AddForce(force, ForceMode.Impulse);
+
+        // duration 동안 대기 후 상태 해제
+        await UniTask.Delay(System.TimeSpan.FromSeconds(duration));
+
+        _isKnockbacked = false; 
     }
 }

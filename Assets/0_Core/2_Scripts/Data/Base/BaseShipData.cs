@@ -1,6 +1,9 @@
 ﻿using UnityEngine;
 using UnityEngine.Serialization;
+using Battleship_Enum;
+using UnityEditor;
 
+[CreateAssetMenu(fileName = "ShipData_", menuName = "BattleShip/Ship Data", order = 1)]
 public class BaseShipData : ScriptableObject
 {
     [Header("배 속성")]
@@ -12,28 +15,29 @@ public class BaseShipData : ScriptableObject
     [FormerlySerializedAs("ShipDescription")]
     public string ShipDescription;
 
-    public float BaseHP; // 배 체력
-    public float BaseDEF; // 배 방어력
+    public ShipSize shipSize;
 
-    public virtual float BaseMoveSpeed => baseMoveSpeed;
-    public virtual float BaseTurnSpeed => baseTurnSpeed;
-
-    [SerializeField] protected float baseMoveSpeed;      // 기본값 설정 가능
-    [SerializeField] protected float baseTurnSpeed;
-
-    public float BaseSPR; // 체력 재생 속도
-    
+    public int BaseHP; // 배 체력
+    public int BaseMP; // 배 마나
+    public int BaseDEF; // 배 방어력
+    public int BaseMagnetRange; // 배 자석 범위
+    public int BaseSPR; // 체력 재생 속도
     public int ShopCost; // 상점 가격
-    
+
+    public Vector2 BaseSurfaceSize; // 배 부력 크기
+     
+    public float BaseHeightOffset; // 배 부력 높이
+    public float BaseMoveSpeed = 10f; // 배 기본 속도
+    public float BaseTurnSpeed = 10f; // 배 회전 속도
+        
     [Header("배 시각화")]
     public GameObject shipVisual; // 배 모습
     public Sprite shipIcon; // 배 아이콘
 
-    protected virtual void ApplyTypeSpecificOverrides() { }
-
-    private void Reset()
+#if UNITY_EDITOR
+    private void OnValidate()
     {
-        ApplyTypeSpecificOverrides(); // 컴포넌트 추가나 Reset 메뉴 클릭 시 딱 1번만 실행됨
+        EditorUtility.SetDirty(this);
     }
-
+#endif
 }

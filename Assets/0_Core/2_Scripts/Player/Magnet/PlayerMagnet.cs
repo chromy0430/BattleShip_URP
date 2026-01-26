@@ -2,6 +2,8 @@
 
 public class PlayerMagnet : MonoBehaviour
 {
+    private BaseShipData shipData;
+
     private Collider[] _coinBuffer = new Collider[50];
     [Header("Local Magnet Settings")]
     [SerializeField] private float _magnetRadius = 5.0f;
@@ -17,6 +19,10 @@ public class PlayerMagnet : MonoBehaviour
         {
             _PlayerTransform = PlayerManager.Instance.PlayerTransform;
         }
+
+        shipData = PlayerDataLoad.playerData.shipData;
+
+        _magnetRadius = new ShipStat(shipData).shipMagnetRange;
     }
 
     void Update()

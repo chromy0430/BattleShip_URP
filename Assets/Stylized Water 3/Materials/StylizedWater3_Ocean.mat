@@ -25,7 +25,6 @@ Material:
   - _DEPTHEXP_ON
   - _DEPTH_TEX
   - _FOAMON_ON
-  - _INTERSECTIONSHARP_ON
   - _RECEIVEDYNAMICEFFECTSFOAM_ON
   - _RECEIVEDYNAMICEFFECTSHEIGHT_ON
   - _RECEIVEDYNAMICEFFECTSNORMAL_ON
@@ -207,20 +206,20 @@ Material:
     - _Glossiness: 0
     - _GlossyReflections: 0
     - _HorizonDistance: 32
-    - _IntersectionClipping: 0.583
-    - _IntersectionDistortion: 0.2
-    - _IntersectionFalloff: 1
+    - _IntersectionClipping: 1
+    - _IntersectionDistortion: 1
+    - _IntersectionFalloff: 0.682
     - _IntersectionFoamOn: 1
-    - _IntersectionLength: 1
-    - _IntersectionRippleDist: 20
+    - _IntersectionLength: 1.93
+    - _IntersectionRippleDist: 10
     - _IntersectionRippleSpeed: 2
-    - _IntersectionRippleStrength: 0.53
-    - _IntersectionSharp: 1
+    - _IntersectionRippleStrength: 1
+    - _IntersectionSharp: 0
     - _IntersectionSize: 0.944
     - _IntersectionSource: 0
     - _IntersectionSpeed: 0.1
     - _IntersectionStyle: 1
-    - _IntersectionTiling: 1
+    - _IntersectionTiling: 0.5
     - _IntersectionWaveDist: 33.28
     - _LightingMode: 2
     - _LightingOn: 1
@@ -311,7 +310,7 @@ Material:
     - _WaveDistortion: 0.5
     - _WaveFrequency: 1
     - _WaveHeight: 1
-    - _WaveMaxLayers: 64
+    - _WaveMaxLayers: 32
     - _WaveNormalStr: 0.6
     - _WaveSpeed: 1
     - _WaveSteepness: 1.56
@@ -333,7 +332,7 @@ Material:
     - _FoamCrestMinMaxHeight: {r: 0.5837838, g: 0.8046726, b: 0, a: 0}
     - _FoamTiling: {r: 0.089999974, g: 0.089999974, b: 0, a: 0}
     - _HorizonColor: {r: 0.50953066, g: 5.8970256, b: 6.3541465, a: 0}
-    - _IntersectionColor: {r: 1, g: 1, b: 1, a: 1}
+    - _IntersectionColor: {r: 0.7311321, g: 1, b: 0.9423054, a: 1}
     - _NormalTiling: {r: 0.020000014, g: 0.020000014, b: 0, a: 0}
     - _RimColor: {r: 1, g: 1, b: 1, a: 1}
     - _ShallowColor: {r: 0, g: 1, b: 0.8273995, a: 1}

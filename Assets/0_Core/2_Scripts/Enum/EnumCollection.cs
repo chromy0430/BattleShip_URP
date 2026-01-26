@@ -9,4 +9,9 @@ namespace Battleship_Enum
     {
         Small, Medium, Large, Boss
     }
+
+    public enum ShipSize
+    {
+        Small, Medium, Large
+    }
 }

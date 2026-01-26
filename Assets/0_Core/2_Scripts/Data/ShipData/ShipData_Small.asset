@@ -9,19 +9,20 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 684eb7e0a7a35e041a866e59b6e0e2aa, type: 3}
-  m_Name: SmallShipData_01
-  m_EditorClassIdentifier: Assembly-CSharp::SmallShipData
+  m_Script: {fileID: 11500000, guid: 52fa85b7dde9fba43ab7a60e29e6cd68, type: 3}
+  m_Name: ShipData_Small
+  m_EditorClassIdentifier: Assembly-CSharp::BaseShipData
   shipID: DefaultSmall_01
   ShipName: "\uAE30\uBCF8 \uC18C\uD615\uC120"
   ShipDescription: "\uAE30\uBCF8\uC73C\uB85C \uC8FC\uC5B4\uC9C0\uB294 \uC18C\uD615\uC120"
+  shipSize: 0
   BaseHP: 300
+  BaseMP: 100
   BaseDEF: 5
-  baseSpeed: 5
-  baseMinSpeed: 4
-  baseMaxSpeed: 6
-  baseTurnSpeed: 10
+  BaseMagnetRange: 5
   BaseSPR: 0
   ShopCost: 0
-  shipVisual: {fileID: 0}
+  BaseMoveSpeed: 10
+  BaseTurnSpeed: 10
+  shipVisual: {fileID: 7150253761806565065, guid: 2c3dab0da11380d4eab0d781c2154404, type: 3}
   shipIcon: {fileID: 0}

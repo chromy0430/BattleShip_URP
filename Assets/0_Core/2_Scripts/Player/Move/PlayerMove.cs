@@ -5,16 +5,19 @@ using UnityEngine.InputSystem;
 [RequireComponent(typeof(Rigidbody))]
 public class PlayerMove : MonoBehaviour
 {
-    [Header("Data")]
-    [SerializeField] private PlayerDataLoad playerData;
+    //[Header("Data")]
+    //[SerializeField] private PlayerDataLoad playerData;
+    private BaseShipData shipData;
+
+    private ShipStat _runtimeShipStat;
+    public ShipStat RuntimeShipStat => _runtimeShipStat;
 
     [Header("Movement")]
     [SerializeField] private float moveSpeed = 30f;
     [SerializeField] private float dashSpeed = 50f;
     [SerializeField] private float turnSpeed = 5f;
-
     [SerializeField] private bool dashOn;
-    [SerializeField] private float currentSpeed;
+    public float currentSpeed { get; set; }
 
     private Rigidbody rb;
     [SerializeField] private AlignToWater atw;
@@ -49,11 +52,13 @@ public class PlayerMove : MonoBehaviour
     }
     private void Start()
     {
-        if (playerData == null) Debug.LogError("데이터 없음");
+        if (shipData == null) shipData = PlayerDataLoad.playerData.shipData;
 
-        dashSpeed += playerData.shipData.BaseMoveSpeed * .2f;
-        moveSpeed += playerData.shipData.BaseMoveSpeed * .1f;
-        turnSpeed += playerData.shipData.BaseTurnSpeed * .1f;
+        _runtimeShipStat = new ShipStat(shipData);
+
+        dashSpeed += _runtimeShipStat.shipMoveSpeed * .2f;
+        moveSpeed += _runtimeShipStat.shipMoveSpeed * .1f;
+        turnSpeed += _runtimeShipStat.shipTurnSpeed * .1f;
     }
 
     private void Update()
@@ -77,6 +82,8 @@ public class PlayerMove : MonoBehaviour
         Move();
         Dash();
         Turn();
+
+        Debug.Log($"현재 속도 = {currentSpeed}");
     }
 
     private void Move()
@@ -103,7 +110,17 @@ public class PlayerMove : MonoBehaviour
     private void Turn()
     {
         // Align Transform To Water 컴포넌트의 Rotation 기능을 통해 회전
-        atw.rotation += turnInput * turnSpeed;
+        if (atw != null)
+        {
+            atw.rotation += turnInput * turnSpeed;
+        }
+        else
+        {
+            Quaternion deltaRotation = Quaternion.Euler(new Vector3(0, turnInput * turnSpeed * 10f * Time.fixedDeltaTime, 0));
+            rb.MoveRotation(rb.rotation * deltaRotation);
+
+            //rb.angularVelocity = Vector3.zero;
+        }
     }
 
     public LayerMask waterlayer;
@@ -111,4 +128,6 @@ public class PlayerMove : MonoBehaviour
     {
         return Physics.CheckBox(transform.position + shipOffset, new Vector3(.5f, .5f, .5f), Quaternion.identity, waterlayer);
     }
+
+   
 }

@@ -52,7 +52,7 @@ public class UpgradeManager : MonoBehaviour
             abc.Add(item);
         }
 
-        if (abc[0].RuntimeStat.FireRate > 5.0f) return;
+        if (abc[0].RuntimeStat.FireRate > 3.0f) return;
 
         abc[0].RuntimeStat.FireRate = abc[0].RuntimeStat.FireRate + multiplier;
         WeaponLevelUp(abc[0]);

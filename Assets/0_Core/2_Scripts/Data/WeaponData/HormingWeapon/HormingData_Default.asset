@@ -16,9 +16,9 @@ MonoBehaviour:
   WeaponDescription: 
   Damage: 310
   Range: 50
-  EnemyCount: 2
+  EnemyCount: 1
   ProjectileSpeed: 30
-  FireRate: 3
+  FireRate: 1
   IsHorming: 1
   Icon: {fileID: 0}
   ProjectilePrefab: {fileID: 1885573495547289161, guid: 8d09c2caabdf46e4a8c7353cbf061d19, type: 3}
