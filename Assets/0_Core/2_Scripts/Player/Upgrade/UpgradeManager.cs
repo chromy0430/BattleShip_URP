@@ -1,13 +1,33 @@
-﻿using System.Collections.Generic;
+﻿using Battleship_Enum;
+using System.Collections.Generic;
 using UnityEngine;
-
-public delegate void OnChangedWeaponStat();
 
 public class UpgradeManager : MonoBehaviour
 {
-    [SerializeField] private AutoAttackController attackController;
+    public static UpgradeManager Instance { get; private set; }
 
-    public event OnChangedWeaponStat onChangedWeaponStat;
+    [Header("Settings")]
+    [SerializeField] private Transform cardParent;      
+    [SerializeField] private GameObject cardPrefab;     
+    [SerializeField] private List<UpgradeData> allUpgrades; 
+
+    [Header("Safety")]
+    [SerializeField] private GameObject inputBlockerPanel;
+
+    // 중복 실행 방지용 플래그
+    private bool _isProcessing = false;
+
+    private void Awake()
+    {
+        if (Instance == null) Instance = this;
+        else
+        {
+            Destroy(gameObject);
+            return;
+        }
+
+        if (inputBlockerPanel != null) inputBlockerPanel.SetActive(false);
+    }
 
     private void Start()
     {
@@ -25,77 +45,80 @@ public class UpgradeManager : MonoBehaviour
 
     private void HandleLevelUp(int newLevel)
     {
-        // 실제로는 여기서 선택지 UI를 띄워야 하지만,
-        // 로직 확인을 위해 모든 무기의 데미지를 10% 올리는 예시를 작성합니다.
-        //UpgradeAllWeaponsDamage(1.1f);
-
-        UpgradeWeaponFireRate(0.1f);
-
-        // 5레벨마다 모든 탄환에 유도 기능 부여 (동적 변화 테스트)
-        if (newLevel % 5 == 0)
-        {
-            UnlockHomingUpgrade();
-        }
-
-        onChangedWeaponStat?.Invoke();
+        ShowRandomUpgrades();
     }
 
-    private void UpgradeWeaponFireRate(float multiplier)
+    public void ShowRandomUpgrades()
     {
-        var mounts = attackController.GetWeaponMounts();
-        if (mounts == null || mounts.Count == 0) return;
+        _isProcessing = false;
+        if (inputBlockerPanel != null) inputBlockerPanel.SetActive(false);
 
-        List<WeaponMount> abc = new(4);
-
-        foreach (var item in mounts)
+        foreach (Transform child in cardParent)
         {
-            abc.Add(item);
+            Destroy(child.gameObject);
         }
 
-        if (abc[0].RuntimeStat.FireRate > 3.0f) return;
+        List<UpgradeData> randomPicks = GetRandomUpgrades(3);
 
-        abc[0].RuntimeStat.FireRate = abc[0].RuntimeStat.FireRate + multiplier;
-        WeaponLevelUp(abc[0]);
-
-        abc[0].InitializeCooldown();
-
-        abc.Clear();
-    }
-
-    private void WeaponLevelUp(WeaponMount stat)
-    {
-        stat.RuntimeStat.WeaponLevel++;
-    }
-
-    private void UpgradeAllWeaponsDamage(float multiplier)
-    {
-        // AutoAttackController가 들고 있는 모든 마운트를 순회
-        var mounts = attackController.GetWeaponMounts();
-
-        foreach (var mount in mounts)
+        foreach (var data in randomPicks)
         {
-            // [핵심] RuntimeStat을 직접 수정
-            mount.RuntimeStat.Damage = Mathf.FloorToInt(mount.RuntimeStat.Damage * multiplier);
-
-            // 공격 속도가 바뀌었다면 마운트 초기화가 필요할 수 있음
-            mount.InitializeCooldown();
-
-            Debug.Log($"[Upgrade] {mount.name} 강화! 데미지: {mount.RuntimeStat.Damage}");
+            GameObject go = Instantiate(cardPrefab, cardParent);
+            UpgradeCardUI cardUI = go.GetComponent<UpgradeCardUI>();
+            cardUI.Setup(data, ApplyUpgrade);
         }
+
+        cardParent.gameObject.SetActive(true);
+        Time.timeScale = 0;
     }
 
-    private void UnlockHomingUpgrade()
+    private void ApplyUpgrade(UpgradeData data)
     {
-        var mounts = attackController.GetWeaponMounts();
-        foreach (var mount in mounts)
+        if (_isProcessing) return;        
+        _isProcessing = true;
+        if (inputBlockerPanel != null) inputBlockerPanel.SetActive(true);
+
+        Debug.Log($"[Upgrade] 선택 확정: {data.upgradeName}");
+
+        if (PlayerDataLoad.playerData != null)
         {
-            if (!mount.RuntimeStat.IsHoming)
-            {
-                mount.RuntimeStat.IsHoming = true;
-                mount.RuntimeStat.HomingTurnSpeed = 180f; // 유도 성능 부여
-                mount.RuntimeStat.Acceleration = 10f;
-                Debug.Log($"[Upgrade] {mount.name} 유도 기능 잠금 해제!");
-            }
+            PlayerDataLoad.playerData.CurrentShipStat.AddBonus(data.targetStat, data.value);
+            PlayerDataLoad.playerData.UpdateStatAndNotify();
         }
+        else
+        {
+            Debug.LogError("PlayerDataLoad가 없습니다! 스탯 적용 실패.");
+        }
+
+        CloseUpgradeUI();
+    }
+
+    private void CloseUpgradeUI()
+    {
+        foreach (Transform child in cardParent)
+        {
+            Destroy(child.gameObject);
+        }
+
+        cardParent.gameObject.SetActive(false);
+        if (inputBlockerPanel != null) inputBlockerPanel.SetActive(false);
+
+        Time.timeScale = 1;
+    }
+
+    private List<UpgradeData> GetRandomUpgrades(int count)
+    {
+        List<UpgradeData> pool = new List<UpgradeData>(allUpgrades);
+        List<UpgradeData> results = new List<UpgradeData>();
+
+        count = Mathf.Min(count, pool.Count);
+
+        for (int i = 0; i < count; i++)
+        {
+            int randomIndex = Random.Range(0, pool.Count);
+            results.Add(pool[randomIndex]);
+            pool.RemoveAt(randomIndex);
+        }
+
+        return results;
     }
 }

@@ -6,7 +6,7 @@ public class BatchPrefabSpawner : EditorWindow
     private GameObject _targetPrefab;
     private bool _resetTransform = true;
 
-    [MenuItem("Tools/JJ Chronicle/Batch Prefab Spawner")]
+    [MenuItem("Tools/JJ Chronicles/Batch Prefab Spawner")]
     public static void ShowWindow()
     {
         GetWindow<BatchPrefabSpawner>("Batch Spawner");

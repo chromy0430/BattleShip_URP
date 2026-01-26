@@ -7,7 +7,6 @@ public class PlayerFloating : MonoBehaviour, IWaterFloatTarget
     [Header("Water Floating")]
     [SerializeField] private Vector2 surfaceSize = new Vector2(1.5f, 8f);
     [SerializeField] private float heightOffset = 0f;
-    [SerializeField] private bool isActive = true;
 
     [Header("Rotation & Smoothing")]
     [Range(0f, 8f)][SerializeField] private float rollAmount = 1.0f; // 파도 정렬 강도
@@ -45,12 +44,12 @@ public class PlayerFloating : MonoBehaviour, IWaterFloatTarget
 
     private void OnEnable()
     {
-        isActive = true;
+        _isActive = true;
     }
 
     private void OnDisable()
     {
-        isActive = false;
+        _isActive = false;
         // 비활성화 시 매니저 목록에서 제거하여 연산 낭비 방지
         if (WaterBatchManager.Instance != null)
         {

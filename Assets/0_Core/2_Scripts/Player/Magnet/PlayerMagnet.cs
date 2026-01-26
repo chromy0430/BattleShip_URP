@@ -2,8 +2,6 @@
 
 public class PlayerMagnet : MonoBehaviour
 {
-    private BaseShipData shipData;
-
     private Collider[] _coinBuffer = new Collider[50];
     [Header("Local Magnet Settings")]
     [SerializeField] private float _magnetRadius = 5.0f;
@@ -20,9 +18,20 @@ public class PlayerMagnet : MonoBehaviour
             _PlayerTransform = PlayerManager.Instance.PlayerTransform;
         }
 
-        shipData = PlayerDataLoad.playerData.shipData;
+        if (PlayerDataLoad.playerData != null)
+        {
+            _magnetRadius = PlayerDataLoad.playerData.CurrentShipStat.shipMagnetRange;
+        }
+    }
 
-        _magnetRadius = new ShipStat(shipData).shipMagnetRange;
+    private void OnEnable()
+    {
+        if (PlayerDataLoad.playerData != null) PlayerDataLoad.playerData.OnStatUpdated += UpdateMagnetStat;
+    }
+
+    private void OnDisable()
+    {
+        if (PlayerDataLoad.playerData != null) PlayerDataLoad.playerData.OnStatUpdated -= UpdateMagnetStat;
     }
 
     void Update()
@@ -60,4 +69,10 @@ public class PlayerMagnet : MonoBehaviour
         }
     }
     #endregion
+
+    private void UpdateMagnetStat()
+    {
+        // 자석 범위 재할당
+        _magnetRadius = PlayerDataLoad.playerData.CurrentShipStat.shipMagnetRange;
+    }
 }

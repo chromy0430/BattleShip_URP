@@ -14,4 +14,15 @@ namespace Battleship_Enum
     {
         Small, Medium, Large
     }
+
+    public enum StatType
+    {
+        MoveSpeed,
+        TurnSpeed,
+        MagnetRange,
+        HP,
+        MP,
+        DEF,
+        SPR
+    }
 }

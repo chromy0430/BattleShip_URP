@@ -1,34 +1,29 @@
-﻿using StylizedWater3;
+﻿using Mono.Cecil.Cil;
+using StylizedWater3;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
 [RequireComponent(typeof(Rigidbody))]
 public class PlayerMove : MonoBehaviour
 {
-    //[Header("Data")]
-    //[SerializeField] private PlayerDataLoad playerData;
-    private BaseShipData shipData;
-
-    private ShipStat _runtimeShipStat;
-    public ShipStat RuntimeShipStat => _runtimeShipStat;
+    private ShipStat _stat => PlayerDataLoad.playerData.CurrentShipStat;
+    private Rigidbody rb;
+    public InputActionReference moveAction;
+    public InputActionReference dashAction;
 
     [Header("Movement")]
     [SerializeField] private float moveSpeed = 30f;
     [SerializeField] private float dashSpeed = 50f;
     [SerializeField] private float turnSpeed = 5f;
     [SerializeField] private bool dashOn;
+    public Vector3 shipOffset;
     public float currentSpeed { get; set; }
 
-    private Rigidbody rb;
-    [SerializeField] private AlignToWater atw;
+    //[SerializeField] private AlignToWater atw;        
     private float moveInput;
     private float turnInput;
 
-    public InputActionReference moveAction;
-    public InputActionReference dashAction;
-
-    public Vector3 shipOffset;
-
+    
     private void OnEnable()
     {
         dashOn = false;
@@ -37,12 +32,16 @@ public class PlayerMove : MonoBehaviour
         dashAction.action.started += context => dashOn = true;
         dashAction.action.performed += context => dashOn = true;
         dashAction.action.canceled += context => dashOn = false;
+
+        if (PlayerDataLoad.playerData != null) PlayerDataLoad.playerData.OnStatUpdated += UpdateMoveStat;    
     }
 
     private void OnDisable()
     {
         moveAction.action.Disable();
         dashAction.action.Disable();
+
+        if (PlayerDataLoad.playerData != null) PlayerDataLoad.playerData.OnStatUpdated -= UpdateMoveStat;
     }
 
     private void Awake()
@@ -52,13 +51,15 @@ public class PlayerMove : MonoBehaviour
     }
     private void Start()
     {
-        if (shipData == null) shipData = PlayerDataLoad.playerData.shipData;
+        if (PlayerDataLoad.playerData == null)
+        {
+            Debug.LogError("PlayerDataLoad가 없습니다!");
+            return;
+        }
 
-        _runtimeShipStat = new ShipStat(shipData);
-
-        dashSpeed += _runtimeShipStat.shipMoveSpeed * .2f;
-        moveSpeed += _runtimeShipStat.shipMoveSpeed * .1f;
-        turnSpeed += _runtimeShipStat.shipTurnSpeed * .1f;
+        dashSpeed += _stat.shipMoveSpeed * .2f;
+        moveSpeed += _stat.shipMoveSpeed * .1f;
+        turnSpeed += _stat.shipTurnSpeed * .1f;
     }
 
     private void Update()
@@ -77,6 +78,7 @@ public class PlayerMove : MonoBehaviour
 #endif
     }
 
+    #region 물리기반 움직임
     private void FixedUpdate()
     {
         Move();
@@ -110,24 +112,33 @@ public class PlayerMove : MonoBehaviour
     private void Turn()
     {
         // Align Transform To Water 컴포넌트의 Rotation 기능을 통해 회전
-        if (atw != null)
+        /*if (atw != null)
         {
             atw.rotation += turnInput * turnSpeed;
         }
         else
-        {
+        {*/
             Quaternion deltaRotation = Quaternion.Euler(new Vector3(0, turnInput * turnSpeed * 10f * Time.fixedDeltaTime, 0));
             rb.MoveRotation(rb.rotation * deltaRotation);
 
             //rb.angularVelocity = Vector3.zero;
-        }
+        //}
     }
 
+    #endregion
+
+    #region 바다에 닿아있는가 체크 (아직 안 씀)
     public LayerMask waterlayer;
     private bool CheckWater()
     {
         return Physics.CheckBox(transform.position + shipOffset, new Vector3(.5f, .5f, .5f), Quaternion.identity, waterlayer);
     }
+    #endregion
 
-   
+    private void UpdateMoveStat() // 후에 보너스 값 추가로 UI 표시할지말지 정해야함 
+    {
+        moveSpeed = _stat.shipMoveSpeed;
+        dashSpeed = moveSpeed * 2f;
+        turnSpeed = _stat.shipTurnSpeed;
+    }
 }
