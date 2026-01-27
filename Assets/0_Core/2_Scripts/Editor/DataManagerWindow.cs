@@ -65,7 +65,7 @@ public class DataManagerWindow : EditorWindow
         if (_tempUpgrade == null) _tempUpgrade = CreateInstance<UpgradeData>();
         if (_tempShip == null) _tempShip = CreateInstance<BaseShipData>();
         if (_tempEnemy == null) _tempEnemy = CreateInstance<EnemyData>();
-        if (_tempWeapon == null) _tempWeapon = CreateInstance<GunData>();
+        if (_tempWeapon == null) _tempWeapon = CreateInstance<BaseWeaponData>();
     }
 
     private void OnGUI()
@@ -356,8 +356,8 @@ public class DataManagerWindow : EditorWindow
     private void UpdateWeaponTempObject()
     {
         if (_tempWeapon != null) DestroyImmediate(_tempWeapon);
-        if (_weaponType == WeaponTypeSelection.Gun) _tempWeapon = CreateInstance<GunData>();
-        else _tempWeapon = CreateInstance<HomingWeaponData>();
+        if (_weaponType == WeaponTypeSelection.Gun) _tempWeapon = CreateInstance<BaseWeaponData>();
+        else _tempWeapon = CreateInstance<BaseWeaponData>();
         _cachedEditor = null;
     }
 

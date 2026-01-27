@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using Battleship_Enum;
+using UnityEngine;
 
 [System.Serializable]
 public class WeaponStat 
@@ -6,6 +7,9 @@ public class WeaponStat
     // 기존 무기 스탯
     public string Name;
     public string Description;
+
+    public WeaponType weaponType;
+    public WeaponAttribute weaponAttribute;
 
     public int WeaponLevel;
     public int Damage;
@@ -45,6 +49,9 @@ public class WeaponStat
 
     public WeaponStat(BaseWeaponData data)
     {
+        weaponType = data.weaponType;
+        weaponAttribute = data.weaponAttribute;
+
         WeaponLevel = 1;
         Name = data.WeaponName;
         Description = data.WeaponDescription;
@@ -53,7 +60,7 @@ public class WeaponStat
         EnemyCount = data.EnemyCount;
         FireRate = data.FireRate;
         projectileSpeed = data.ProjectileSpeed;
-        IsHoming = data.IsHorming;
+        IsHoming = data.IsHoming;
 
         Icon = data.Icon;
 
@@ -61,15 +68,8 @@ public class WeaponStat
         shotEffect = data.ShotEffect;
         muzzleEffect = data.MuzzleEffect;
 
-        if (data is HomingWeaponData homingData)
-        {
-            HomingTurnSpeed = homingData.homingTurnSpeed;            
-            Acceleration = homingData.acceleration;
-        }
-        else
-        {
-            HomingTurnSpeed = 20f;
-            Acceleration = 30f;
-        }
+        HomingTurnSpeed = data.homingTurnSpeed;            
+        Acceleration = data.acceleration;
+        
     }
 }

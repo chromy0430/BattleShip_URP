@@ -9,14 +9,14 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d304d69453ef7c14a9e5c7c73f99afd9, type: 3}
-  m_Name: CannonData_Default
-  m_EditorClassIdentifier: Assembly-CSharp::CannonData
+  m_Script: {fileID: 11500000, guid: 2a8cbf1ab5c81d843b0fd5ea837fbce6, type: 3}
+  m_Name: WeaponData_Missile
+  m_EditorClassIdentifier: Assembly-CSharp::BaseWeaponData
   WeaponName: 
   WeaponDescription: 
-  Damage: 20
-  Range: 40
-  EnemyCount: 10
+  Damage: 0
+  Range: 0
+  EnemyCount: 0
   ProjectileSpeed: 0
   FireRate: 0
   IsHorming: 0
@@ -26,5 +26,3 @@ MonoBehaviour:
   ShotEffect: {fileID: 0}
   MuzzleSfx: {fileID: 0}
   ShotSfx: {fileID: 0}
-  explosionRadius: 10
-  arcHeight: 10

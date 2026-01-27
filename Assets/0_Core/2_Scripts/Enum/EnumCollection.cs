@@ -26,4 +26,14 @@ namespace Battleship_Enum
         DEF,
         SPR
     }
+
+    public enum WeaponType
+    {
+        Gun, Cannon, Missile, Shotgun, Arrow, Laser, Grenade, Pulse 
+    }
+
+    public enum WeaponAttribute
+    {
+        None, Lightning, Fire, Ice
+    }
 }
