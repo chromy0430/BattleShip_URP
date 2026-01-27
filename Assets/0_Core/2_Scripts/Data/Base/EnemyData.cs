@@ -5,7 +5,7 @@ using Battleship_Enum;
 [CreateAssetMenu(fileName = "EnemyData", menuName = "BattleShip/Enemy Data")]
 public class EnemyData : ScriptableObject
 {
-    [Header("Enemy Data")]
+    [Header("적 속성")]
     public string EnemyID;
     public string EnemyName;
     [TextArea] public string Description;
@@ -14,7 +14,7 @@ public class EnemyData : ScriptableObject
     public float TurnSpeed;
     public float SizeRadius;
 
-    [Header("Enemy Stats")]
+    [Header("적 능력치")]
     public int Damage;
     public int Shield;
     public int MaxHP;
@@ -22,11 +22,11 @@ public class EnemyData : ScriptableObject
     public int HPRecovery;
     public int ExpReward;
 
-    [Header("Addressable Assets")]
+    [Header("어드레서블")]
     public AssetReferenceGameObject ModelPrefab;
     public AssetReference DeathAnim;
 
-    [Header("Types")]
+    [Header("적 타입")]
     public EnemyAttackType AttackType;
     public EnemySizeType SizeType;
 

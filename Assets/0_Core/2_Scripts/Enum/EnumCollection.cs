@@ -17,6 +17,7 @@ namespace Battleship_Enum
 
     public enum StatType
     {
+        Damage,
         MoveSpeed,
         TurnSpeed,
         MagnetRange,

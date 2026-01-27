@@ -12,7 +12,7 @@ public class WeaponUIManager : MonoBehaviour
     
 
 
-    /*private void Start()
+    private void Start()
     {
         CreateWeaponSlots();
 
@@ -27,8 +27,8 @@ public class WeaponUIManager : MonoBehaviour
     private void OnDisable()
     {
         if (InitManager.Instance != null)
-            InitManager.Instance.upgradeManager.onChangedWeaponStat += RefreshAllSlots;
-    }*/
+            InitManager.Instance.upgradeManager.onChangedWeaponStat -= RefreshAllSlots;
+    }
 
     // 1. 처음 슬롯 생성
     public void CreateWeaponSlots()

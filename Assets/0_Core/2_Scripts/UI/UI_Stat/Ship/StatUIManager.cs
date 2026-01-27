@@ -17,7 +17,7 @@ public class PlayerStatUIManager : MonoBehaviour
 
     private void RefreshUI()
     {
-        ShipStat stat = PlayerDataLoad.playerData.CurrentShipStat;
+        PlayerStat stat = PlayerDataLoad.playerData.CurrentPlayerStat;
 
         if (stat.bonusMoveSpeed > 0)
         {

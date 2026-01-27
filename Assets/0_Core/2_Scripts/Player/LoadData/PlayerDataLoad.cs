@@ -5,7 +5,7 @@ public class PlayerDataLoad : MonoBehaviour
     public static PlayerDataLoad playerData { get; set; }
 
     public BaseShipData shipData;
-    public ShipStat CurrentShipStat { get; private set; }
+    public PlayerStat CurrentPlayerStat { get; private set; }
     public event Action OnStatUpdated;
 
     private void Awake()
@@ -21,10 +21,9 @@ public class PlayerDataLoad : MonoBehaviour
             return;
         }
         
-        if (shipData == null)
-            Debug.LogError("데이터가 없습니다.");
+        if (shipData == null)   Debug.LogError("데이터가 없습니다.");
 
-        CurrentShipStat = new ShipStat(shipData);
+        CurrentPlayerStat = new PlayerStat(shipData);
     }
 
     public void UpdateStatAndNotify()

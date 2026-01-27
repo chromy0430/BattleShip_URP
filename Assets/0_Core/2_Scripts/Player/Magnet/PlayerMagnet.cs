@@ -20,7 +20,7 @@ public class PlayerMagnet : MonoBehaviour
 
         if (PlayerDataLoad.playerData != null)
         {
-            _magnetRadius = PlayerDataLoad.playerData.CurrentShipStat.shipMagnetRange;
+            _magnetRadius = PlayerDataLoad.playerData.CurrentPlayerStat.shipMagnetRange;
         }
     }
 
@@ -73,6 +73,6 @@ public class PlayerMagnet : MonoBehaviour
     private void UpdateMagnetStat()
     {
         // 자석 범위 재할당
-        _magnetRadius = PlayerDataLoad.playerData.CurrentShipStat.shipMagnetRange;
+        _magnetRadius = PlayerDataLoad.playerData.CurrentPlayerStat.shipMagnetRange;
     }
 }

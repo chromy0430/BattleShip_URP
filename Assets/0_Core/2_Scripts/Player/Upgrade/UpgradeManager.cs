@@ -1,10 +1,13 @@
 ﻿using Battleship_Enum;
 using System.Collections.Generic;
 using UnityEngine;
+using System;
 
 public class UpgradeManager : MonoBehaviour
 {
     public static UpgradeManager Instance { get; private set; }
+
+    public event Action onChangedWeaponStat;
 
     [Header("Settings")]
     [SerializeField] private Transform cardParent;      
@@ -27,6 +30,7 @@ public class UpgradeManager : MonoBehaviour
         }
 
         if (inputBlockerPanel != null) inputBlockerPanel.SetActive(false);
+        if (cardParent != null) cardParent.gameObject.SetActive(false);
     }
 
     private void Start()
@@ -58,7 +62,7 @@ public class UpgradeManager : MonoBehaviour
             Destroy(child.gameObject);
         }
 
-        List<UpgradeData> randomPicks = GetRandomUpgrades(3);
+        List<UpgradeData> randomPicks = GetRandomUpgrades(4);
 
         foreach (var data in randomPicks)
         {
@@ -81,7 +85,7 @@ public class UpgradeManager : MonoBehaviour
 
         if (PlayerDataLoad.playerData != null)
         {
-            PlayerDataLoad.playerData.CurrentShipStat.AddBonus(data.targetStat, data.value);
+            PlayerDataLoad.playerData.CurrentPlayerStat.AddBonus(data.targetStat, data.value);
             PlayerDataLoad.playerData.UpdateStatAndNotify();
         }
         else
@@ -103,6 +107,7 @@ public class UpgradeManager : MonoBehaviour
         if (inputBlockerPanel != null) inputBlockerPanel.SetActive(false);
 
         Time.timeScale = 1;
+        onChangedWeaponStat?.Invoke();
     }
 
     private List<UpgradeData> GetRandomUpgrades(int count)
@@ -114,7 +119,7 @@ public class UpgradeManager : MonoBehaviour
 
         for (int i = 0; i < count; i++)
         {
-            int randomIndex = Random.Range(0, pool.Count);
+            int randomIndex = UnityEngine.Random.Range(0, pool.Count);
             results.Add(pool[randomIndex]);
             pool.RemoveAt(randomIndex);
         }

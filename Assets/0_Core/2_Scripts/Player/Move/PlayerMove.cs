@@ -6,7 +6,7 @@ using UnityEngine.InputSystem;
 [RequireComponent(typeof(Rigidbody))]
 public class PlayerMove : MonoBehaviour
 {
-    private ShipStat _stat => PlayerDataLoad.playerData.CurrentShipStat;
+    private PlayerStat _stat => PlayerDataLoad.playerData.CurrentPlayerStat;
     private Rigidbody rb;
     public InputActionReference moveAction;
     public InputActionReference dashAction;
@@ -56,10 +56,10 @@ public class PlayerMove : MonoBehaviour
             Debug.LogError("PlayerDataLoad가 없습니다!");
             return;
         }
-
-        dashSpeed += _stat.shipMoveSpeed * .2f;
-        moveSpeed += _stat.shipMoveSpeed * .1f;
-        turnSpeed += _stat.shipTurnSpeed * .1f;
+        
+        moveSpeed = _stat.GetFinalMoveSpeed(_stat.shipMoveSpeed); 
+        dashSpeed = moveSpeed * 1.8f;
+        turnSpeed = _stat.GetFinalTurnSpeed(_stat.shipTurnSpeed);
     }
 
     private void Update()
@@ -84,8 +84,6 @@ public class PlayerMove : MonoBehaviour
         Move();
         Dash();
         Turn();
-
-        Debug.Log($"현재 속도 = {currentSpeed}");
     }
 
     private void Move()
@@ -115,14 +113,10 @@ public class PlayerMove : MonoBehaviour
         /*if (atw != null)
         {
             atw.rotation += turnInput * turnSpeed;
-        }
-        else
-        {*/
-            Quaternion deltaRotation = Quaternion.Euler(new Vector3(0, turnInput * turnSpeed * 10f * Time.fixedDeltaTime, 0));
-            rb.MoveRotation(rb.rotation * deltaRotation);
-
-            //rb.angularVelocity = Vector3.zero;
-        //}
+        }*/
+        Quaternion deltaRotation = Quaternion.Euler(new Vector3(0, turnInput * turnSpeed * 10f * Time.fixedDeltaTime, 0));
+        rb.MoveRotation(rb.rotation * deltaRotation);
+        rb.angularVelocity = Vector3.zero; // 없으면 회전하고 나서 혼자 밀림        
     }
 
     #endregion
@@ -135,10 +129,11 @@ public class PlayerMove : MonoBehaviour
     }
     #endregion
 
-    private void UpdateMoveStat() // 후에 보너스 값 추가로 UI 표시할지말지 정해야함 
+    // 갱신 요소
+    private void UpdateMoveStat()
     {
-        moveSpeed = _stat.shipMoveSpeed;
-        dashSpeed = moveSpeed * 2f;
-        turnSpeed = _stat.shipTurnSpeed;
+        moveSpeed = _stat.GetFinalMoveSpeed(_stat.shipMoveSpeed);
+        dashSpeed = moveSpeed * 1.8f;
+        turnSpeed = _stat.GetFinalTurnSpeed(_stat.shipTurnSpeed);
     }
 }
