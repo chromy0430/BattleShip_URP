@@ -108,4 +108,8 @@ public class PlayerManager : MonoBehaviour
     }
 
     #endregion
+
+    #region 무기 획득 함수
+
+    #endregion
 }

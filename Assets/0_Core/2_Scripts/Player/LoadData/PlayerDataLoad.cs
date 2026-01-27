@@ -13,7 +13,6 @@ public class PlayerDataLoad : MonoBehaviour
         if(playerData == null)
         {
             playerData = this;
-            DontDestroyOnLoad(gameObject);
         }
         else
         {
@@ -28,6 +27,23 @@ public class PlayerDataLoad : MonoBehaviour
 
     public void UpdateStatAndNotify()
     {
+        if (OnStatUpdated != null)
+        {
+            // 구독자 수 확인 (GetInvocationList 사용)
+            int subscriberCount = OnStatUpdated.GetInvocationList().Length;
+            Debug.Log($"[Event Check] 현재 구독자 수: {subscriberCount}명");
+
+            foreach (var subscriber in OnStatUpdated.GetInvocationList())
+            {
+                Debug.Log($"[Event Check] 구독 중인 객체: {subscriber.Method.DeclaringType}.{subscriber.Method.Name}");
+            }
+        }
+        else
+        {
+            Debug.LogWarning("[Event Check] 구독자가 아무도 없습니다!");
+        }
+
         OnStatUpdated?.Invoke();
+        Debug.Log("UpdateStatAndNotify 실행");
     }
 }

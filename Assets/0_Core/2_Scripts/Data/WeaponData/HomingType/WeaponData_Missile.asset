@@ -12,17 +12,26 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2a8cbf1ab5c81d843b0fd5ea837fbce6, type: 3}
   m_Name: WeaponData_Missile
   m_EditorClassIdentifier: Assembly-CSharp::BaseWeaponData
-  WeaponName: 
-  WeaponDescription: 
-  Damage: 0
-  Range: 0
-  EnemyCount: 0
-  ProjectileSpeed: 0
-  FireRate: 0
-  IsHorming: 0
+  WeaponID: Wpn_Missile_01
+  WeaponName: "\uBBF8\uC0AC\uC77C"
+  WeaponDescription: "\uC801\uC744 \uB05D\uAE4C\uC9C0 \uCD94\uACA9\uD558\uB294 \uBBF8\uC0AC\uC77C"
+  weaponType: 2
+  weaponAttribute: 0
+  ShopCost: 0
+  Damage: 310
+  Range: 50
+  EnemyCount: 1
+  PierceCount: 0
+  FireRate: 1
+  Cooltime: 0
+  Duration: 0
+  ProjectileSpeed: 30
+  Acceleration: 10
+  IsHoming: 1
+  homingTurnSpeed: 20
   Icon: {fileID: 0}
-  ProjectilePrefab: {fileID: 0}
+  ProjectilePrefab: {fileID: 1885573495547289161, guid: 8d09c2caabdf46e4a8c7353cbf061d19, type: 3}
   MuzzleEffect: {fileID: 0}
-  ShotEffect: {fileID: 0}
+  ShotEffect: {fileID: 1223707457253503544, guid: 70196fc3ea0449948b474b178c20c2c6, type: 3}
   MuzzleSfx: {fileID: 0}
   ShotSfx: {fileID: 0}

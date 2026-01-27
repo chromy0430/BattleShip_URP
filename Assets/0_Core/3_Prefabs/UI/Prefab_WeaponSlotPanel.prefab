@@ -123,7 +123,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Sniper Rifle
+  m_text: Empty
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: acb0e523a39099e4999ef728faaa86aa, type: 2}
   m_sharedMaterial: {fileID: 5877073146813868065, guid: acb0e523a39099e4999ef728faaa86aa, type: 2}
@@ -260,7 +260,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: FireRate 2.5
+  m_text: FireRate 0
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 4bfbd85c87d8c55429e35246be528f2d, type: 2}
   m_sharedMaterial: {fileID: -6660749598578046690, guid: 4bfbd85c87d8c55429e35246be528f2d, type: 2}
@@ -397,7 +397,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 'Lv.99
+  m_text: 'Lv.0
 
 '
   m_isRightToLeft: 0
@@ -530,7 +530,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
   m_Material: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_RaycastTarget: 1
+  m_RaycastTarget: 0
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
@@ -611,7 +611,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 'Damage 100
+  m_text: 'Damage 0
 
 '
   m_isRightToLeft: 0

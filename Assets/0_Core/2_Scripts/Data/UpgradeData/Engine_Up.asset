@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Engine_Up
   m_EditorClassIdentifier: Assembly-CSharp::UpgradeData
   upgradeName: "\uC5D4\uC9C4 \uAC15\uD654"
-  description: "\uC5D4\uC9C4\uC744 \uAC15\uD654\uC2DC\uCF1C \uC18D\uB3C4\uB97C 10%
+  description: "\uC5D4\uC9C4\uC744 \uAC15\uD654\uC2DC\uCF1C \uC18D\uB3C4\uB97C {value}%
     \uC99D\uAC00\uC2DC\uD0B5\uB2C8\uB2E4."
   icon: {fileID: 0}
   targetStat: 1

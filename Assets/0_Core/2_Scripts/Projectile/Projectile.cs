@@ -23,6 +23,9 @@ public class Projectile : MonoBehaviour
     private static readonly Collider[] _searchBuffer = new Collider[10]; // 탐색할 최대 타겟 수
     private int _currentTargetId;
 
+    // 관통 관련
+    private int _currentPierceCount;
+
     // 디버그 전용
     private bool debug = false;
     private Vector3 projectileSize;
@@ -62,6 +65,7 @@ public class Projectile : MonoBehaviour
         this._target = target;
         this._launcher = firePoint;
         this.currentbound = 0;
+        this._currentPierceCount = 0;
 
         if (PlayerDataLoad.playerData != null)
         {
@@ -273,7 +277,7 @@ public class Projectile : MonoBehaviour
     /// </summary>
     private void OnHitTarget(IEnemy enemy) 
     {
-        if (_collider != null)  _collider.enabled = false;
+        //if (_collider != null)  _collider.enabled = false;
 
         if (enemy != null && enemy.IsAlive)
         {
@@ -283,7 +287,8 @@ public class Projectile : MonoBehaviour
             }
             else
             {
-                enemy.TakeDamage(_finalCachedDamage, out int finalDamage);                
+                int dmg = (_stat != null) ? _finalCachedDamage : 0;
+                enemy.TakeDamage(dmg, out int finalDamage);                
             }
         }
 
@@ -291,13 +296,22 @@ public class Projectile : MonoBehaviour
         if (_stat.shotEffect != null)
         {
             var hitEffect = ObjectPoolManager.Instance.Get(_stat.shotEffect);
-            if (hitEffect != null)
-            {
-                hitEffect.transform.position = transform.position;
-            } 
+            if (hitEffect != null)  hitEffect.transform.position = transform.position;
         }
 
-        Disable().Forget();
+        _currentPierceCount++;
+
+        if (_currentPierceCount > _stat.PierceCount)
+        {
+            if (_collider != null) _collider.enabled = false;
+            Disable().Forget();
+        }
+        else
+        {
+            _rb.linearVelocity *= 0.9f;
+        }
+
+        //Disable().Forget();
     }
     #endregion
 

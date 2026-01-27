@@ -239,15 +239,7 @@ public class DataManagerWindow : EditorWindow
     {
         EditorGUILayout.LabelField("Create New Data", EditorStyles.boldLabel);
         EditorGUILayout.HelpBox("새 데이터를 생성합니다.", MessageType.Info);
-        EditorGUILayout.Space(10);
-
-        if (_selectedTab == 3) // Weapon
-        {
-            WeaponTypeSelection oldType = _weaponType;
-            _weaponType = (WeaponTypeSelection)EditorGUILayout.EnumPopup("Weapon Type", _weaponType);
-            if (oldType != _weaponType) UpdateWeaponTempObject();
-            EditorGUILayout.Space(5);
-        }
+        EditorGUILayout.Space(10);              
 
         _newFileName = EditorGUILayout.TextField("File Name (English)", _newFileName);
         EditorGUILayout.Space(10);
@@ -371,7 +363,7 @@ public class DataManagerWindow : EditorWindow
             case 0: relativePath = PATH_UPGRADE; break;
             case 1: relativePath = PATH_SHIP; break;
             case 2: relativePath = PATH_ENEMY; break;
-            case 3: relativePath = PATH_WEAPON + (_weaponType == WeaponTypeSelection.Gun ? "Gun/" : "HormingWeapon/"); break;
+            case 3: relativePath = PATH_WEAPON; break;
         }
 
         string fullPath = ROOT_PATH + relativePath;

@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: ManaStone_Up
   m_EditorClassIdentifier: Assembly-CSharp::UpgradeData
   upgradeName: "\uB9C8\uB098\uC11D \uAC15\uD654"
-  description: "\uCD5C\uB300 \uB9C8\uB825\uC774 10% \uC99D\uAC00\uD569\uB2C8\uB2E4."
+  description: "\uCD5C\uB300 \uB9C8\uB825\uC774 {value} \uC99D\uAC00\uD569\uB2C8\uB2E4."
   icon: {fileID: 0}
   targetStat: 5
-  value: 0.1
+  value: 50

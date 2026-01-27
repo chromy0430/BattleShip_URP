@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Keel_Up
   m_EditorClassIdentifier: Assembly-CSharp::UpgradeData
   upgradeName: "\uC120\uCCB4 \uAC15\uD654"
-  description: "\uCD5C\uB300 \uCCB4\uB825\uC774 10% \uC99D\uAC00\uD569\uB2C8\uB2E4."
+  description: "\uCD5C\uB300 \uCCB4\uB825\uC774 {value} \uC99D\uAC00\uD569\uB2C8\uB2E4."
   icon: {fileID: 0}
   targetStat: 4
-  value: 0.1
+  value: 50

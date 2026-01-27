@@ -388,7 +388,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 42757c1606a60244a94f26b38062a7b4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::WeaponMount
-  _weaponData: {fileID: 11400000, guid: 1ec069f228a32b548bec3f6eb77b43d2, type: 2}
+  _weaponData: {fileID: 11400000, guid: 6e2f02ad61df99e40876305ac88db82c, type: 2}
   firePoint: {fileID: 6939262005843617006}
 --- !u!114 &3027726063150322345
 MonoBehaviour:
@@ -402,7 +402,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 42757c1606a60244a94f26b38062a7b4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::WeaponMount
-  _weaponData: {fileID: 11400000, guid: 368dcd4904e79ed4b872444dcdede41b, type: 2}
+  _weaponData: {fileID: 11400000, guid: 5aaa673bce0663048a3ca3a6358572a7, type: 2}
   firePoint: {fileID: 6355162148084614833}
 --- !u!114 &9056468818831595362
 MonoBehaviour:
@@ -454,11 +454,12 @@ GameObject:
   m_Component:
   - component: {fileID: 2171142783127658759}
   - component: {fileID: 9123515468975888438}
+  - component: {fileID: 3745631181084332432}
+  - component: {fileID: 8735316355732567118}
   - component: {fileID: 4683933945338407186}
   - component: {fileID: 4947130954859748014}
   - component: {fileID: 3597542089210836206}
   - component: {fileID: 5357141066748331237}
-  - component: {fileID: 3745631181084332432}
   - component: {fileID: 132993765381713464}
   - component: {fileID: 4694164374102446694}
   - component: {fileID: 7050723356318128996}
@@ -516,6 +517,42 @@ Rigidbody:
   m_Interpolate: 1
   m_Constraints: 80
   m_CollisionDetection: 0
+--- !u!65 &3745631181084332432
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9177572583775750368}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 2.8, y: 2, z: 10}
+  m_Center: {x: 0, y: 1, z: -0.5}
+--- !u!114 &8735316355732567118
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9177572583775750368}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3ad72e5355dce7449968ad7653640001, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::StickyNote
+  noteTitle: New Note
+  noteBody: "MoveSpeed \uCD5C\uB300 30\uAE4C\uC9C0\nTurnSpeed \uCD5C\uB300 12\uAE4C\uC9C0"
+  noteColor: 0
 --- !u!114 &4683933945338407186
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -528,13 +565,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3cbe1d9507eaab04b9879ae56465d3da, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerMove
+  moveAction: {fileID: 0}
+  dashAction: {fileID: 0}
   moveSpeed: 16
   dashSpeed: 40
   turnSpeed: 5
   dashOn: 0
-  atw: {fileID: 0}
-  moveAction: {fileID: 0}
-  dashAction: {fileID: 0}
   shipOffset: {x: 0, y: -0.3, z: 0}
   waterlayer:
     serializedVersion: 2
@@ -581,27 +617,6 @@ MonoBehaviour:
   growthMultiplier: 1.2
   currentExp: 0
   currentLevel: 0
---- !u!65 &3745631181084332432
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 9177572583775750368}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 2.8, y: 2, z: 10}
-  m_Center: {x: 0, y: 1, z: -0.5}
 --- !u!114 &132993765381713464
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -614,7 +629,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a5b025212c6d1e14ab1ac5925375e59f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerMagnet
-  _magnetRadius: 5
+  _magnetRadius: 1
   _moveSpeed: 30
   _coinLayer:
     serializedVersion: 2
@@ -633,8 +648,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerFloating
   surfaceSize: {x: 3, y: 8}
-  heightOffset: -0.45
-  isActive: 1
+  heightOffset: -0.6
   rollAmount: 0.1
   smoothing: 0.15
 --- !u!114 &7050723356318128996

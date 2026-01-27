@@ -16,18 +16,18 @@ public class WeaponUIManager : MonoBehaviour
     {
         CreateWeaponSlots();
 
-        if (InitManager.Instance != null)
+        /*if (InitManager.Instance != null)
             InitManager.Instance.upgradeManager.onChangedWeaponStat += RefreshAllSlots; 
         else
         {
             Debug.Log("Init Manager 인스턴스 없는 상태");
-        }
+        }*/
     }
 
     private void OnDisable()
     {
-        if (InitManager.Instance != null)
-            InitManager.Instance.upgradeManager.onChangedWeaponStat -= RefreshAllSlots;
+        //if (InitManager.Instance != null)
+        //    InitManager.Instance.upgradeManager.onChangedWeaponStat -= RefreshAllSlots;
     }
 
     // 1. 처음 슬롯 생성

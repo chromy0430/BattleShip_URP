@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using Battleship_Enum;
+using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
@@ -21,11 +23,10 @@ public class WeaponMount : MonoBehaviour
     private float _attackInterval = 0f;
     private bool _isReadyToFire = true;
 
-    private void Start()
-    {
-        Initialize();
-    }
+    private AuraWeapon _activeAura;
+    private Coroutine _auraRoutine;
 
+    #region 초기화
     /// <summary>
     /// 무기 데이터를 기반으로 쿨타임 등 초기 설정
     /// </summary>
@@ -33,20 +34,58 @@ public class WeaponMount : MonoBehaviour
     {
         if (_weaponData != null)
         {
-            _runtimeStat = new WeaponStat(_weaponData);
+            if (_runtimeStat == null)   _runtimeStat = new WeaponStat(_weaponData);
 
-            if (_runtimeStat.FireRate > 0)
+            InitializeCooldown();
+
+            // 무기 타입에 따른 초기화 분기
+            if (_weaponData.weaponType == WeaponType.Pulse)
             {
-                _attackInterval = 1f / _runtimeStat.FireRate;
-            }
-            else
-            {
-                _attackInterval = float.MaxValue;
+                if (_activeAura == null) // 없을 때만 만듦
+                {
+                    CreateAuraWeapon();
+                }
+                else
+                {
+                    // 이미 있다면 스탯만 최신 버전으로 주입
+                    _activeAura.Initialize(_runtimeStat);
+                }
+
+                // 코루틴이 꺼져있다면 재가동
+                if (_auraRoutine == null && gameObject.activeInHierarchy)
+                {
+                    _auraRoutine = StartCoroutine(AuraLifecycleLoop());
+                }
             }
         }
+    }
 
-        _currentCooldown = 0f;
-        _isReadyToFire = true;
+    private IEnumerator AuraLifecycleLoop()
+    {
+        while (true)
+        {
+            // Duration 동안 켜짐
+            if (_activeAura != null) _activeAura.gameObject.SetActive(true);
+            yield return new WaitForSeconds(_runtimeStat.Duration);
+
+            // Cooltime 동안 꺼짐
+            if (_activeAura != null) _activeAura.gameObject.SetActive(false);
+            yield return new WaitForSeconds(_runtimeStat.Cooltime);
+        }
+    }
+
+    private void CreateAuraWeapon()
+    {
+        if (_runtimeStat.projectilePrefab == null) return;
+
+        GameObject go = Instantiate(_runtimeStat.projectilePrefab, transform);
+        go.transform.localPosition = Vector3.zero;        
+
+        _activeAura = go.GetComponent<AuraWeapon>();
+        if (_activeAura != null)
+        {
+            _activeAura.Initialize(_runtimeStat);
+        }
     }
 
     /// <summary>
@@ -56,15 +95,18 @@ public class WeaponMount : MonoBehaviour
     {
         if (_runtimeStat != null && _runtimeStat.FireRate > 0)
         {
-            // 강화된 FireRate 수치를 실제 시간 간격으로 변환
             _attackInterval = 1f / _runtimeStat.FireRate;
         }
         else
         {
-            _attackInterval = float.MaxValue; // 발사 불가 상태
+            _attackInterval = float.MaxValue;
         }
+        _currentCooldown = 0f;
+        _isReadyToFire = true;
     }
+    #endregion
 
+    #region 발사 관련
     /// <summary>
     /// 매 프레임 쿨타임을 감소시킵니다.
     /// </summary>
@@ -89,6 +131,8 @@ public class WeaponMount : MonoBehaviour
     /// <param name="target">공격할 대상</param>
     public void Fire(List<IEnemy> targets)
     {
+        if (_weaponData.weaponType == WeaponType.Pulse) return;
+
         if (_runtimeStat == null || targets == null || targets.Count == 0) return;
         
         _isReadyToFire = false;
@@ -126,5 +170,72 @@ public class WeaponMount : MonoBehaviour
         // TODO: 발사 이펙트/사운드 풀링 (muzzleEffect, muzzleSfx)
         // if (WeaponData.muzzleEffect) ...
         // if (WeaponData.muzzleSfx) ...
+    }
+    #endregion
+
+    #region 강화 관련
+    public string GetWeaponID()
+    {
+        return _weaponData != null ? _weaponData.WeaponID : "";
+    }
+
+    public void ApplyUpgradeBonus(StatType type, float amount)
+    {
+        if (_runtimeStat == null) return;
+
+        switch (type)
+        {
+            case StatType.Damage:
+                _runtimeStat.Damage += (int)amount; // 혹은 퍼센트 로직
+                if (_activeAura != null) _activeAura.Initialize(_runtimeStat);
+                break;
+            case StatType.FireRate:
+                _runtimeStat.FireRate += amount;
+                InitializeCooldown(); // 쿨타임 재계산 필수
+                break;
+            case StatType.ProjectileSpeed:
+                _runtimeStat.projectileSpeed += amount;
+                break;
+            case StatType.PierceCount:
+                _runtimeStat.PierceCount += (int)amount;
+                break;
+            case StatType.MultiProjectile:
+                _runtimeStat.EnemyCount += (int)amount;
+                break;
+            case StatType.Acceleration:
+                _runtimeStat.Acceleration += amount;
+                break;
+            case StatType.WeaponRange: // 사거리(오라 크기) 증가
+                _runtimeStat.Range += (int)amount;
+                if (_activeAura != null) _activeAura.Initialize(_runtimeStat);
+                break;
+                // ... 사거리, 속도 등 추가
+        }
+    }
+    #endregion
+
+    #region 헬퍼 함수
+    public WeaponType GetWeaponType()
+    {
+        return _weaponData != null ? _weaponData.weaponType : WeaponType.Gun;
+    }
+
+    public bool HasWeapon()
+    {
+        return _weaponData != null;
+    }
+
+    public void EquipWeapon(BaseWeaponData newData)
+    {
+        _weaponData = newData;
+        Initialize();
+        UpgradeManager.Instance.RefreshWeaponList();
+    }
+    #endregion
+
+    private void OnDisable()
+    {
+        if (_auraRoutine != null) StopCoroutine(_auraRoutine);
+        if (_activeAura != null) _activeAura.gameObject.SetActive(false);
     }
 }

@@ -70,9 +70,13 @@ public class AutoAttackController : MonoBehaviour
         // 모든 무기 마운트의 쿨타임 업데이트
         foreach (var mount in _weaponMounts)
         {
+            // 발사 조건 체크
             if (mount == null || !mount.enabled) continue;
+            if (!mount.HasWeapon()) continue;
+            if (mount.GetWeaponType() == Battleship_Enum.WeaponType.Pulse)  continue;
 
             // 쿨타임이 다 돌았는지 확인
+            // 투사체 종류만 허용
             if (mount.TickCooldown(Time.deltaTime))
             {
                 int enemyCount = mount.RuntimeStat.EnemyCount;

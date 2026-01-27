@@ -11,27 +11,36 @@ public class UpgradeCardUI : MonoBehaviour
     [SerializeField] private Button selectButton;
 
     private UpgradeData _data;
-    private Action<UpgradeData> _onSelected; // 클릭 시 실행할 함수(대리자)
+    private Action<UpgradeData> _onSelected; // 클릭 시 실행
 
-    // 매니저가 이 함수를 호출해서 정보를 꽂아줍니다. (Dependency Injection)
     public void Setup(UpgradeData data, Action<UpgradeData> onSelectedCallback)
     {
         _data = data;
         _onSelected = onSelectedCallback;
 
-        // UI 갱신
         titleText.text = data.upgradeName;
-        descText.text = data.description;
+
+        string finalDesc = data.GetDescription();
+
+        if (string.IsNullOrEmpty(data.relatedWeaponID) && PlayerDataLoad.playerData != null)
+        {
+            float currentVal = PlayerDataLoad.playerData.CurrentPlayerStat.GetCurrentStatValue(data.targetStat);
+
+            // 소수점 1자리까지만 예쁘게 포맷팅 (예: 12.5)
+            // 색상을 넣어서 강조 (Rich Text 사용)
+            finalDesc += $"\n<size=80%><color=#FFFF00>(현재 값 : {currentVal:F1})</color></size>";
+        }
+
+        descText.text = finalDesc;
+
         if (data.icon != null) iconImage.sprite = data.icon;
 
-        // 버튼 리스너 초기화
         selectButton.onClick.RemoveAllListeners();
         selectButton.onClick.AddListener(OnClick);
     }
 
     private void OnClick()
     {
-        // 매니저에게 "이 데이터가 선택되었어!"라고 보고
         _onSelected?.Invoke(_data);
     }
 }

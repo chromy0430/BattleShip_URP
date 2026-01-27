@@ -5,11 +5,12 @@ public class PlayerStat
 {
     // 변하는 능력치만 지정
     public ShipSize shipSize;
+    public const float MaxMoveSpeed = 30f;
+    public const float MaxTurnSpeed = 12f;
     public float shipMoveSpeed;
     public float shipTurnSpeed;
     public float shipMagnetRange;
-
-    
+      
 
     public int shipHP;
     public int shipMP;
@@ -95,21 +96,81 @@ public class PlayerStat
         }
     }
 
+    public float GetCurrentStatValue(StatType type)
+    {
+        switch (type)
+        {
+            case StatType.Damage:
+                return bonusDamage;
+            case StatType.MoveSpeed:
+                return GetFinalMoveSpeed(shipMoveSpeed);
+            case StatType.TurnSpeed:
+                return GetFinalTurnSpeed(shipTurnSpeed);
+            case StatType.MagnetRange:
+                return shipMagnetRange + bonusMagnetRange;
+            case StatType.HP:
+                return GetFinalMaxHP();
+            // ... 필요한 만큼 추가
+            default:
+                return 0f;
+        }
+    }
+
+    public bool IsStatCapped(StatType type)
+    {
+        switch (type)
+        {
+            case StatType.MoveSpeed:
+                // 현재 속도가 제한값 이상이면 True
+                return GetFinalMoveSpeed(shipMoveSpeed) >= MaxMoveSpeed;
+
+            case StatType.TurnSpeed:
+                return GetFinalTurnSpeed(shipTurnSpeed) >= MaxTurnSpeed;
+
+            // 제한이 없는 스탯은 항상 False (계속 강화 가능)
+            default:
+                return false;
+        }
+    }
+
     public float GetFinalMoveSpeed(float shipBaseSpeed)
     {
         float multiplier = 1.0f + bonusMoveSpeed;
-        return shipBaseSpeed * multiplier;
+        float finalspeed = shipBaseSpeed * multiplier;
+        return Mathf.Min(finalspeed, MaxMoveSpeed);
     }
 
     public float GetFinalTurnSpeed(float shipBaseTurnSpeed)
     {
         float multiplier = 1.0f + bonusTurnSpeed;
-        return shipBaseTurnSpeed * multiplier;
+        float finalspeed = shipBaseTurnSpeed * multiplier;
+        return Mathf.Min(finalspeed, MaxTurnSpeed);
     }
 
     public int GetFinalDamage(int weaponBaseDamage)
     {
         float multiplier = 1.0f + bonusDamage;
         return Mathf.RoundToInt(weaponBaseDamage * multiplier);
+    }
+
+    public float GetMagnetRange(float shipBaseMagnetRange)
+    {
+        float multiplier = 1.0f + bonusMagnetRange;
+        return shipBaseMagnetRange * multiplier;
+    }
+
+    public float GetTotalMagnetRange() 
+    {
+        return shipMagnetRange + bonusMagnetRange;
+    }
+
+    public int GetFinalMaxHP()
+    {
+        return Mathf.Max(1, shipHP + bonusHP);
+    }
+
+    public int GetFinalMaxMP()
+    {
+        return Mathf.Max(0, shipMP + bonusMP);
     }
 }
