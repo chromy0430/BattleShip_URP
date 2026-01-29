@@ -30,4 +30,6 @@ public class EnemyData : ScriptableObject
     public EnemyAttackType AttackType;
     public EnemySizeType SizeType;
 
+    [Header("레이더 아이콘")]
+    public Sprite MinimapIcon;
 }

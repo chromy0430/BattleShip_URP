@@ -38,6 +38,11 @@ public class Enemy : MonoBehaviour, IEnemy
             chaser.turnSpeed = data.TurnSpeed;
         }
 
+        if (RadarSystem.Instance != null && _enemyData != null)
+        {
+            RadarSystem.Instance.AddTarget(gameObject, _enemyData.MinimapIcon);
+        }
+
         transform.localScale = new Vector3(2, 3, 2) * (data.SizeType == EnemySizeType.Large ? 2f : 1);
     }
 
@@ -59,6 +64,11 @@ public class Enemy : MonoBehaviour, IEnemy
             EnemyManager.Instance.RegisterEnemy(this);
         }
 
+        if (RadarSystem.Instance != null && _enemyData != null)
+        {
+            RadarSystem.Instance.AddTarget(gameObject, _enemyData.MinimapIcon);
+        }
+
         EnableInterpolationDelay().Forget();
     }
 
@@ -67,6 +77,11 @@ public class Enemy : MonoBehaviour, IEnemy
         if (EnemyManager.Instance != null)
         {
             EnemyManager.Instance.UnregisterEnemy(this);
+        }
+
+        if (RadarSystem.Instance != null)
+        {
+            RadarSystem.Instance.RemoveTarget(this.gameObject);
         }
     }
 
