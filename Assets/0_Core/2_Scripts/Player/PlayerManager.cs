@@ -8,6 +8,9 @@ public class PlayerManager : MonoBehaviour
     public static PlayerManager Instance { get; private set; }
     public Transform PlayerTransform { get; set; }
 
+    [Header("Weapon System")]
+    private AutoAttackController autoAttackController;
+
     public event Action getDamage;
 
     private void Awake()
@@ -22,6 +25,7 @@ public class PlayerManager : MonoBehaviour
         }
 
         PlayerTransform = this.transform;
+        autoAttackController = GetComponentInChildren<AutoAttackController>();
     }
 
     #region 자석 아이템 로직
@@ -113,6 +117,35 @@ public class PlayerManager : MonoBehaviour
     #endregion
 
     #region 무기 획득 함수
+
+    // 외부(PlayerItemManager)에서 호출할 함수
+    public bool TryAddWeapon(BaseWeaponData newWeaponData)
+    {
+        if (autoAttackController == null)
+        {
+            Debug.LogError("[PlayerManager] AutoAttackController 컴포넌트가 없습니다!");
+            return false;
+        }
+
+        var mounts = autoAttackController.GetWeaponMounts();
+
+        // 리스트를 순회하며 빈 포문 찾기
+        foreach (var mount in mounts)
+        {
+            // [조건] 무기가 장착되어 있지 않다면?
+            if (!mount.HasWeapon())
+            {
+                // 장착 실행
+                mount.EquipWeapon(newWeaponData);
+                Debug.Log($"[PlayerManager] {newWeaponData.Name} 장착 완료 (슬롯: {mount.name})");
+                return true; // 장착 성공하고 종료
+            }
+        }
+
+        // [결과] 모든 반복문을 돌았는데 return이 안 됐다면 = 꽉 찼다는 뜻
+        Debug.Log("[PlayerManager] 무기 슬롯이 가득 차서 획득할 수 없습니다. (교체 불가)");
+        return false;
+    }
 
     #endregion
 

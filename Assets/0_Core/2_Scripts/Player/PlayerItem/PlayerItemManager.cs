@@ -21,7 +21,7 @@ namespace BattleShip
             else Destroy(gameObject);
         }
 
-        // --- [핵심] 외부(FieldItem)에서 아이템을 먹었을 때 호출하는 함수 ---
+        // 외부(FieldItem)에서 아이템을 먹었을 때 호출하는 함수 
         public void ObtainItem(BaseItemData itemData)
         {
             if (itemData == null) return;
@@ -42,15 +42,25 @@ namespace BattleShip
             }
         }
 
-        // 1. 무기 획득 처리
+        // 무기 획득 처리
         private void EquipWeapon(BaseWeaponData weaponData)
         {
-            Debug.Log($"[Weapon] {weaponData.Name} 획득! (무기 장착 로직 연결 필요)");
-            // TODO: WeaponMount.cs나 WeaponManager에 무기 추가 요청
-            // 예: PlayerManager.Instance.WeaponSystem.AddWeapon(weaponData);
+            // Debug.Log($"[Weapon] {weaponData.Name} 획득! (무기 장착 로직 연결 필요)");
+
+            // [수정] PlayerManager에게 무기 장착 요청
+            if (PlayerManager.Instance != null)
+            {
+                bool success = PlayerManager.Instance.TryAddWeapon(weaponData);
+
+                if (!success)
+                {
+                    // 꽉 차서 장착 못했을 때의 처리 (예: 경험치로 변환? 혹은 인벤토리?)
+                    Debug.Log("무기 획득 실패: 슬롯 가득 참");
+                }
+            }
         }
 
-        // 2. 장비 획득 처리 (빈 슬롯 체크 -> 장착 or 스왑)
+        // 장비 획득 처리 (빈 슬롯 체크 -> 장착 or 스왑)
         private void HandleEquipment(BaseEquipmentData equipData)
         {
             // A. 빈 슬롯 찾기
@@ -79,17 +89,15 @@ namespace BattleShip
             }
         }
 
-        // 3. 화물 획득 처리
+        // 화물 획득 처리
         private void HandleCargo(BaseCargoData cargoData)
         {
             CollectedCargo.Add(cargoData);
             Debug.Log($"[Cargo] {cargoData.Name} 화물 적재 완료.");
 
-            // 화물은 획득 즉시 스탯 적용
-            ApplyStats(cargoData.statModifiers, true);
+            // [수정됨] CS1061 에러 해결: statModifiers -> effectPerStack
+            ApplyStats(cargoData.effectPerStack, true);
         }
-
-        // --- 내부 로직 (장착/해제/스왑) ---
 
         private void EquipItemAtIndex(BaseEquipmentData data, int index)
         {
@@ -123,26 +131,83 @@ namespace BattleShip
         // isAdding: true면 능력치 추가, false면 능력치 제거(장비 해제 시)
         private void ApplyStats(List<StatModifier> modifiers, bool isAdding)
         {
-            if (PlayerManager.Instance == null) return;
+            if (PlayerDataLoad.playerData == null)
+            {
+                Debug.LogWarning("PlayerDataLoad가 초기화되지 않아 스탯을 적용할 수 없습니다.");
+                return;
+            }
 
-            // 플레이어 스탯 매니저 가져오기 (가정: PlayerManager에 Stat 관련 접근자가 있다고 가정)
-            // 만약 PlayerStat 클래스에 직접 접근해야 한다면 아래 로직을 수정해야 합니다.
+            var playerStat = PlayerDataLoad.playerData.CurrentPlayerStat;
+            if (playerStat == null) return;
 
-            // 예시 로직: PlayerStat이 있고, 거기에 AddModifier 함수가 있다고 가정
-            /* var playerStat = PlayerManager.Instance.Stat; 
             foreach (var mod in modifiers)
             {
-                float value = isAdding ? mod.value : -mod.value; // 더하거나 뺌
-                playerStat.ApplyModifier(mod.targetStat, value, mod.isPercentage);
-            }
-            */
+                float finalValue = 0f;
 
-            // [임시 로그] 실제 PlayerStat 연결 전 확인용
-            foreach (var mod in modifiers)
-            {
-                string op = isAdding ? "증가" : "감소";
-                Debug.Log($"[Stat] {mod.targetStat} {mod.value} {op} 적용됨.");
+                // 1. 퍼센트(%) 여부에 따른 값 변환
+                if (mod.isPercentage)
+                {
+                    // 10 -> 0.1 (10%)로 변환
+                    float percentage = mod.value / 100f;
+
+                    switch (mod.targetStat)
+                    {
+                        // [계수형 스탯] 이동속도, 선회속도, 데미지 등은 PlayerStat에서 (1.0 + bonus)로 계산하므로 0.1을 더하면 됨
+                        case StatType.MoveSpeed:
+                        case StatType.TurnSpeed:
+                        case StatType.MagnetRange:
+                        case StatType.Damage:
+                            finalValue = percentage;
+                            break;
+
+                        // [플랫형 스탯] HP, MP, 방어력 등은 고정값이므로 기본값에 비례하여 증가량 계산 (예: 기본HP 100의 10% = 10)
+                        case StatType.HP:
+                            finalValue = playerStat.shipHP * percentage;
+                            break;
+                        case StatType.MP:
+                            finalValue = playerStat.shipMP * percentage;
+                            break;
+                        case StatType.DEF:
+                            finalValue = playerStat.shipDEF * percentage;
+                            break;
+                        case StatType.SPR:
+                            finalValue = playerStat.shipSPR * percentage;
+                            break;
+
+                        default:
+                            finalValue = mod.value; // 예외 처리
+                            break;
+                    }
+                }
+                else
+                {
+                    // 고정값 (Flat)
+                    switch (mod.targetStat)
+                    {
+                        // 속도 계열은 고정값을 더하려면 기본 속도로 나누어 비율로 변환해줘야 함 (PlayerStat 구조상)
+                        case StatType.MoveSpeed:
+                            finalValue = (playerStat.shipMoveSpeed > 0) ? (mod.value / playerStat.shipMoveSpeed) : 0;
+                            break;
+                        case StatType.TurnSpeed:
+                            finalValue = (playerStat.shipTurnSpeed > 0) ? (mod.value / playerStat.shipTurnSpeed) : 0;
+                            break;
+
+                        default:
+                            finalValue = mod.value;
+                            break;
+                    }
+                }
+
+                // 2. 스탯 적용 (장착이면 +, 해제면 -)
+                float valueToApply = isAdding ? finalValue : -finalValue;
+
+                playerStat.AddBonus(mod.targetStat, valueToApply);
+
+                Debug.Log($"[Stat Applied] {mod.targetStat}: {valueToApply:F2} (Original: {mod.value}, Is%: {mod.isPercentage})");
             }
+
+            // [수정됨] 스탯 변경 후 이벤트 알림 (UI 갱신 등)
+            PlayerDataLoad.playerData.UpdateStatAndNotify();
         }
     }
 }

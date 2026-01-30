@@ -229,7 +229,8 @@ public class WeaponMount : MonoBehaviour
     {
         _weaponData = newData;
         Initialize();
-        UpgradeManager.Instance.RefreshWeaponList();
+
+        if(UpgradeManager.Instance != null) UpgradeManager.Instance.RefreshWeaponList();
     }
     #endregion
 
