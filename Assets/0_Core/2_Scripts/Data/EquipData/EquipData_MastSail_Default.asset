@@ -1,0 +1,38 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 09f8623ec252d154ca6ddfa355c7e98a, type: 3}
+  m_Name: EquipData_MastSail_Default
+  m_EditorClassIdentifier: Assembly-CSharp::BattleShip.BaseEquipmentData
+  ID: MastSail_Default_01
+  Name: "\uAE30\uBCF8 \uB3DB\uB300"
+  Description: "\uBC30\uC758 \uC18D\uB3C4\uB97C \uCC45\uC784\uC9C0\uB294 \uAE30\uBCF8
+    \uB3DB\uB300"
+  Icon: {fileID: 0}
+  itemType: 1
+  ShopCost: 0
+  DefaultLevel: 1
+  MaxLevel: 15
+  equipSlot: 3
+  baseStats:
+  - targetStat: 1
+    value: 3
+    isPercentage: 0
+  - targetStat: 2
+    value: 2
+    isPercentage: 0
+  growthPerLevel:
+  - targetStat: 1
+    value: 10
+    isPercentage: 1
+  - targetStat: 2
+    value: 10
+    isPercentage: 1

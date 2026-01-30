@@ -1,18 +1,15 @@
-﻿using Battleship_Enum;
+﻿using BattleShip;
+using Battleship_Enum;
 using UnityEditor;
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "WeaponData_", menuName = "BattleShip/Weapon Data", order = 1)]
-public class BaseWeaponData : ScriptableObject 
+[CreateAssetMenu(fileName = "WeaponData_", menuName = "BattleShip/Item/Weapon Data", order = 1)]
+public class BaseWeaponData : BaseItemData
 {
     [Header("무기 속성")]
-    public string WeaponID;
-    public string WeaponName; // 무기 이름
-    [TextArea] public string WeaponDescription; // 무기 설명
     public WeaponType weaponType;
     public WeaponAttribute weaponAttribute;
-    public int ShopCost;
-
+    
     [Header("전투 능력치")]
     public int Damage;                // 기본 공격력
     public int Range;                 // 사거리
@@ -29,12 +26,19 @@ public class BaseWeaponData : ScriptableObject
     public float homingTurnSpeed; // 유도 회전 속도
 
     [Header("비주얼/사운드")]
-    public Sprite Icon; // 무기 아이콘
     public GameObject ProjectilePrefab; // 투사체
     public GameObject MuzzleEffect; // 발사하는 순간의 이펙트
     public GameObject ShotEffect; // 맞는 순간의 이펙트
     public AudioClip MuzzleSfx; // 발사하는 순간의 사운드
     public AudioClip ShotSfx; // 맞는 순간의 사운드
+
+    private void OnEnable()
+    {
+        // 생성될 때 타입을 자동으로 무기로 설정
+        itemType = ItemType.Weapon;
+        DefaultLevel = 1;
+        MaxLevel = 15;
+    }
 
 #if UNITY_EDITOR
     private void OnValidate()

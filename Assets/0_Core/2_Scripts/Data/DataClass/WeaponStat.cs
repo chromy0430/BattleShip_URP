@@ -52,8 +52,8 @@ public class WeaponStat
         weaponType = data.weaponType;
         weaponAttribute = data.weaponAttribute;
         
-        Name = data.WeaponName;
-        Description = data.WeaponDescription;
+        Name = data.Name;
+        Description = data.Description;
         Damage = data.Damage;
         Range = data.Range;
         EnemyCount = data.EnemyCount;

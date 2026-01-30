@@ -149,21 +149,9 @@ public class Enemy : MonoBehaviour, IEnemy
             int reward = _enemyData != null ? _enemyData.ExpReward : 10;
 
             // 이 함수 하나로 "신규 생성" 혹은 "주변 보석과 병합"이 자동으로 결정됨
-            DropManager.Instance.SpawnExperience(this.transform.position, reward);
+            DropManager.Instance.SpawnDrops(this.transform.position, reward);
         }
 
-        /*if (EnemyManager.Instance != null)
-        {
-            GameObject dropObj = EnemyManager.Instance.GetDrop(this.transform.position);
-
-            // EnemyDrop 컴포넌트를 가져와서 데이터 주입
-            if (dropObj != null && dropObj.TryGetComponent<EnemyDrop>(out var dropItem))
-            {
-                // _enemyData가 null이 아닐 때만 경험치 적용 (안전장치)
-                int reward = _enemyData != null ? _enemyData.ExpReward : 10;
-                dropItem.Initialize(reward);
-            }
-        }*/
 
         flickerFeedback?.ResetFeedbacks();
 

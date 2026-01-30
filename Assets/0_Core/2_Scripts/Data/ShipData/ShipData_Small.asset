@@ -25,6 +25,6 @@ MonoBehaviour:
   BaseSurfaceSize: {x: 0, y: 0}
   BaseHeightOffset: 0
   BaseMoveSpeed: 10
-  BaseTurnSpeed: 10
+  BaseTurnSpeed: 5
   shipVisual: {fileID: 7150253761806565065, guid: 2c3dab0da11380d4eab0d781c2154404, type: 3}
   shipIcon: {fileID: 0}

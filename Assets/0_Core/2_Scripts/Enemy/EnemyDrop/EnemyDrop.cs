@@ -6,7 +6,6 @@ public class EnemyDrop : MonoBehaviour, IWaterFloatTarget
     [Header("Visual Settings")]
     [SerializeField] private MeshRenderer _renderer;
     private Vector3 _baseScale;
-    private Tween _pulseTween;
 
     [Header("Floating Settings")]
     public float heightOffset = 0.1f;

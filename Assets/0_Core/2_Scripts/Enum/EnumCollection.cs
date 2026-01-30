@@ -1,5 +1,20 @@
 namespace Battleship_Enum
 {
+    public enum ItemType
+    {
+        Weapon, Equipment, Cargo
+    }
+
+    public enum EquipmentSlot
+    {
+        None,
+        Hull,
+        Keel,
+        MastSail,
+        RepairKit,
+        Wheel
+    }
+
     public enum EnemyAttackType
     {
         melee, Ranged, SelfDestruct

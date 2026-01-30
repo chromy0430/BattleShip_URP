@@ -176,7 +176,7 @@ public class WeaponMount : MonoBehaviour
     #region 강화 관련
     public string GetWeaponID()
     {
-        return _weaponData != null ? _weaponData.WeaponID : "";
+        return _weaponData != null ? _weaponData.ID : "";
     }
 
     public void ApplyUpgradeBonus(StatType type, float amount)

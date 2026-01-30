@@ -1,419 +1,343 @@
 ﻿using UnityEngine;
 using UnityEditor;
+using System.Collections.Generic;
 using System.IO;
+using System.Reflection;
 using Battleship_Enum;
+using BattleShip;
 
 public class DataManagerWindow : EditorWindow
 {
-    // ---------------------------------------------------------
-    // 1. 경로 상수
-    // ---------------------------------------------------------
-    private const string ROOT_PATH = "Assets/0_Core/2_Scripts/Data/";
-    private const string PATH_UPGRADE = "UpgradeData/";
-    private const string PATH_SHIP = "ShipData/";
-    private const string PATH_ENEMY = "EnemyData/";
-    private const string PATH_WEAPON = "WeaponData/";
+    private enum TabType { Weapon, Equipment, Cargo, Upgrade, Ship, Enemy }
+    private TabType currentTab = TabType.Weapon;
 
-    // ---------------------------------------------------------
-    // 2. 내부 변수
-    // ---------------------------------------------------------
-    private int _selectedTab = 0;
-    private string[] _tabs = { "Upgrade", "Ship", "Enemy", "Weapon" };
+    // 리스트 관리 (좌측 패널용 스크롤)
+    private Vector2 leftPanelScrollPos;
+    private List<ScriptableObject> currentList = new List<ScriptableObject>();
+    private ScriptableObject selectedData;
+    private Editor cachedEditor;
 
-    private Vector2 _scrollPosLeft;
-    private Vector2 _scrollPosRight;
-    private float _sidebarWidth = 280f; // 버튼 추가로 너비 살짝 늘림
+    // [수정] 오른쪽 패널용 스크롤 변수 추가
+    private Vector2 inspectorScrollPos;
 
-    // [Edit Mode] 선택된 에셋
-    private ScriptableObject _selectedAsset;
+    // 생성용 임시 데이터 & 에디터
+    private ScriptableObject tempCreationData;
+    private Editor tempCreationEditor;
+    private string newFileName = "";
 
-    // [Create Mode] 임시 에셋
-    private UpgradeData _tempUpgrade;
-    private BaseShipData _tempShip;
-    private EnemyData _tempEnemy;
-    private BaseWeaponData _tempWeapon;
+    // [설정] 아이콘 크기
+    private float iconSize = 32f;
 
-    // [Create Mode] 파일 이름
-    private string _newFileName = "New_Data";
+    // [설정] 기본 경로
+    private string BasePath => "Assets/0_Core/2_Scripts/Data";
 
-    // [Common] 에디터 캐싱
-    private Editor _cachedEditor;
-
-    // [Weapon Type Selection]
-    private enum WeaponTypeSelection { Gun, Missile }
-    private WeaponTypeSelection _weaponType = WeaponTypeSelection.Gun;
-
-
-    // ---------------------------------------------------------
-    // 3. 초기화
-    // ---------------------------------------------------------
-    [MenuItem("Tools/JJ Chronicles/Battleship Data Manager")]
+    [MenuItem("BattleShip/Data Manager")]
     public static void ShowWindow()
     {
-        DataManagerWindow window = GetWindow<DataManagerWindow>("Data Manager");
-        window.minSize = new Vector2(1000, 600);
+        GetWindow<DataManagerWindow>("Data Manager");
     }
 
     private void OnEnable()
     {
-        RefreshAssetList();
-        InitTempData();
+        RefreshList();
     }
 
-    private void InitTempData()
+    private void OnDisable()
     {
-        if (_tempUpgrade == null) _tempUpgrade = CreateInstance<UpgradeData>();
-        if (_tempShip == null) _tempShip = CreateInstance<BaseShipData>();
-        if (_tempEnemy == null) _tempEnemy = CreateInstance<EnemyData>();
-        if (_tempWeapon == null) _tempWeapon = CreateInstance<BaseWeaponData>();
+        if (tempCreationData != null)
+        {
+            DestroyImmediate(tempCreationData);
+        }
     }
 
     private void OnGUI()
     {
-        ProcessEnterKey();
-
-        // 1. 상단 탭바
-        GUILayout.BeginArea(new Rect(0, 0, position.width, 30));
-        int oldTab = _selectedTab;
-        _selectedTab = GUILayout.Toolbar(_selectedTab, _tabs, GUILayout.Height(25));
-
-        if (oldTab != _selectedTab)
+        // 1. 상단 탭
+        GUILayout.BeginHorizontal();
+        string[] tabNames = { "무기", "장비", "화물", "강화", "함선", "적" };
+        EditorGUI.BeginChangeCheck();
+        currentTab = (TabType)GUILayout.Toolbar((int)currentTab, tabNames, GUILayout.Height(30));
+        if (EditorGUI.EndChangeCheck())
         {
-            _selectedAsset = null;
-            _cachedEditor = null;
-            _newFileName = "New_Data";
-            GUI.FocusControl(null);
+            // 탭 변경 시 초기화
+            selectedData = null;
+            cachedEditor = null;
+            newFileName = "";
+            inspectorScrollPos = Vector2.zero; // 탭 바꿀때 스크롤 초기화
+
+            if (tempCreationData != null) DestroyImmediate(tempCreationData);
+            tempCreationData = null;
+            tempCreationEditor = null;
+
+            RefreshList();
         }
-        GUILayout.EndArea();
+        GUILayout.EndHorizontal();
 
-        // 2. 메인 패널
-        GUILayout.BeginArea(new Rect(0, 30, position.width, position.height - 30));
+        // 2. 패널 분할
         EditorGUILayout.BeginHorizontal();
-
-        DrawLeftPanel();  // 리스트
-        DrawRightPanel(); // 폼
-
+        DrawLeftPanel();
+        DrawRightPanel();
         EditorGUILayout.EndHorizontal();
-        GUILayout.EndArea();
     }
 
-    // ---------------------------------------------------------
-    // 4. 왼쪽 패널 (리스트 + 삭제 버튼)
-    // ---------------------------------------------------------
+    // 좌측: 리스트
     private void DrawLeftPanel()
     {
-        GUIStyle sidebarStyle = new GUIStyle(GUI.skin.box);
-        sidebarStyle.normal.background = MakeTex(2, 2, new Color(0.25f, 0.25f, 0.25f, 1f));
+        float panelWidth = 300f;
+        EditorGUILayout.BeginVertical("box", GUILayout.Width(panelWidth), GUILayout.ExpandHeight(true));
 
-        EditorGUILayout.BeginVertical(sidebarStyle, GUILayout.Width(_sidebarWidth), GUILayout.ExpandHeight(true));
+        if (GUILayout.Button("Refresh List", GUILayout.Height(25))) RefreshList();
+        GUILayout.Space(5);
 
-        // 상단 버튼
-        EditorGUILayout.BeginHorizontal();
-        if (GUILayout.Button("+ Create New", GUILayout.Height(30)))
+        // [수정] 좌측 패널 전용 변수 사용
+        leftPanelScrollPos = EditorGUILayout.BeginScrollView(leftPanelScrollPos);
+
+        if (currentList != null)
         {
-            _selectedAsset = null;
-            _cachedEditor = null;
-            _newFileName = "New_Data";
-            GUI.FocusControl(null);
+            for (int i = 0; i < currentList.Count; i++)
+            {
+                var data = currentList[i];
+                if (data == null) continue;
+
+                bool isSelected = (selectedData == data);
+                if (isSelected) GUI.backgroundColor = Color.cyan;
+                else GUI.backgroundColor = Color.white;
+
+                EditorGUILayout.BeginHorizontal("box", GUILayout.Height(iconSize + 4));
+
+                // 1. 아이콘
+                Texture2D iconTex = GetIconTexture(data);
+                if (iconTex != null)
+                {
+                    GUI.DrawTexture(GUILayoutUtility.GetRect(iconSize, iconSize, GUILayout.Width(iconSize)), iconTex, ScaleMode.ScaleToFit);
+                }
+                else
+                {
+                    GUILayout.Space(iconSize);
+                }
+
+                // 2. 이름 버튼
+                GUILayout.BeginVertical();
+                GUILayout.FlexibleSpace();
+                if (GUILayout.Button(data.name, EditorStyles.label, GUILayout.Height(iconSize)))
+                {
+                    selectedData = data;
+                    cachedEditor = Editor.CreateEditor(data);
+                    inspectorScrollPos = Vector2.zero; // 선택 변경 시 스크롤 맨 위로
+
+                    if (tempCreationData != null) DestroyImmediate(tempCreationData);
+                    tempCreationData = null;
+
+                    GUI.FocusControl(null);
+                }
+                GUILayout.FlexibleSpace();
+                GUILayout.EndVertical();
+
+                // 3. 삭제 버튼
+                GUI.backgroundColor = Color.red;
+                if (GUILayout.Button("X", EditorStyles.miniButton, GUILayout.Width(20), GUILayout.Height(20)))
+                {
+                    if (EditorUtility.DisplayDialog("데이터 삭제", $"{data.name} 삭제하시겠습니까?", "삭제", "취소"))
+                    {
+                        DeleteData(data);
+                        RefreshList();
+                        GUIUtility.ExitGUI();
+                    }
+                }
+                GUI.backgroundColor = Color.white;
+
+                EditorGUILayout.EndHorizontal();
+            }
         }
-        if (GUILayout.Button("↻", GUILayout.Width(30), GUILayout.Height(30)))
+
+        EditorGUILayout.EndScrollView();
+        EditorGUILayout.EndVertical();
+    }
+
+    // 우측: 상세 설정 or 생성
+    private void DrawRightPanel()
+    {
+        EditorGUILayout.BeginVertical("box", GUILayout.ExpandHeight(true));
+
+        if (selectedData != null)
         {
-            RefreshAssetList();
+            // --- [편집 모드] ---
+            GUILayout.Label($"[Edit] {selectedData.name}", EditorStyles.boldLabel);
+            GUILayout.Space(10);
+
+            if (cachedEditor == null) cachedEditor = Editor.CreateEditor(selectedData);
+
+            // [수정] Vector2.zero 대신 inspectorScrollPos 변수 사용 -> 스크롤 기억됨
+            inspectorScrollPos = EditorGUILayout.BeginScrollView(inspectorScrollPos);
+            cachedEditor.OnInspectorGUI();
+            EditorGUILayout.EndScrollView();
+
+            GUILayout.Space(10);
+            if (GUILayout.Button("Save Changes", GUILayout.Height(30)))
+            {
+                EditorUtility.SetDirty(selectedData);
+                AssetDatabase.SaveAssets();
+                Debug.Log($"{selectedData.name} 저장 완료!");
+            }
         }
-        EditorGUILayout.EndHorizontal();
+        else
+        {
+            // --- [생성 모드] ---
+            GUILayout.Label($"Create New {currentTab}", EditorStyles.boldLabel);
+            GUILayout.Space(10);
 
-        EditorGUILayout.Space(5);
-        EditorGUILayout.LabelField("Existing Data List", EditorStyles.boldLabel);
+            GUILayout.BeginHorizontal();
+            GUILayout.Label("File Name:", GUILayout.Width(80));
+            newFileName = EditorGUILayout.TextField(newFileName);
+            GUILayout.EndHorizontal();
+            GUILayout.Space(10);
 
-        _scrollPosLeft = EditorGUILayout.BeginScrollView(_scrollPosLeft, GUIStyle.none, GUI.skin.verticalScrollbar);
+            if (tempCreationData == null)
+            {
+                InitTempCreationData();
+            }
 
-        string[] guids = FindAssetsByTab();
+            if (tempCreationData != null)
+            {
+                if (tempCreationEditor == null) tempCreationEditor = Editor.CreateEditor(tempCreationData);
+
+                GUILayout.Label("Initial Values (설정 후 Create 누르세요):", EditorStyles.helpBox);
+
+                // [수정] 여기도 inspectorScrollPos 사용
+                inspectorScrollPos = EditorGUILayout.BeginScrollView(inspectorScrollPos);
+                tempCreationEditor.OnInspectorGUI();
+                EditorGUILayout.EndScrollView();
+            }
+
+            GUILayout.Space(10);
+
+            GUI.backgroundColor = Color.green;
+            if (GUILayout.Button("Create Data File", GUILayout.Height(40)))
+            {
+                CreateNewData();
+            }
+            GUI.backgroundColor = Color.white;
+        }
+
+        EditorGUILayout.EndVertical();
+    }
+
+    // 아이콘 텍스처 추출
+    private Texture2D GetIconTexture(ScriptableObject data)
+    {
+        if (data == null) return null;
+
+        Sprite sprite = null;
+
+        if (data is BaseItemData itemData)
+        {
+            sprite = itemData.Icon;
+        }
+        else
+        {
+            var type = data.GetType();
+            var field = type.GetField("Icon") ?? type.GetField("icon");
+            if (field != null)
+            {
+                var val = field.GetValue(data);
+                if (val is Sprite s) sprite = s;
+            }
+        }
+
+        return sprite != null ? sprite.texture : null;
+    }
+
+    private void InitTempCreationData()
+    {
+        switch (currentTab)
+        {
+            case TabType.Weapon: tempCreationData = CreateInstance<BaseWeaponData>(); break;
+            case TabType.Equipment: tempCreationData = CreateInstance<BaseEquipmentData>(); break;
+            case TabType.Cargo: tempCreationData = CreateInstance<BaseCargoData>(); break;
+            case TabType.Upgrade: tempCreationData = CreateInstance<UpgradeData>(); break;
+            case TabType.Ship: tempCreationData = CreateInstance<BaseShipData>(); break;
+            case TabType.Enemy: tempCreationData = CreateInstance<EnemyData>(); break;
+        }
+    }
+
+    private void CreateNewData()
+    {
+        if (string.IsNullOrEmpty(newFileName))
+        {
+            EditorUtility.DisplayDialog("Error", "파일 이름을 입력해주세요.", "OK");
+            return;
+        }
+
+        if (tempCreationData == null) InitTempCreationData();
+
+        string folderName = "";
+        switch (currentTab)
+        {
+            case TabType.Weapon: folderName = "WeaponData"; break;
+            case TabType.Equipment: folderName = "EquipmentData"; break;
+            case TabType.Cargo: folderName = "CargoData"; break;
+            case TabType.Upgrade: folderName = "UpgradeData"; break;
+            case TabType.Ship: folderName = "ShipData"; break;
+            case TabType.Enemy: folderName = "EnemyData"; break;
+        }
+
+        string fullFolderPath = $"{BasePath}/{folderName}";
+
+        if (!Directory.Exists(fullFolderPath))
+        {
+            Directory.CreateDirectory(fullFolderPath);
+            AssetDatabase.Refresh();
+        }
+
+        string fullPath = $"{fullFolderPath}/{newFileName}.asset";
+        fullPath = AssetDatabase.GenerateUniqueAssetPath(fullPath);
+
+        AssetDatabase.CreateAsset(tempCreationData, fullPath);
+        AssetDatabase.SaveAssets();
+        AssetDatabase.Refresh();
+
+        Debug.Log($"생성 완료: {fullPath}");
+
+        tempCreationData = null;
+        tempCreationEditor = null;
+        newFileName = "";
+
+        RefreshList();
+        selectedData = AssetDatabase.LoadAssetAtPath<ScriptableObject>(fullPath);
+    }
+
+    private void RefreshList()
+    {
+        currentList.Clear();
+        string[] guids = new string[0];
+        string typeFilter = "";
+
+        switch (currentTab)
+        {
+            case TabType.Weapon: typeFilter = "t:BaseWeaponData"; break;
+            case TabType.Equipment: typeFilter = "t:BaseEquipmentData"; break;
+            case TabType.Cargo: typeFilter = "t:BaseCargoData"; break;
+            case TabType.Upgrade: typeFilter = "t:UpgradeData"; break;
+            case TabType.Ship: typeFilter = "t:BaseShipData"; break;
+            case TabType.Enemy: typeFilter = "t:EnemyData"; break;
+        }
+
+        guids = AssetDatabase.FindAssets(typeFilter);
+
         foreach (string guid in guids)
         {
             string path = AssetDatabase.GUIDToAssetPath(guid);
             ScriptableObject asset = AssetDatabase.LoadAssetAtPath<ScriptableObject>(path);
-            if (asset == null) continue;
-
-            // [변경점] 가로 정렬 시작 (이름 버튼 + 삭제 버튼)
-            EditorGUILayout.BeginHorizontal();
-
-            // 1. 에셋 선택 버튼
-            GUIStyle btnStyle = new GUIStyle(GUI.skin.button);
-            btnStyle.alignment = TextAnchor.MiddleLeft;
-            if (_selectedAsset == asset)
-            {
-                btnStyle.normal.textColor = Color.cyan;
-                btnStyle.fontStyle = FontStyle.Bold;
-            }
-
-            // ExpandWidth(true)를 써서 남은 공간을 다 차지하게 함
-            if (GUILayout.Button($" {asset.name}", btnStyle, GUILayout.Height(25), GUILayout.ExpandWidth(true)))
-            {
-                _selectedAsset = asset;
-                _cachedEditor = null;
-                GUI.FocusControl(null);
-            }
-
-            // 2. 삭제(X) 버튼
-            GUI.backgroundColor = new Color(1f, 0.6f, 0.6f); // 연한 빨강
-            if (GUILayout.Button("X", GUILayout.Width(25), GUILayout.Height(25)))
-            {
-                // 삭제 로직 실행
-                if (DeleteAssetDirectly(asset))
-                {
-                    // 삭제되었다면 루프를 멈추고 리턴 (리스트 갱신을 위해)
-                    GUI.backgroundColor = Color.white;
-                    EditorGUILayout.EndHorizontal();
-                    EditorGUILayout.EndScrollView();
-                    EditorGUILayout.EndVertical();
-                    return;
-                }
-            }
-            GUI.backgroundColor = Color.white; // 색상 복구
-
-            EditorGUILayout.EndHorizontal();
-        }
-
-        EditorGUILayout.EndScrollView();
-        EditorGUILayout.EndVertical();
-    }
-
-    // ---------------------------------------------------------
-    // 5. 오른쪽 패널 (통합 뷰어)
-    // ---------------------------------------------------------
-    private void DrawRightPanel()
-    {
-        EditorGUILayout.BeginVertical(GUILayout.ExpandHeight(true));
-        _scrollPosRight = EditorGUILayout.BeginScrollView(_scrollPosRight);
-
-        EditorGUILayout.Space(10);
-
-        if (_selectedAsset != null)
-        {
-            // [EDIT MODE]
-            DrawInspectorFor(_selectedAsset, "Edit Mode");
-            DrawEditModeButtons();
-        }
-        else
-        {
-            // [CREATE MODE]
-            DrawCreateHeader();
-
-            ScriptableObject targetTemp = GetCurrentTempObject();
-            if (targetTemp != null)
-            {
-                DrawInspectorFor(targetTemp, "Input Form");
-                DrawCreateButton(targetTemp);
-            }
-        }
-
-        EditorGUILayout.EndScrollView();
-        EditorGUILayout.EndVertical();
-    }
-
-    private void DrawInspectorFor(ScriptableObject obj, string title)
-    {
-        EditorGUILayout.LabelField(title, EditorStyles.boldLabel);
-        EditorGUILayout.Space(5);
-
-        if (_cachedEditor == null || _cachedEditor.target != obj)
-        {
-            if (_cachedEditor != null) DestroyImmediate(_cachedEditor);
-            _cachedEditor = Editor.CreateEditor(obj);
-        }
-
-        if (_cachedEditor != null)
-        {
-            EditorGUILayout.BeginVertical(GUI.skin.box);
-            EditorGUI.BeginChangeCheck();
-            _cachedEditor.OnInspectorGUI();
-            if (EditorGUI.EndChangeCheck())
-            {
-                EditorUtility.SetDirty(obj);
-            }
-            EditorGUILayout.EndVertical();
+            if (asset != null) currentList.Add(asset);
         }
     }
 
-    private void DrawCreateHeader()
+    private void DeleteData(ScriptableObject data)
     {
-        EditorGUILayout.LabelField("Create New Data", EditorStyles.boldLabel);
-        EditorGUILayout.HelpBox("새 데이터를 생성합니다.", MessageType.Info);
-        EditorGUILayout.Space(10);              
-
-        _newFileName = EditorGUILayout.TextField("File Name (English)", _newFileName);
-        EditorGUILayout.Space(10);
-    }
-
-    private void DrawCreateButton(ScriptableObject sourceTemp)
-    {
-        EditorGUILayout.Space(20);
-        GUI.backgroundColor = Color.green;
-        if (GUILayout.Button("Create Asset", GUILayout.Height(40)))
-        {
-            CreateAssetFromTemp(sourceTemp);
-        }
-        GUI.backgroundColor = Color.white;
-    }
-
-    private void DrawEditModeButtons()
-    {
-        EditorGUILayout.Space(20);
-
-        EditorGUILayout.BeginHorizontal();
-
-        GUI.backgroundColor = new Color(0.5f, 1f, 0.5f);
-        if (GUILayout.Button("Update Data (Save)", GUILayout.Height(40)))
-        {
-            SaveSelectedAsset();
-        }
-
-        GUI.backgroundColor = new Color(1f, 0.5f, 0.5f);
-        if (GUILayout.Button("Delete Data", GUILayout.Height(40)))
-        {
-            if (DeleteAssetDirectly(_selectedAsset)) return;
-        }
-
-        EditorGUILayout.EndHorizontal();
-        GUI.backgroundColor = Color.white;
-
-        EditorGUILayout.Space(5);
-        EditorGUILayout.HelpBox("Tip: 값을 수정하고 'Enter' 키를 누르면 자동 저장됩니다.", MessageType.None);
-    }
-
-    // ---------------------------------------------------------
-    // 기능 로직 (삭제, 저장, 엔터키)
-    // ---------------------------------------------------------
-    private bool DeleteAssetDirectly(ScriptableObject asset)
-    {
-        if (asset == null) return false;
-
-        if (EditorUtility.DisplayDialog("Delete Asset", $"정말 '{asset.name}'을 삭제하시겠습니까?\n(이 작업은 되돌릴 수 없습니다)", "Yes", "No"))
-        {
-            string path = AssetDatabase.GetAssetPath(asset);
-
-            // 만약 삭제하려는게 현재 보고 있던거면 선택 해제
-            if (_selectedAsset == asset)
-            {
-                _selectedAsset = null;
-                _cachedEditor = null;
-            }
-
-            AssetDatabase.DeleteAsset(path);
-            RefreshAssetList();
-            Debug.Log($"[Data Manager] '{asset.name}' 삭제 완료.");
-            return true; // 삭제됨
-        }
-        return false; // 취소됨
-    }
-
-    private void ProcessEnterKey()
-    {
-        Event e = Event.current;
-        if (e.type == EventType.KeyDown)
-        {
-            if (e.keyCode == KeyCode.Return || e.keyCode == KeyCode.KeypadEnter)
-            {
-                if (_selectedAsset != null)
-                {
-                    SaveSelectedAsset();
-                    e.Use();
-                    Repaint();
-                }
-            }
-        }
-    }
-
-    private void SaveSelectedAsset()
-    {
-        if (_selectedAsset == null) return;
-        GUI.FocusControl(null);
-        EditorUtility.SetDirty(_selectedAsset);
+        string path = AssetDatabase.GetAssetPath(data);
+        AssetDatabase.DeleteAsset(path);
         AssetDatabase.SaveAssets();
-        Debug.Log($"[Data Manager] '{_selectedAsset.name}' 저장(Update) 완료!");
-    }
-
-    private ScriptableObject GetCurrentTempObject()
-    {
-        switch (_selectedTab)
-        {
-            case 0: return _tempUpgrade;
-            case 1: return _tempShip;
-            case 2: return _tempEnemy;
-            case 3: return _tempWeapon;
-        }
-        return null;
-    }
-
-    private void UpdateWeaponTempObject()
-    {
-        if (_tempWeapon != null) DestroyImmediate(_tempWeapon);
-        if (_weaponType == WeaponTypeSelection.Gun) _tempWeapon = CreateInstance<BaseWeaponData>();
-        else _tempWeapon = CreateInstance<BaseWeaponData>();
-        _cachedEditor = null;
-    }
-
-    private void CreateAssetFromTemp(ScriptableObject sourceTemp)
-    {
-        GUI.FocusControl(null);
-
-        string relativePath = "";
-        switch (_selectedTab)
-        {
-            case 0: relativePath = PATH_UPGRADE; break;
-            case 1: relativePath = PATH_SHIP; break;
-            case 2: relativePath = PATH_ENEMY; break;
-            case 3: relativePath = PATH_WEAPON; break;
-        }
-
-        string fullPath = ROOT_PATH + relativePath;
-        if (!Directory.Exists(fullPath))
-        {
-            Directory.CreateDirectory(fullPath);
-            AssetDatabase.Refresh();
-        }
-
-        ScriptableObject newData = CreateInstance(sourceTemp.GetType());
-        EditorUtility.CopySerialized(sourceTemp, newData);
-
-        if (string.IsNullOrEmpty(_newFileName)) _newFileName = "New_Data";
-        string assetPathAndName = AssetDatabase.GenerateUniqueAssetPath(fullPath + _newFileName + ".asset");
-
-        AssetDatabase.CreateAsset(newData, assetPathAndName);
-        AssetDatabase.SaveAssets();
-
-        RefreshAssetList();
-        _selectedAsset = newData;
-        GUI.FocusControl(null);
-        Debug.Log($"[Data Manager] {_newFileName} 생성 완료!");
-    }
-
-    private string[] FindAssetsByTab()
-    {
-        string typeFilter = "";
-        switch (_selectedTab)
-        {
-            case 0: typeFilter = "t:UpgradeData"; break;
-            case 1: typeFilter = "t:BaseShipData"; break;
-            case 2: typeFilter = "t:EnemyData"; break;
-            case 3: typeFilter = "t:BaseWeaponData"; break;
-        }
-        return AssetDatabase.FindAssets(typeFilter);
-    }
-
-    private void RefreshAssetList()
-    {
-        AssetDatabase.Refresh();
-        Repaint();
-    }
-
-    private Texture2D MakeTex(int width, int height, Color col)
-    {
-        Color[] pix = new Color[width * height];
-        for (int i = 0; i < pix.Length; ++i) pix[i] = col;
-        Texture2D result = new Texture2D(width, height);
-        result.SetPixels(pix);
-        result.Apply();
-        return result;
+        selectedData = null;
+        cachedEditor = null;
     }
 }

@@ -12,13 +12,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2a8cbf1ab5c81d843b0fd5ea837fbce6, type: 3}
   m_Name: WeaponData_Pulse
   m_EditorClassIdentifier: Assembly-CSharp::BaseWeaponData
-  WeaponID: Wpn_Pulse_01
-  WeaponName: "\uBC94\uC704\uACF5\uACA9"
-  WeaponDescription: "\uBC30\uB97C \uC911\uC2EC\uC73C\uB85C \uBC94\uC704 \uB0B4 \uC801\uB4E4\uC744
+  ID: Wpn_Pulse_01
+  Name: "\uBC94\uC704\uACF5\uACA9"
+  Description: "\uBC30\uB97C \uC911\uC2EC\uC73C\uB85C \uBC94\uC704 \uB0B4 \uC801\uB4E4\uC744
     \uBAA8\uB450 \uACF5\uACA9\uD55C\uB2E4."
+  Icon: {fileID: 0}
+  itemType: 0
+  ShopCost: 0
+  DefaultLevel: 1
+  MaxLevel: 15
   weaponType: 7
   weaponAttribute: 0
-  ShopCost: 0
   Damage: 150
   Range: 300
   EnemyCount: 0
@@ -30,7 +34,6 @@ MonoBehaviour:
   Acceleration: 0
   IsHoming: 0
   homingTurnSpeed: 0
-  Icon: {fileID: 0}
   ProjectilePrefab: {fileID: 4889422524205254272, guid: 39e98b4be1c4d86409b20adc8ad57efa, type: 3}
   MuzzleEffect: {fileID: 0}
   ShotEffect: {fileID: 1223707457253503544, guid: 70196fc3ea0449948b474b178c20c2c6, type: 3}
