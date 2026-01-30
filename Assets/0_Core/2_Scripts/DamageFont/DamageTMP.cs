@@ -11,14 +11,18 @@ public class DamageTMP : MonoBehaviour
     private Vector2 velocity; // 초기속도 (포물선 운동)
     private float gravity = -1000f; // 중력효과 ui 이동이므로 값 조절 필요
     private Color textColor;
+    private float fontSizePlus = 10f;
+    private float fontOrgSize;
+    [SerializeField] private Color playerDmgColor;
 
     private void Awake()
     {
         m_Text = GetComponent<TextMeshProUGUI>();
         rectTransform = GetComponent<RectTransform>();
+        fontOrgSize = m_Text.fontSize;
     }
 
-    public void Initialize(Transform parent, Vector3 pos, string temp)
+    public void Initialize(Transform parent, Vector3 pos, string temp, bool isPlayer = false)
     {
         transform.SetParent(parent);
 
@@ -27,13 +31,23 @@ public class DamageTMP : MonoBehaviour
         Vector3 screenPosition = Camera.main.WorldToScreenPoint(pos);
         rectTransform.position = screenPosition;
 
-        velocity = new Vector2(Random.Range(-50.0f, 50.0f), Random.Range(150.0f, 250.0f));
+        velocity = new Vector2(Random.Range(-50.0f, 50.0f), Random.Range(250.0f, 350.0f));
         textColor = m_Text.color;
 
-        StartCoroutine(MoveAndFade());
+        if (isPlayer)
+        {
+            textColor = playerDmgColor;
+            m_Text.fontSize += fontSizePlus;
+        }
+        else
+        {
+            m_Text.fontSize = fontOrgSize;
+        }
+
+        StartCoroutine(MoveAndFade(isPlayer));
     }
 
-    IEnumerator MoveAndFade()
+    IEnumerator MoveAndFade(bool isPlayer)
     {
         float elapsedTime = 0.0f;
 

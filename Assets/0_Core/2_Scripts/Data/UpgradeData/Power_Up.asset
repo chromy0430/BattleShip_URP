@@ -18,4 +18,4 @@ MonoBehaviour:
   relatedWeaponID: 
   targetStat: 0
   value: 0.1
-  maxCount: 5
+  maxCount: 15

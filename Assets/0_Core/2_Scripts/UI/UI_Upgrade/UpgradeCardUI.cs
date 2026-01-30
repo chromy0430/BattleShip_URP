@@ -28,7 +28,7 @@ public class UpgradeCardUI : MonoBehaviour
 
             // 소수점 1자리까지만 예쁘게 포맷팅 (예: 12.5)
             // 색상을 넣어서 강조 (Rich Text 사용)
-            finalDesc += $"\n<size=80%><color=#FFFF00>(현재 값 : {currentVal:F1})</color></size>";
+            finalDesc += $"\n<size=80%><color=#FFFF00>([디버그용] 현재 값 : {currentVal:F1})</color></size>";
         }
 
         descText.text = finalDesc;

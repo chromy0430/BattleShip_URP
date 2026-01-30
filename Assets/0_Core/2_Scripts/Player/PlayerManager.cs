@@ -1,4 +1,5 @@
 ﻿using StylizedWater3;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -6,6 +7,8 @@ public class PlayerManager : MonoBehaviour
 {
     public static PlayerManager Instance { get; private set; }
     public Transform PlayerTransform { get; set; }
+
+    public event Action getDamage;
 
     private void Awake()
     {
@@ -111,5 +114,12 @@ public class PlayerManager : MonoBehaviour
 
     #region 무기 획득 함수
 
+    #endregion
+
+    #region 데미지 피해
+    public void Damaged()
+    {
+        getDamage?.Invoke();
+    }
     #endregion
 }

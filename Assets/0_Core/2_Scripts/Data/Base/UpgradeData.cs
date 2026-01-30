@@ -30,9 +30,7 @@ public class UpgradeData : ScriptableObject
             // 퍼센트 단위인 친구들 (예: 공격력, 이속)
             case StatType.Damage:
             case StatType.MoveSpeed:
-            case StatType.TurnSpeed:
-            case StatType.SPR:
-            case StatType.DEF:
+            case StatType.TurnSpeed:                     
             case StatType.MagnetRange:
                 // 0.1 -> 10, 0.5 -> 50 으로 변환
                 displayValue = (value * 100).ToString("0");

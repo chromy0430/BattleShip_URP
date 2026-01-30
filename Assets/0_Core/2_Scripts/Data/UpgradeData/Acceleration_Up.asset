@@ -19,4 +19,4 @@ MonoBehaviour:
   relatedWeaponID: Wpn_Missile_01
   targetStat: 15
   value: 0.1
-  maxCount: 10
+  maxCount: 15

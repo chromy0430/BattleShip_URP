@@ -110,6 +110,13 @@ public class PlayerStat
                 return shipMagnetRange + bonusMagnetRange;
             case StatType.HP:
                 return GetFinalMaxHP();
+            case StatType.MP:
+                return GetFinalMaxMP();
+            case StatType.DEF:
+                return shipDEF + bonusDEF;
+            case StatType.SPR:
+                return shipSPR + bonusSPR;
+
             // ... 필요한 만큼 추가
             default:
                 return 0f;

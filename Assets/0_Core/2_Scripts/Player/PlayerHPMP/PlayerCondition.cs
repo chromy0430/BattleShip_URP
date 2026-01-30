@@ -10,6 +10,8 @@ public class PlayerCondition : MonoBehaviour
     private int _prevMaxHp;
     private int _prevMaxMp;
 
+    private PlayerStat stat;
+
     public int CurrentHp => _currentHp;
     public int CurrentMp => _currentMp;
 
@@ -18,12 +20,14 @@ public class PlayerCondition : MonoBehaviour
     public event Action<int, int> OnMpChanged;
     public event Action OnPlayerDead;
 
+    public GameObject DamageFont;
+
     private void Start()
     {
         // 게임 시작 시 최대치
         if (PlayerDataLoad.playerData != null)
         {
-            var stat = PlayerDataLoad.playerData.CurrentPlayerStat;
+            stat = PlayerDataLoad.playerData.CurrentPlayerStat;
             
             _prevMaxHp = stat.GetFinalMaxHP();
             _prevMaxMp = stat.GetFinalMaxMP();
@@ -81,8 +85,22 @@ public class PlayerCondition : MonoBehaviour
     {
         if (_currentHp <= 0) return; // 이미 사망
 
+        int finalDmg = amount - (stat.shipDEF + stat.bonusDEF);
         // 방어력 적용 공식이 필요하면 여기서 stat.shipDEF 등을 가져와 계산
-        _currentHp -= amount;
+        _currentHp -= finalDmg;
+
+        var damageFont = ObjectPoolManager.Instance.Get(DamageFont);
+        damageFont.GetComponent<DamageTMP>().Initialize
+            (
+                Base_Canvas.Instance.transform,
+                transform.position,
+                finalDmg.ToString(),
+                true
+            //_stat.Damage.ToString()
+            );
+
+        Debug.Log($"피해 입음, 현재 체력 {_currentHp}, 피해량 {finalDmg}");
+
 
         if (_currentHp <= 0)
         {

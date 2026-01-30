@@ -1,3 +1,5 @@
+using BattleShip;
+using Cysharp.Threading.Tasks;
 using TMPro;
 using UnityEngine;
 
@@ -16,16 +18,17 @@ public class PlayTimeUIManager : MonoBehaviour
 
         _currentPlayTime += Time.deltaTime;
 
-        UpdateTimeUI();
+        //UpdateTimeUI();
+        playTimerText.SetText(Utils.FormatTime(_currentPlayTime));
     }
 
-    private void UpdateTimeUI()
+    /*private void UpdateTimeUI()
     {
         int min = Mathf.FloorToInt(_currentPlayTime / 60f);
         int sec = Mathf.FloorToInt(_currentPlayTime % 60f);
 
         playTimerText.SetText($"{min:D2}:{sec:D2}");
-    }
+    }*/
 
     public void StopTimer()
     {

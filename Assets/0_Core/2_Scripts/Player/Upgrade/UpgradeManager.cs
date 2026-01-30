@@ -1,9 +1,7 @@
-﻿using Battleship_Enum;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using System;
 using ZLinq;
-using static StylizedWater3.Extension;
 
 public class UpgradeManager : MonoBehaviour
 {

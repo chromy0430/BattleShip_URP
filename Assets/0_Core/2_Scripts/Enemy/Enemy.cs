@@ -22,9 +22,10 @@ public class Enemy : MonoBehaviour, IEnemy
     public GameObject DamageObject; // 데미지 폰트
     private bool _isKnockbacked = false; // 넉백 상태
     public bool IsKnockbacked => _isKnockbacked;
-
+    public bool canAttack;
     public void Initialize(EnemyData data)
     {
+        canAttack = true;
         _enemyData = data;
 
         maxHealth = data.MaxHP;
@@ -191,5 +192,22 @@ public class Enemy : MonoBehaviour, IEnemy
         await UniTask.Delay(System.TimeSpan.FromSeconds(duration));
 
         _isKnockbacked = false; 
+    }
+
+    private void OnCollisionEnter(Collision collision)
+    {
+        if (collision.collider.CompareTag("Player"))
+        {
+            collision.collider.TryGetComponent<PlayerCondition>(out PlayerCondition pc);
+
+            // 데미지 처리 후 플레이어 몸체 붉은색 표시 및 넉백 + 잠깐의 멈춤
+            if (canAttack)
+            {
+                canAttack = false;
+                pc.TakeDamage(_enemyData.Damage);
+                PlayerManager.Instance.Damaged();
+                UniTask.Delay(500);
+            }
+        }
     }
 }

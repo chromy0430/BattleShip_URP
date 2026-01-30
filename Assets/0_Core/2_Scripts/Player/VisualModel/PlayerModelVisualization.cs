@@ -1,16 +1,37 @@
+using MoreMountains.Feedbacks;
+using System.Runtime.CompilerServices;
 using UnityEngine;
 
 public class PlayerModelVisualization : MonoBehaviour
 {
     private GameObject shipModel;
 
+    [SerializeField] MMF_Player modelFeedback;
+
     private void Start()
     {
+        if (PlayerManager.Instance != null) PlayerManager.Instance.getDamage += DamageFeedback;
+
         shipModel = PlayerDataLoad.playerData.shipData.shipVisual;
 
         GameObject ship = Instantiate(shipModel, this.transform);
         ship.transform.localPosition = shipModel.transform.position;
         ship.transform.localRotation = shipModel.transform.rotation;
+
+        if (modelFeedback == null) modelFeedback.GetComponent<MMF_Player>();
+
+        modelFeedback.GetComponent<MMF_Flicker>().BoundRenderer = shipModel.GetComponent<Renderer>();
     }
 
+    private void OnDisable()
+    {
+        if (PlayerManager.Instance != null) PlayerManager.Instance.getDamage -= DamageFeedback;
+    }
+
+    private void DamageFeedback()
+    {
+        if (modelFeedback == null) return;
+
+        modelFeedback.PlayFeedbacks();
+    }
 }
