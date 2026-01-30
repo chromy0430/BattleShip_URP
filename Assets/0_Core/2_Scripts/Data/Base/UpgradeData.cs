@@ -32,6 +32,7 @@ public class UpgradeData : ScriptableObject
             case StatType.MoveSpeed:
             case StatType.TurnSpeed:                     
             case StatType.MagnetRange:
+            case StatType.FireRate:
                 // 0.1 -> 10, 0.5 -> 50 으로 변환
                 displayValue = (value * 100).ToString("0");
                 break;

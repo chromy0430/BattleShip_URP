@@ -23,7 +23,7 @@ public class PlayerCondition : MonoBehaviour
     public GameObject DamageFont;
 
     private void Start()
-    {
+    {        
         // 게임 시작 시 최대치
         if (PlayerDataLoad.playerData != null)
         {
@@ -93,7 +93,7 @@ public class PlayerCondition : MonoBehaviour
         damageFont.GetComponent<DamageTMP>().Initialize
             (
                 Base_Canvas.Instance.transform,
-                transform.position,
+                transform.position + (transform.right * UnityEngine.Random.Range(-6, 6)) + (Vector3.up * 2.5f), 
                 finalDmg.ToString(),
                 true
             //_stat.Damage.ToString()

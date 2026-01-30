@@ -91,7 +91,7 @@ public class PlayerMove : MonoBehaviour
         // 적에게 밀리면 플레이어 떨림 현상 해결
         rb.angularVelocity = Vector3.zero;
 
-        // 배의 정면을 향해서 직진하도록만 설정
+        // 입력할때만 움직이도록
         if (Mathf.Abs(moveInput) > 0.01f)
         {            
             rb.linearVelocity = (moveInput * transform.forward) * currentSpeed;
@@ -99,6 +99,7 @@ public class PlayerMove : MonoBehaviour
         else
         {
             rb.linearVelocity = Vector3.zero;
+            rb.angularDamping = 50f;
         }
     }
 

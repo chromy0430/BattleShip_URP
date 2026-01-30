@@ -96,19 +96,36 @@ public class PlayerFloating : MonoBehaviour, IWaterFloatTarget
             _currentNormal = _targetNormal;
         }
 
-        // 회전값 산출
-        Quaternion waveRotation = Quaternion.FromToRotation(Vector3.up, _currentNormal);
-
-        // 물리적 적용 (MovePosition/Rotation)
         Vector3 nextPos = _rb.position;
         nextPos.y = _currentHeight;
 
-        Quaternion finalRotation = waveRotation * Quaternion.Euler(0, transform.eulerAngles.y, 0);
+        Vector3 flatNormal = Vector3.ProjectOnPlane(_targetNormal, transform.right);
+        // 회전값 산출
+        Quaternion waveRotation = Quaternion.FromToRotation(Vector3.up, flatNormal);
+
+        Vector3 finalEuler = new Vector3(waveRotation.eulerAngles.x, transform.eulerAngles.y, 0f);
+        Quaternion finalRotation = Quaternion.Euler(finalEuler);
 
         if (rollAmount > 0)
+        {
+            Quaternion smoothedRotation = Quaternion.Slerp(_rb.rotation, finalRotation, 5f * Time.fixedDeltaTime);
+            _rb.Move(nextPos, smoothedRotation);
+        }
+        else
+        {
+            _rb.MovePosition(nextPos);
+        }
+
+        // 물리적 적용 (MovePosition/Rotation)
+        //Vector3 nextPos = _rb.position;
+        //nextPos.y = _currentHeight;
+
+        //Quaternion finalRotation = waveRotation * Quaternion.Euler(0, transform.eulerAngles.y, 0);
+
+        /*if (rollAmount > 0)
             _rb.Move(nextPos, finalRotation);
         else
-            _rb.MovePosition(nextPos);
+            _rb.MovePosition(nextPos);*/
     }
 
     public void SetWaterObject(HeightQuerySystem.Interface heightInterface)

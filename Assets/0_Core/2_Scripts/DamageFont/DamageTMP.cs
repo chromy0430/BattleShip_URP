@@ -31,7 +31,7 @@ public class DamageTMP : MonoBehaviour
         Vector3 screenPosition = Camera.main.WorldToScreenPoint(pos);
         rectTransform.position = screenPosition;
 
-        velocity = new Vector2(Random.Range(-50.0f, 50.0f), Random.Range(250.0f, 350.0f));
+        velocity = new Vector2(Random.Range(-50.0f, 50.0f), Random.Range(150.0f, 250.0f));
         textColor = m_Text.color;
 
         if (isPlayer)

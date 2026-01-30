@@ -10,6 +10,7 @@ public class RadarSystem : MonoBehaviour
     [Header("Settings")]
     public float RadarDistance = 50f; // 탐지 범위
     public int initPoolSize = 500; // 초기화 풀링 생성
+    [SerializeField] private float _mapRadius = 0.43f;
 
     [Header("UI Components")]
     public RectTransform RadarPointPrefab; // 적 아이콘 프리팹
@@ -89,7 +90,7 @@ public class RadarSystem : MonoBehaviour
             Background.rectTransform.localRotation = Quaternion.Euler(0, 0, actor.eulerAngles.y);
         }
 
-        float mapRadius = Background.rectTransform.sizeDelta.x * 0.5f;
+        float mapRadius = Background.rectTransform.sizeDelta.x * _mapRadius;
         Vector3 actorPos = actor.position;
         float actorYRot = actor.eulerAngles.y;
 

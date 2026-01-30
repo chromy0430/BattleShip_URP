@@ -20,7 +20,8 @@ public class PlayerModelVisualization : MonoBehaviour
 
         if (modelFeedback == null) modelFeedback.GetComponent<MMF_Player>();
 
-        modelFeedback.GetComponent<MMF_Flicker>().BoundRenderer = shipModel.GetComponent<Renderer>();
+        MMF_Flicker flickerFeedback = modelFeedback.GetFeedbackOfType<MMF_Flicker>();
+        flickerFeedback.BoundRenderer = ship.GetComponent<MeshRenderer>();
     }
 
     private void OnDisable()
