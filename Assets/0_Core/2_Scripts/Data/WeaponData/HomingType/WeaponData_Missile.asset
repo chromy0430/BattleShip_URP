@@ -38,3 +38,7 @@ MonoBehaviour:
   ShotEffect: {fileID: 1223707457253503544, guid: 70196fc3ea0449948b474b178c20c2c6, type: 3}
   MuzzleSfx: {fileID: 0}
   ShotSfx: {fileID: 0}
+  growthPerLevel:
+  - targetStat: 9
+    value: 0.5
+    isPercentage: 0

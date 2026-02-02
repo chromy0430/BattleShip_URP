@@ -8,6 +8,13 @@ public class AuraWeapon : MonoBehaviour
     private float _tickTimer;
     private float _tickInterval;
 
+    [Header("Visual Settings")]
+    [Tooltip("사거리 1당 적용될 실제 크기 비율")]
+    [SerializeField] private float _rangeToScaleRatio = 0.01f;
+
+    [Tooltip("프리팹의 기본 스케일 (초기값 복원용)")]
+    [SerializeField] private Vector3 _baseScale = new Vector3(20, 20, 20);
+
     // 무기 생성 시 스탯 주입
     public void Initialize(WeaponStat stat)
     {
@@ -17,23 +24,22 @@ public class AuraWeapon : MonoBehaviour
         _tickInterval = 1f / Mathf.Max(0.1f, stat.FireRate);
 
         // 사거리(Range)에 맞춰 크기 조절
-        // 게임 스케일에 맞춰 보정값(0.01f 등)이 필요할 수 있습니다.
-        // 현재는 Range 값을 그대로 Scale에 적용합니다.
-        float finalScale = stat.Range * 0.01f; // 예: Range 300 -> Scale 3
+        // Range 300 * 0.01 = 3배수
+        float scaleMultiplier = stat.Range * _rangeToScaleRatio;
 
-        // 나중에 다시할 때 사이즈 변경
-        //transform.localScale = Vector3.one * finalScale;
-        transform.localScale = this.transform.localScale * finalScale;
+        transform.localScale = _baseScale * scaleMultiplier;       
+        
+        //transform.localScale = this.transform.localScale * finalScale;
     }
 
     private void OnEnable()
     {
         // 켜질 때 목록 초기화
         _targetsInRagne.Clear();
-        //_tickTimer = 0f;
         _tickTimer = _tickInterval;
     }
 
+    #region 트리거 함수
     // 영역 진입 감지
     private void OnTriggerEnter(Collider other)
     {
@@ -51,6 +57,7 @@ public class AuraWeapon : MonoBehaviour
             _targetsInRagne.Remove(enemy);
         }
     }
+    #endregion
 
     private void Update()
     {

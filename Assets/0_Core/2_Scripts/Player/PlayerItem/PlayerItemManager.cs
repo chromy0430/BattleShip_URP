@@ -12,6 +12,9 @@ namespace BattleShip
         // 장비 슬롯 5개 (null이면 비어있음)
         public BaseEquipmentData[] EquipmentSlots = new BaseEquipmentData[5];
 
+        // 각 장비 레벨 체크
+        private int[] _equipmentLevels = new int[5];
+
         // 획득한 화물 리스트 (중첩 가능하므로 리스트로 관리)
         public List<BaseCargoData> CollectedCargo = new List<BaseCargoData>();
 
@@ -21,7 +24,7 @@ namespace BattleShip
             else Destroy(gameObject);
         }
 
-        // 외부(FieldItem)에서 아이템을 먹었을 때 호출하는 함수 
+        // 외부에서 아이템을 먹었을 때 호출
         public void ObtainItem(BaseItemData itemData)
         {
             if (itemData == null) return;
@@ -42,28 +45,30 @@ namespace BattleShip
             }
         }
 
-        // 무기 획득 처리
+        // 무기 획득
         private void EquipWeapon(BaseWeaponData weaponData)
         {
-            // Debug.Log($"[Weapon] {weaponData.Name} 획득! (무기 장착 로직 연결 필요)");
-
-            // [수정] PlayerManager에게 무기 장착 요청
             if (PlayerManager.Instance != null)
             {
-                bool success = PlayerManager.Instance.TryAddWeapon(weaponData);
-
-                if (!success)
-                {
-                    // 꽉 차서 장착 못했을 때의 처리 (예: 경험치로 변환? 혹은 인벤토리?)
-                    Debug.Log("무기 획득 실패: 슬롯 가득 참");
-                }
+                PlayerManager.Instance.TryAddWeapon(weaponData);
             }
         }
 
         // 장비 획득 처리 (빈 슬롯 체크 -> 장착 or 스왑)
         private void HandleEquipment(BaseEquipmentData equipData)
         {
-            // A. 빈 슬롯 찾기
+            // 장착된 장비 체크
+            for (int i = 0; i < EquipmentSlots.Length; i++)
+            {
+                if (EquipmentSlots[i] != null && EquipmentSlots[i].ID == equipData.ID)
+                {
+                    // 레벨업 실행
+                    LevelUpEquipmentAtIndex(i);
+                    return;
+                }
+            }
+
+            // 빈 슬롯 체크
             int emptyIndex = -1;
             for (int i = 0; i < EquipmentSlots.Length; i++)
             {
@@ -74,17 +79,14 @@ namespace BattleShip
                 }
             }
 
-            // B. 빈 슬롯이 있다면 -> 장착
+            // 장착 또는 변경
             if (emptyIndex != -1)
             {
                 EquipItemAtIndex(equipData, emptyIndex);
             }
-            // C. 꽉 찼다면 -> 스왑 (일단 가장 오래된 0번과 교체하거나, UI를 띄워야 함)
             else
             {
                 Debug.Log("[Equipment] 슬롯이 가득 찼습니다! (스왑 로직 발동)");
-                // 기획서: "현재 장착된 장비와 위치를 바꿈"
-                // 임시로 0번 슬롯과 교체합니다. (나중에 UI 선택으로 고도화 가능)
                 SwapItem(equipData, 0);
             }
         }
@@ -94,8 +96,6 @@ namespace BattleShip
         {
             CollectedCargo.Add(cargoData);
             Debug.Log($"[Cargo] {cargoData.Name} 화물 적재 완료.");
-
-            // [수정됨] CS1061 에러 해결: statModifiers -> effectPerStack
             ApplyStats(cargoData.effectPerStack, true);
         }
 
@@ -108,23 +108,53 @@ namespace BattleShip
             ApplyStats(data.baseStats, true); // true: 더하기
         }
 
+        private void LevelUpEquipmentAtIndex(int index)
+        {
+            BaseEquipmentData data = EquipmentSlots[index];
+            if (data == null) return;
+
+            if (_equipmentLevels[index] >= data.MaxLevel)
+            {
+                Debug.Log($"[Equip] {data.Name}은(는) 이미 최대 레벨입니다.");
+                return;
+            }
+
+            _equipmentLevels[index]++;
+            Debug.Log($"[Equip] {data.Name} 레벨업! (Lv.{_equipmentLevels[index]})");
+
+            // 성장 스탯 적용 (Growth 값을 한번 더해줌)
+            ApplyStats(data.growthPerLevel, true);
+        }
+
         private void UnEquipItemAtIndex(int index)
         {
             if (EquipmentSlots[index] == null) return;
 
             BaseEquipmentData oldItem = EquipmentSlots[index];
-            Debug.Log($"[UnEquip] {oldItem.Name} 장착 해제.");
+            int currentLevel = _equipmentLevels[index];
 
-            // 스탯 제거 (-값, 즉 false로 처리하여 빼기)
+            Debug.Log($"[UnEquip] {oldItem.Name} 해제.");
+
+            // 1. 기본 스탯 제거
             ApplyStats(oldItem.baseStats, false);
 
+            // 2. 레벨업으로 오른 스탯 전부 제거 ( (레벨-1) * 성장치 )
+            if (currentLevel > 1)
+            {
+                for (int i = 0; i < currentLevel - 1; i++)
+                {
+                    ApplyStats(oldItem.growthPerLevel, false);
+                }
+            }
+
             EquipmentSlots[index] = null;
+            _equipmentLevels[index] = 0;
         }
 
         private void SwapItem(BaseEquipmentData newItem, int index)
         {
-            UnEquipItemAtIndex(index); // 기존 것 빼고 (스탯 차감)
-            EquipItemAtIndex(newItem, index); // 새 것 끼기 (스탯 증가)
+            UnEquipItemAtIndex(index); // 기존 장비 해제 (스탯 초기화)
+            EquipItemAtIndex(newItem, index); // 새 장비 장착 (1레벨 스탯)
         }
 
         // --- 스탯 계산기 (Stat Calculator) ---
@@ -144,7 +174,7 @@ namespace BattleShip
             {
                 float finalValue = 0f;
 
-                // 1. 퍼센트(%) 여부에 따른 값 변환
+                // 퍼센트(%) 여부에 따른 값 변환
                 if (mod.isPercentage)
                 {
                     // 10 -> 0.1 (10%)로 변환
@@ -152,15 +182,20 @@ namespace BattleShip
 
                     switch (mod.targetStat)
                     {
-                        // [계수형 스탯] 이동속도, 선회속도, 데미지 등은 PlayerStat에서 (1.0 + bonus)로 계산하므로 0.1을 더하면 됨
+                        // [계수형 스탯]
+                        // 이동속도, 선회속도, 데미지 등
+                        // PlayerStat에서 (1.0 + bonus)로 계산하므로 0.1을 더하면 됨
                         case StatType.MoveSpeed:
                         case StatType.TurnSpeed:
                         case StatType.MagnetRange:
                         case StatType.Damage:
+                        case StatType.WeaponRange:
                             finalValue = percentage;
                             break;
 
-                        // [플랫형 스탯] HP, MP, 방어력 등은 고정값이므로 기본값에 비례하여 증가량 계산 (예: 기본HP 100의 10% = 10)
+                        // [플랫형 스탯]
+                        // HP, MP, 방어력 등은 고정값이므로
+                        // 기본값에 비례하여 증가량 계산 (예: 기본HP 100의 10% = 10)
                         case StatType.HP:
                             finalValue = playerStat.shipHP * percentage;
                             break;
@@ -198,7 +233,7 @@ namespace BattleShip
                     }
                 }
 
-                // 2. 스탯 적용 (장착이면 +, 해제면 -)
+                // 스탯 적용 (장착이면 +, 해제면 -)
                 float valueToApply = isAdding ? finalValue : -finalValue;
 
                 playerStat.AddBonus(mod.targetStat, valueToApply);

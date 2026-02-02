@@ -95,7 +95,6 @@ namespace BattleShip
             {
                 Debug.Log($"[FieldItem] 획득: {_itemData.Name} ({_itemData.itemType})");
 
-                // Step 3에서 만들 매니저로 연결
                 if (PlayerItemManager.Instance != null)
                 {
                     PlayerItemManager.Instance.ObtainItem(_itemData);

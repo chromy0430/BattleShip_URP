@@ -51,7 +51,8 @@ namespace Battleship_Enum
         Knockback,        // 넉백 파워
         ProjectileSize,   // 투사체 크기
         Acceleration,     // 가속도
-        MultiProjectile   // 다중 발사 개수 (멀티샷)
+        MultiProjectile,   // 다중 발사 개수 (멀티샷)
+        CoolTime           // 재사용 대기 시간 (레이저, 장판 등)
     }
 
     public enum WeaponType

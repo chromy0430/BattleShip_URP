@@ -187,34 +187,49 @@ public class WeaponMount : MonoBehaviour
         {
             case StatType.Damage:
                 _runtimeStat.Damage += (int)amount; // 혹은 퍼센트 로직
-                if (_activeAura != null) _activeAura.Initialize(_runtimeStat);
+                if (AuraCheck()) _activeAura.Initialize(_runtimeStat);
                 break;
-            case StatType.FireRate:
+            case StatType.FireRate: // 투사체 초당 발사 횟수 증가
                 _runtimeStat.FireRate += amount;
                 InitializeCooldown(); // 쿨타임 재계산 필수
+                if (AuraCheck()) _activeAura.Initialize(_runtimeStat);
                 break;
-            case StatType.ProjectileSpeed:
+            case StatType.ProjectileSpeed: // 투사체 발사 속도 증가
                 _runtimeStat.projectileSpeed += amount;
                 break;
-            case StatType.PierceCount:
+            case StatType.PierceCount: // 적 관통 수 증가
                 _runtimeStat.PierceCount += (int)amount;
                 break;
-            case StatType.MultiProjectile:
+            case StatType.MultiProjectile: // 다수 적 공격 수 증가
                 _runtimeStat.EnemyCount += (int)amount;
                 break;
-            case StatType.Acceleration:
+            case StatType.Acceleration: // 투사체 가속력 증가
                 _runtimeStat.Acceleration += amount;
                 break;
             case StatType.WeaponRange: // 사거리(오라 크기) 증가
                 _runtimeStat.Range += (int)amount;
-                if (_activeAura != null) _activeAura.Initialize(_runtimeStat);
+                if (AuraCheck()) _activeAura.Initialize(_runtimeStat);
                 break;
-                // ... 사거리, 속도 등 추가
+
+            // 펄스형
+            case StatType.Duration: // 지속시간 증가
+                _runtimeStat.Duration += amount;
+                if (AuraCheck()) _activeAura.Initialize(_runtimeStat);
+                break;
+            case StatType.CoolTime: // 재사용 대기시간 감소
+                _runtimeStat.Cooltime -= amount;
+                if (AuraCheck()) _activeAura.Initialize(_runtimeStat);
+                break;
         }
     }
     #endregion
 
     #region 헬퍼 함수
+    private bool AuraCheck()
+    {
+        return _activeAura != null;
+    }
+
     public WeaponType GetWeaponType()
     {
         return _weaponData != null ? _weaponData.weaponType : WeaponType.Gun;
@@ -225,9 +240,30 @@ public class WeaponMount : MonoBehaviour
         return _weaponData != null;
     }
 
+    // 무기 레벨업
+    public void LevelUp()
+    {
+        if (_weaponData == null || _runtimeStat == null) return;
+
+        if (_runtimeStat.WeaponLevel >= _weaponData.MaxLevel)
+        {
+            // 최고 레벨일 시 행동 로직 추가
+            return;
+        }
+
+        _runtimeStat.WeaponLevel++;
+
+        foreach (var modifier in _weaponData.growthPerLevel)
+        {
+            ApplyUpgradeBonus(modifier.targetStat, modifier.value);
+        }
+    }
+
     public void EquipWeapon(BaseWeaponData newData)
     {
         _weaponData = newData;
+        _runtimeStat = new WeaponStat(_weaponData);
+
         Initialize();
 
         if(UpgradeManager.Instance != null) UpgradeManager.Instance.RefreshWeaponList();

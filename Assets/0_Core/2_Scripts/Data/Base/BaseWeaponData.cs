@@ -1,5 +1,6 @@
 ﻿using BattleShip;
 using Battleship_Enum;
+using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 
@@ -31,6 +32,9 @@ public class BaseWeaponData : BaseItemData
     public GameObject ShotEffect; // 맞는 순간의 이펙트
     public AudioClip MuzzleSfx; // 발사하는 순간의 사운드
     public AudioClip ShotSfx; // 맞는 순간의 사운드
+
+    [Header("레벨업 강화")]
+    public List<StatModifier> growthPerLevel = new List<StatModifier>();
 
     private void OnEnable()
     {
