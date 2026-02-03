@@ -13,7 +13,7 @@ public class AuraWeapon : MonoBehaviour
     [SerializeField] private float _rangeToScaleRatio = 0.01f;
 
     [Tooltip("프리팹의 기본 스케일 (초기값 복원용)")]
-    [SerializeField] private Vector3 _baseScale = new Vector3(20, 20, 20);
+    [SerializeField] private Vector3 _baseScale = new Vector3(25, 25, 25);
 
     // 무기 생성 시 스탯 주입
     public void Initialize(WeaponStat stat)

@@ -72,6 +72,5 @@ public class PlayerMagnet : MonoBehaviour
     {
         // 자석 범위 재할당
         _magnetRadius = PlayerDataLoad.playerData.CurrentPlayerStat.GetTotalMagnetRange();//GetMagnetRange(_magnetRadius);
-        Debug.Log($"현재 자석 범위 : {_magnetRadius}"); 
     }
 }

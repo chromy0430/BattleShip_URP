@@ -6442,6 +6442,26 @@ PrefabInstance:
       propertyPath: spawnRatePerUnit
       value: 2
       objectReference: {fileID: 0}
+    - target: {fileID: 1947661086921078455, guid: cae5f9a344f3b9146aa3a4b34bccb45a, type: 3}
+      propertyPath: _weaponMounts.Array.size
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 1947661086921078455, guid: cae5f9a344f3b9146aa3a4b34bccb45a, type: 3}
+      propertyPath: '_weaponMounts.Array.data[0]'
+      value: 
+      objectReference: {fileID: 1103555389}
+    - target: {fileID: 1947661086921078455, guid: cae5f9a344f3b9146aa3a4b34bccb45a, type: 3}
+      propertyPath: '_weaponMounts.Array.data[1]'
+      value: 
+      objectReference: {fileID: 1103555388}
+    - target: {fileID: 1947661086921078455, guid: cae5f9a344f3b9146aa3a4b34bccb45a, type: 3}
+      propertyPath: '_weaponMounts.Array.data[2]'
+      value: 
+      objectReference: {fileID: 1103555387}
+    - target: {fileID: 1947661086921078455, guid: cae5f9a344f3b9146aa3a4b34bccb45a, type: 3}
+      propertyPath: '_weaponMounts.Array.data[3]'
+      value: 
+      objectReference: {fileID: 1103555386}
     - target: {fileID: 2171142783127658759, guid: cae5f9a344f3b9146aa3a4b34bccb45a, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0

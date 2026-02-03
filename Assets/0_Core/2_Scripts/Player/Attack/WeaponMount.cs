@@ -34,8 +34,13 @@ public class WeaponMount : MonoBehaviour
     {
         if (_weaponData != null)
         {
-            if (_runtimeStat == null)   _runtimeStat = new WeaponStat(_weaponData);
+            if (_runtimeStat == null)
+            {
+                _runtimeStat = new WeaponStat(_weaponData);
+                Debug.Log("무기 스탯 생성");
+            }
 
+            
             InitializeCooldown();
 
             // 무기 타입에 따른 초기화 분기
