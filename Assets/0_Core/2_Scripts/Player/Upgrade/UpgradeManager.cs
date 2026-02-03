@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using BattleShip;
 using UnityEngine;
 using System;
 using ZLinq;
@@ -8,15 +9,27 @@ public class UpgradeManager : MonoBehaviour
     public static UpgradeManager Instance { get; private set; }
     public event Action onChangedWeaponStat;    
          
-    [Header("Settings")]
+    [Header("Level Up UI Settings")]
     [SerializeField] private Transform cardParent;      
-    [SerializeField] private GameObject cardPrefab;     
-    [SerializeField] private List<UpgradeData> allUpgrades;
-    [SerializeField] private List<WeaponMount> _activeWeaponMounts = new List<WeaponMount>();
+    [SerializeField] private GameObject levelUpCardPrefab;     
+    [SerializeField] private List<UpgradeData> allUpgrades;    
     [SerializeField] private int canChoice = 3;
-    [Header("Safety")]
-    [SerializeField] private GameObject inputBlockerPanel;
 
+    [Header("LootBox UI")]
+    [SerializeField] private GameObject lootBoxPanel;
+    [SerializeField] private Transform lootBoxCardParent;
+    [SerializeField] private int lootBoxChoiceCount = 2;
+    [SerializeField] private GameObject LootBoxCardPrefab;
+
+    [Header("LootBox Data")]
+    public List<BaseWeaponData> allWeapons;
+    public List<BaseEquipmentData> allEquipments;
+    public List<BaseCargoData> allCargos;
+
+    [Header("참조")]
+    [SerializeField] private List<WeaponMount> _activeWeaponMounts = new List<WeaponMount>();
+    [SerializeField] private GameObject inputBlockerPanel;
+    
     // 강화 횟수 제한 <강화 이름, 현재 강화 횟수>
     private Dictionary<string, int> _upgradeCounts = new Dictionary<string, int>();
     
@@ -34,6 +47,7 @@ public class UpgradeManager : MonoBehaviour
 
         if (inputBlockerPanel != null) inputBlockerPanel.SetActive(false);
         if (cardParent != null) cardParent.gameObject.SetActive(false);
+        if (lootBoxPanel != null) lootBoxPanel.SetActive(false);
     }
 
     private void Start()
@@ -59,6 +73,7 @@ public class UpgradeManager : MonoBehaviour
             PlayerExpManager.Instance.OnLevelUp -= HandleLevelUp;
     }
 
+    #region 레벨업 시스템
     private void HandleLevelUp(int newLevel)
     {
         ShowRandomUpgrades();
@@ -68,6 +83,7 @@ public class UpgradeManager : MonoBehaviour
     {
         _isProcessing = false;
         if (inputBlockerPanel != null) inputBlockerPanel.SetActive(false);
+        if (lootBoxPanel != null) lootBoxPanel .SetActive(false);
 
         foreach (Transform child in cardParent)
         {
@@ -78,7 +94,7 @@ public class UpgradeManager : MonoBehaviour
 
         foreach (var data in randomPicks)
         {
-            GameObject go = Instantiate(cardPrefab, cardParent);
+            GameObject go = Instantiate(levelUpCardPrefab, cardParent);
             UpgradeCardUI cardUI = go.GetComponent<UpgradeCardUI>();
             cardUI.Setup(data, ApplyUpgrade);
         }
@@ -108,12 +124,7 @@ public class UpgradeManager : MonoBehaviour
             if (PlayerDataLoad.playerData != null)
             {
                 PlayerDataLoad.playerData.CurrentPlayerStat.AddBonus(data.targetStat, data.value);
-                Debug.Log($"TargetStat = {data.targetStat}, Value = {data.value}");
                 PlayerDataLoad.playerData.UpdateStatAndNotify();
-            }
-            else
-            {
-                Debug.LogError("PlayerDataLoad가 없습니다! 스탯 적용 실패.");
             }
         }
         else
@@ -130,31 +141,113 @@ public class UpgradeManager : MonoBehaviour
                 }
             }
 
-            if (applied) Debug.Log($"[Upgrade] 무기 강화 완료: {data.relatedWeaponID}");
-            else Debug.LogWarning($"[Upgrade] 해당 무기를 찾지 못함: {data.relatedWeaponID}");
+            if (!applied) Debug.LogWarning($"[Upgrade] 해당 무기를 찾지 못함: {data.relatedWeaponID}");
         }
 
-        CloseUpgradeUI();
+        CloseAllUI();
     }
+    #endregion
 
-    private void CloseUpgradeUI()
+    #region 부유물 시스템
+
+    public void ShowLootBoxSelected()
     {
-        foreach (Transform child in cardParent)
+        _isProcessing = false;
+
+        if (inputBlockerPanel != null) inputBlockerPanel.SetActive(false);
+        if (cardParent != null) cardParent.gameObject.SetActive(false);
+
+        foreach (Transform child in lootBoxCardParent)
         {
             Destroy(child.gameObject);
         }
 
-        cardParent.gameObject.SetActive(false);
+        List<BaseItemData> randomPicks = GetRandomItems(lootBoxChoiceCount);
+
+        foreach (var itemData in randomPicks)
+        {
+            GameObject go = Instantiate(LootBoxCardPrefab, lootBoxCardParent);
+            UpgradeCardUI cardUI = go.GetComponent<UpgradeCardUI>();
+
+            string statusText = "획득가능!";
+            // 이미 보유중인지 체크해서 텍스트 다르게 표시
+
+            cardUI.Setup(itemData, ApplyItemSelection, statusText);
+        }
+
+        lootBoxPanel.SetActive(true);
+        Time.timeScale = 0;
+    }
+
+    private void ApplyItemSelection(BaseItemData itemData)
+    {
+        if (_isProcessing) return;
+        _isProcessing = true;
+        if (inputBlockerPanel != null) inputBlockerPanel.SetActive(true);
+
+        Debug.Log($"[LootBox] 아이템 선택: {itemData.Name}");
+
+        if (PlayerItemManager.Instance != null)
+        {
+            PlayerItemManager.Instance.ObtainItem(itemData);
+        }
+        else
+        {
+            Debug.LogError("PlayerItemManager가 없습니다!");
+        }
+
+        CloseAllUI();
+    }
+
+    #endregion
+
+    private void CloseAllUI()
+    {
+        if (cardParent != null)
+        {
+            foreach (Transform child in cardParent) Destroy(child.gameObject);
+            cardParent.gameObject.SetActive(false);
+        }
+
+        if (lootBoxCardParent != null)
+        {
+            foreach (Transform child in lootBoxCardParent) Destroy(child.gameObject);
+        }
+
+        if (lootBoxPanel != null) lootBoxPanel.SetActive(false);
         if (inputBlockerPanel != null) inputBlockerPanel.SetActive(false);
 
-        Time.timeScale = 1;
+        Time.timeScale = 1; // 게임 재개
         onChangedWeaponStat?.Invoke();
+    }
+
+    private List<BaseItemData> GetRandomItems(int count)
+    {
+        List<BaseItemData> pool = new List<BaseItemData>();
+        if (allWeapons != null) pool.AddRange(allWeapons);
+        if (allEquipments != null) pool.AddRange(allEquipments);
+        if (allCargos != null) pool.AddRange(allCargos);
+
+        // TODO: 여기서 이미 만렙인 장비나 획득 불가한 아이템을 pool에서 제거하는 로직 추가 가능
+
+        List<BaseItemData> results = new List<BaseItemData>();
+        if (pool.Count == 0) return results;
+
+        // 랜덤 뽑기
+        count = Mathf.Min(count, pool.Count);
+        for (int i = 0; i < count; i++)
+        {
+            int randomIndex = UnityEngine.Random.Range(0, pool.Count);
+            results.Add(pool[randomIndex]);
+            pool.RemoveAt(randomIndex); // 중복 방지
+        }
+
+        return results;
     }
 
     private List<UpgradeData> GetRandomUpgrades(int count)
     {
         List<UpgradeData> validPool = GetValidUpgrades();
-        //List<UpgradeData> pool = new List<UpgradeData>(allUpgrades);
         List<UpgradeData> results = new List<UpgradeData>();
 
         count = Mathf.Min(count, validPool.Count);
@@ -172,15 +265,13 @@ public class UpgradeManager : MonoBehaviour
     private List<UpgradeData> GetValidUpgrades()
     {
         List<UpgradeData> list = new List<UpgradeData>();
-
-        // 내 무기 ID 목록 수집 - HashSet으로 중복 제거
         HashSet<string> myWeaponIDs = new HashSet<string>();
+
         foreach (var mount in _activeWeaponMounts)
         {
             if (mount != null && mount.gameObject.activeSelf)
             {
                 string id = mount.GetWeaponID();
-                //myWeaponIDs.Add(mount.GetWeaponID());
                 if (!string.IsNullOrEmpty(id))
                 {
                     myWeaponIDs.Add(id);
@@ -190,33 +281,20 @@ public class UpgradeManager : MonoBehaviour
 
         foreach (var data in allUpgrades)
         {
-            // 최대 레벨 체크
             int currentCount = _upgradeCounts.ContainsKey(data.upgradeName) ? _upgradeCounts[data.upgradeName] : 0;
             if (currentCount >= data.maxCount) continue;
 
-            // 조건 체크
             if (string.IsNullOrEmpty(data.relatedWeaponID))
             {
                 if (PlayerDataLoad.playerData != null)
                 {
-                    // 이미 제한값(30 or 12)에 도달했다면 리스트에 넣지 않음
-                    if (PlayerDataLoad.playerData.CurrentPlayerStat.IsStatCapped(data.targetStat))
-                    {
-                        continue;
-                    }
+                    if (PlayerDataLoad.playerData.CurrentPlayerStat.IsStatCapped(data.targetStat)) continue;
                 }
-            }
-
-            if (string.IsNullOrEmpty(data.relatedWeaponID))
-            {
                 list.Add(data);
             }
             else
             {
-                if (myWeaponIDs.Contains(data.relatedWeaponID))
-                {
-                    list.Add(data);
-                }
+                if (myWeaponIDs.Contains(data.relatedWeaponID)) list.Add(data);
             }
         }
         return list;

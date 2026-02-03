@@ -1,7 +1,8 @@
-using UnityEngine;
+ï»¿using UnityEngine;
 using TMPro;
 using UnityEngine.UI;
 using System;
+using BattleShip;
 
 public class UpgradeCardUI : MonoBehaviour
 {
@@ -10,37 +11,77 @@ public class UpgradeCardUI : MonoBehaviour
     [SerializeField] private Image iconImage;
     [SerializeField] private Button selectButton;
 
-    private UpgradeData _data;
-    private Action<UpgradeData> _onSelected; // Å¬¸¯ ½Ã ½ÇÇà
+    private UpgradeData _upgradeData;
+    private Action<UpgradeData> _onUpgradeSelected; // í´ë¦­ ì‹œ ì‹¤í–‰
+
+    private BaseItemData _itemData;
+    private Action<BaseItemData> _onItemSelected;
 
     public void Setup(UpgradeData data, Action<UpgradeData> onSelectedCallback)
     {
-        _data = data;
-        _onSelected = onSelectedCallback;
+        _upgradeData = data;
+        _onUpgradeSelected = onSelectedCallback;
+
+        _itemData = null;
+        _onItemSelected = null;
 
         titleText.text = data.upgradeName;
 
         string finalDesc = data.GetDescription();
 
+        // ë””ë²„ê·¸ìš©, í›„ì— ì‚­ì œ ì˜ˆì •
         if (string.IsNullOrEmpty(data.relatedWeaponID) && PlayerDataLoad.playerData != null)
         {
             float currentVal = PlayerDataLoad.playerData.CurrentPlayerStat.GetCurrentStatValue(data.targetStat);
-
-            // ¼Ò¼öÁ¡ 1ÀÚ¸®±îÁö¸¸ ¿¹»Ú°Ô Æ÷¸ËÆÃ (¿¹: 12.5)
-            // »ö»óÀ» ³Ö¾î¼­ °­Á¶ (Rich Text »ç¿ë)
-            finalDesc += $"\n<size=80%><color=#FFFF00>([µğ¹ö±×¿ë] ÇöÀç °ª : {currentVal:F1})</color></size>";
+            finalDesc += $"\n<size=80%><color=#FFFF00>([ë””ë²„ê·¸ìš©] í˜„ì¬ ê°’ : {currentVal:F1})</color></size>";
         }
 
         descText.text = finalDesc;
 
         if (data.icon != null) iconImage.sprite = data.icon;
 
+        RefreshButtonListener();
+    }
+
+    public void Setup(BaseItemData itemData, Action<BaseItemData> onSelectedCallback, string customDesc = "")
+    {
+        _itemData = itemData;
+        _onItemSelected = onSelectedCallback;
+
+        _upgradeData = null;
+        _onUpgradeSelected = null;
+
+        titleText.SetText(itemData.name);
+
+        if (!string.IsNullOrEmpty(customDesc))
+        {
+            descText.SetText(customDesc);
+        }
+        else
+        {
+            descText.SetText(itemData.Description);
+        }
+
+        if (itemData.Icon != null) iconImage.sprite = itemData.Icon;
+
+        RefreshButtonListener();
+    }
+
+    private void RefreshButtonListener()
+    {
         selectButton.onClick.RemoveAllListeners();
         selectButton.onClick.AddListener(OnClick);
     }
 
     private void OnClick()
     {
-        _onSelected?.Invoke(_data);
+        if (_upgradeData != null)
+        {
+            _onUpgradeSelected?.Invoke(_upgradeData);
+        }
+        else if (_itemData != null)
+        {
+            _onItemSelected?.Invoke(_itemData);
+        }
     }
 }

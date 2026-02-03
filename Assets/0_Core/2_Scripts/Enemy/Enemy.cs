@@ -1,7 +1,8 @@
-﻿using Cysharp.Threading.Tasks;
+﻿using Battleship_Enum;
+using Cysharp.Threading.Tasks;
 using MoreMountains.Feedbacks;
+using System;
 using UnityEngine;
-using Battleship_Enum;
 
 public class Enemy : MonoBehaviour, IEnemy
 {
@@ -145,10 +146,7 @@ public class Enemy : MonoBehaviour, IEnemy
 
         if (DropManager.Instance != null)
         {
-            // [수정] 직접 생성하지 않고 DropManager에게 요청
             int reward = _enemyData != null ? _enemyData.ExpReward : 10;
-
-            // 이 함수 하나로 "신규 생성" 혹은 "주변 보석과 병합"이 자동으로 결정됨
             DropManager.Instance.SpawnDrops(this.transform.position, reward);
         }
 
@@ -194,8 +192,14 @@ public class Enemy : MonoBehaviour, IEnemy
                 canAttack = false;
                 pc.TakeDamage(_enemyData.Damage);
                 PlayerManager.Instance.Damaged();
-                UniTask.Delay(500);
+                ResumeAttackAbility();
             }
         }
+    }
+    private async void ResumeAttackAbility(float delay = 0.5f)
+    {
+        // UniTask.Delay는 비동기적으로 작동하며, 해당 시간만큼 대기합니다.
+        await UniTask.Delay(TimeSpan.FromSeconds(delay));
+        canAttack = true;
     }
 }

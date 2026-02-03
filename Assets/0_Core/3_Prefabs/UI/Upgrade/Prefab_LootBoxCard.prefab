@@ -365,7 +365,7 @@ GameObject:
   - component: {fileID: 7581390376229133539}
   - component: {fileID: 4869035475543536652}
   m_Layer: 0
-  m_Name: Prefab_UpgradeCard
+  m_Name: Prefab_LootBoxCard
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -391,7 +391,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 500, y: 120}
+  m_SizeDelta: {x: 280, y: 380}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &4682048604862861725
 CanvasRenderer:
