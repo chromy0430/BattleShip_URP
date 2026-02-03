@@ -24,7 +24,7 @@ MonoBehaviour:
   weaponType: 7
   weaponAttribute: 0
   Damage: 150
-  Range: 300
+  Range: 100
   EnemyCount: 0
   PierceCount: 0
   FireRate: 1

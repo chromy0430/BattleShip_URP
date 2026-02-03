@@ -30,7 +30,6 @@ public class DropManager : MonoBehaviour
     [SerializeField] private int _cargoWeight = 30;
 
     [Header("Item Data Pools")]
-    // 에디터에서 만든 SO 데이터들을 여기에 리스트로 할당하세요.
     public List<BaseWeaponData> _weaponList;
     public List<BaseEquipmentData> _equipmentList;
     public List<BaseCargoData> _cargoList;

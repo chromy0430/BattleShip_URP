@@ -1,67 +1,71 @@
-using UnityEngine;
+ï»¿using UnityEngine;
 using System.Collections.Generic;
 
 public class AuraWeapon : MonoBehaviour
 {
     private WeaponStat _stat;
-    private HashSet<IEnemy> _targetsInRagne = new HashSet<IEnemy>(); // ¿µ¿ª ³» Àû ¸ñ·Ï
+    private List<IEnemy> _targetsInRange = new List<IEnemy>();
     private float _tickTimer;
     private float _tickInterval;
 
     [Header("Visual Settings")]
-    [Tooltip("»ç°Å¸® 1´ç Àû¿ëµÉ ½ÇÁ¦ Å©±â ºñÀ²")]
+    [Tooltip("ì‚¬ê±°ë¦¬ 1ë‹¹ ì ìš©ë  ì‹¤ì œ í¬ê¸° ë¹„ìœ¨")]
     [SerializeField] private float _rangeToScaleRatio = 0.01f;
 
-    [Tooltip("ÇÁ¸®ÆÕÀÇ ±âº» ½ºÄÉÀÏ (ÃÊ±â°ª º¹¿ø¿ë)")]
+    [Tooltip("í”„ë¦¬íŒ¹ì˜ ê¸°ë³¸ ìŠ¤ì¼€ì¼ (ì´ˆê¸°ê°’ ë³µì›ìš©)")]
     [SerializeField] private Vector3 _baseScale = new Vector3(20, 20, 20);
 
-    // ¹«±â »ý¼º ½Ã ½ºÅÈ ÁÖÀÔ
+    // ë¬´ê¸° ìƒì„± ì‹œ ìŠ¤íƒ¯ ì£¼ìž…
     public void Initialize(WeaponStat stat)
     {
         _stat = stat;
 
-        // FireRate°¡ ³ôÀ»¼ö·Ï µ¥¹ÌÁö ÁÖ±â°¡ »¡¶óÁü (¿¹: 2 -> 0.5ÃÊ¸¶´Ù)
+        // FireRateê°€ ë†’ì„ìˆ˜ë¡ ë°ë¯¸ì§€ ì£¼ê¸°ê°€ ë¹¨ë¼ì§ (ì˜ˆ: 2 -> 0.5ì´ˆë§ˆë‹¤)
         _tickInterval = 1f / Mathf.Max(0.1f, stat.FireRate);
 
-        // »ç°Å¸®(Range)¿¡ ¸ÂÃç Å©±â Á¶Àý
-        // Range 300 * 0.01 = 3¹è¼ö
+        // ì‚¬ê±°ë¦¬(Range)ì— ë§žì¶° í¬ê¸° ì¡°ì ˆ
+        // Range 300 * 0.01 = 3ë°°ìˆ˜
         float scaleMultiplier = stat.Range * _rangeToScaleRatio;
-
-        transform.localScale = _baseScale * scaleMultiplier;       
-        
-        //transform.localScale = this.transform.localScale * finalScale;
+        transform.localScale = _baseScale * scaleMultiplier;
     }
 
     private void OnEnable()
     {
-        // ÄÑÁú ¶§ ¸ñ·Ï ÃÊ±âÈ­
-        _targetsInRagne.Clear();
+        // ì¼œì§ˆ ë•Œ ëª©ë¡ ì´ˆê¸°í™”
+        _targetsInRange.Clear();
         _tickTimer = _tickInterval;
     }
 
-    #region Æ®¸®°Å ÇÔ¼ö
-    // ¿µ¿ª ÁøÀÔ °¨Áö
+    #region íŠ¸ë¦¬ê±° í•¨ìˆ˜
+
+    // íŠ¸ë¦¬ê±° ì§„ìž…
     private void OnTriggerEnter(Collider other)
     {
         if (other.TryGetComponent(out IEnemy enemy))
         {
-            if (enemy.IsAlive) _targetsInRagne.Add(enemy);
+            if (enemy.IsAlive && !_targetsInRange.Contains(enemy))
+            {
+                _targetsInRange.Add(enemy);
+            }
         }
     }
 
-    // ¿µ¿ª ÀÌÅ» °¨Áö
+    // íŠ¸ë¦¬ê±° ì´íƒˆ
     private void OnTriggerExit(Collider other)
     {
         if (other.TryGetComponent(out IEnemy enemy))
         {
-            _targetsInRagne.Remove(enemy);
+            if (_targetsInRange.Contains(enemy))
+            {
+                _targetsInRange.Remove(enemy);
+            }
         }
     }
     #endregion
 
     private void Update()
     {
-        // ¸Å ÇÁ·¹ÀÓ Å¸ÀÌ¸Ó Ã¼Å©
+        // ë§¤ í”„ë ˆìž„ íƒ€ì´ë¨¸ ì²´í¬
         _tickTimer += Time.deltaTime;
         if (_tickTimer >= _tickInterval)
         {
@@ -72,22 +76,23 @@ public class AuraWeapon : MonoBehaviour
 
     private void DealDamageToAll()
     {
-        // Á×Àº ÀûÀÌ³ª nullÀÎ ÀûÀº ¸®½ºÆ®¿¡¼­ Ã»¼Ò
-        _targetsInRagne.RemoveWhere(e => e == null || !e.IsAlive);
-
         int finalDamage = _stat.Damage;
-
         if (PlayerDataLoad.playerData != null)
         {
-            // PlayerStat¿¡ ÀÖ´Â µ¥¹ÌÁö °ø½Ä È°¿ë (±âº»°ø°Ý·Â * º¸³Ê½º%)
             finalDamage = PlayerDataLoad.playerData.CurrentPlayerStat.GetFinalDamage(_stat.Damage);
         }
 
-        // ¹üÀ§ ³» ¸ðµç Àû¿¡°Ô µ¥¹ÌÁö
-        foreach (var enemy in _targetsInRagne)
+        for (int i = _targetsInRange.Count - 1; i >= 0; i--)
         {
-            Vector3 knockbackDir = (this.transform.position - transform.position).normalized;            
+            var enemy = _targetsInRange[i];
 
+            if (enemy == null || !enemy.IsAlive)
+            {
+                _targetsInRange.RemoveAt(i);
+                continue;
+            }
+
+            Vector3 knockbackDir = (enemy.TargetTransform.position - transform.position).normalized;
             enemy.TakeDamage(finalDamage, out int finalDmg);
             enemy.ApplyKnockback(knockbackDir * 1.2f, 0.2f);
         }
