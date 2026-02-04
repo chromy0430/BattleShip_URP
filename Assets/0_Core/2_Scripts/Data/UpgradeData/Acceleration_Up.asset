@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Acceleration_Up
   m_EditorClassIdentifier: Assembly-CSharp::UpgradeData
   upgradeName: "\uBBF8\uC0AC\uC77C \uAC00\uC18D"
-  description: "\uBBF8\uC0AC\uC77C\uC758 \uAC00\uC18D\uB825\uC744 {value}\uB9CC\uD07C
+  description: "\uBBF8\uC0AC\uC77C\uC758 \uAC00\uC18D\uB825\uC744 {value}%\uB9CC\uD07C
     \uC99D\uAC00\uC2DC\uD0A8\uB2E4."
   icon: {fileID: 0}
   relatedWeaponID: Wpn_Missile_01

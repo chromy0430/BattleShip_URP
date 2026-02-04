@@ -1,49 +1,50 @@
-using UnityEngine;
+ï»¿using UnityEngine;
 using Battleship_Enum;
 
 [CreateAssetMenu(fileName = "LevelUP-Upgrade", menuName = "BattleShip/Upgrade Data")]
 public class UpgradeData : ScriptableObject
 {
-    [Header("°­È­ ¼Ó¼º")]
-    public string upgradeName;       // °­È­ ÀÌ¸§
-    [TextArea] public string description; // °­È­ ¼³¸í
-    public Sprite icon;              // Ç¥½ÃÇÒ UI ¾ÆÀÌÄÜ
+    [Header("ê°•í™” ì†ì„±")]
+    public string upgradeName;       // ê°•í™” ì´ë¦„
+    [TextArea] public string description; // ê°•í™” ì„¤ëª…
+    public Sprite icon;              // í‘œì‹œí•  UI ì•„ì´ì½˜
 
-    [Header("Å¸°Ù ¼³Á¤")]
-    [Tooltip("ºñ¾îÀÖÀ¸¸é °øÅë ¾÷±×·¹ÀÌµå·Î Ç×»ó ³ª¿È, ¹«±â IDÀûÀ¸¸é ÇØ´ç ¹«±â Àü¿ë ¾÷±×·¹ÀÌµå")]
-    public string relatedWeaponID; // ¿¹½Ã : "Wpn_Gun_01"
+    [Header("íƒ€ê²Ÿ ì„¤ì •")]
+    [Tooltip("ë¹„ì–´ìˆìœ¼ë©´ ê³µí†µ ì—…ê·¸ë ˆì´ë“œë¡œ í•­ìƒ ë‚˜ì˜´, ë¬´ê¸° IDì ìœ¼ë©´ í•´ë‹¹ ë¬´ê¸° ì „ìš© ì—…ê·¸ë ˆì´ë“œ")]
+    public string relatedWeaponID; // ì˜ˆì‹œ : "Wpn_Gun_01"
 
-    [Header("°­È­ÇÒ ´É·ÂÄ¡")]
-    public StatType targetStat;      // ¹Ù²Ü ½ºÅÈ Á¾·ù 
-    public float value;              // Áõ°¡·® 
+    [Header("ê°•í™”í•  ëŠ¥ë ¥ì¹˜")]
+    public StatType targetStat;      // ë°”ê¿€ ìŠ¤íƒ¯ ì¢…ë¥˜ 
+    public float value;              // ì¦ê°€ëŸ‰ 
 
-    [Header("ÃÖ´ë ¼±ÅÃ È½¼ö")]
+    [Header("ìµœëŒ€ ì„ íƒ íšŸìˆ˜")]
     public int maxCount = 5;
 
     public string GetDescription()
     {
         string displayValue = "";
 
-        // ½ºÅÈ Å¸ÀÔ¿¡ µû¶ó Ç¥½Ã Çü½Ä ´Ù¸£°Ô ÇÏ±â
+        // ìŠ¤íƒ¯ íƒ€ì…ì— ë”°ë¼ í‘œì‹œ í˜•ì‹ ë‹¤ë¥´ê²Œ í•˜ê¸°
         switch (targetStat)
         {
-            // ÆÛ¼¾Æ® ´ÜÀ§ÀÎ Ä£±¸µé (¿¹: °ø°İ·Â, ÀÌ¼Ó)
+            // í¼ì„¼íŠ¸ ë‹¨ìœ„ì¸ ì¹œêµ¬ë“¤ (ì˜ˆ: ê³µê²©ë ¥, ì´ì†)
             case StatType.Damage:
             case StatType.MoveSpeed:
             case StatType.TurnSpeed:                     
             case StatType.MagnetRange:
             case StatType.FireRate:
-                // 0.1 -> 10, 0.5 -> 50 À¸·Î º¯È¯
+            case StatType.Acceleration:
+                // 0.1 -> 10, 0.5 -> 50 ìœ¼ë¡œ ë³€í™˜
                 displayValue = (value * 100).ToString("0");
                 break;
 
-            // Á¤¼ö ´ÜÀ§ÀÎ Ä£±¸µé (¿¹: Ã¼·Â, ¹æ¾î·Â)
+            // ì •ìˆ˜ ë‹¨ìœ„ì¸ ì¹œêµ¬ë“¤ (ì˜ˆ: ì²´ë ¥, ë°©ì–´ë ¥)
             default:
                 displayValue = value.ToString();
                 break;
         }
 
-        // ÅØ½ºÆ® ±³Ã¼
+        // í…ìŠ¤íŠ¸ êµì²´
         return description.Replace("{value}", displayValue);
     }
 }

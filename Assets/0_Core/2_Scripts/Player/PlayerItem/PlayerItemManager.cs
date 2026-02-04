@@ -1,6 +1,7 @@
-using UnityEngine;
+ï»¿using UnityEngine;
 using System.Collections.Generic;
 using Battleship_Enum;
+using BattleShip;
 
 namespace BattleShip
 {
@@ -9,13 +10,13 @@ namespace BattleShip
         public static PlayerItemManager Instance { get; private set; }
 
         [Header("Status")]
-        // Àåºñ ½½·Ô 5°³ (nullÀÌ¸é ºñ¾îÀÖÀ½)
+        // ì¥ë¹„ ìŠ¬ë¡¯ 5ê°œ (nullì´ë©´ ë¹„ì–´ìˆìŒ)
         public BaseEquipmentData[] EquipmentSlots = new BaseEquipmentData[5];
 
-        // °¢ Àåºñ ·¹º§ Ã¼Å©
+        // ê° ì¥ë¹„ ë ˆë²¨ ì²´í¬
         private int[] _equipmentLevels = new int[5];
 
-        // È¹µæÇÑ È­¹° ¸®½ºÆ® (ÁßÃ¸ °¡´ÉÇÏ¹Ç·Î ¸®½ºÆ®·Î °ü¸®)
+        // íšë“í•œ í™”ë¬¼ ë¦¬ìŠ¤íŠ¸ (ì¤‘ì²© ê°€ëŠ¥í•˜ë¯€ë¡œ ë¦¬ìŠ¤íŠ¸ë¡œ ê´€ë¦¬)
         public List<BaseCargoData> CollectedCargo = new List<BaseCargoData>();
 
         private void Awake()
@@ -24,8 +25,22 @@ namespace BattleShip
             else Destroy(gameObject);
         }
 
-        // ¿ÜºÎ¿¡¼­ ¾ÆÀÌÅÛÀ» ¸Ô¾úÀ» ¶§ È£Ãâ
+        // ì™¸ë¶€ì—ì„œ ë¶€ìœ ë¬¼ ìƒìë¥¼ ë¨¹ì—ˆì„ ë•Œ í˜¸ì¶œ -> ì—°ì¶œ ì‹œì‘
         public void ObtainItem(BaseItemData itemData)
+        {
+            if (itemData == null) return;
+
+            if (UpgradeManager.Instance != null)
+            {
+                UpgradeManager.Instance.TriggerLootBoxEvent();
+            }
+            else
+            {
+                ObtainItemImmediate(itemData);
+            }
+        }
+
+        public void ObtainItemImmediate(BaseItemData itemData)
         {
             if (itemData == null) return;
 
@@ -45,7 +60,7 @@ namespace BattleShip
             }
         }
 
-        // ¹«±â È¹µæ
+        // ë¬´ê¸° íšë“
         private void EquipWeapon(BaseWeaponData weaponData)
         {
             if (PlayerManager.Instance != null)
@@ -54,21 +69,21 @@ namespace BattleShip
             }
         }
 
-        // Àåºñ È¹µæ Ã³¸® (ºó ½½·Ô Ã¼Å© -> ÀåÂø or ½º¿Ò)
+        // ì¥ë¹„ íšë“ ì²˜ë¦¬ (ë¹ˆ ìŠ¬ë¡¯ ì²´í¬ -> ì¥ì°© or ìŠ¤ì™‘)
         private void HandleEquipment(BaseEquipmentData equipData)
         {
-            // ÀåÂøµÈ Àåºñ Ã¼Å©
+            // ì¥ì°©ëœ ì¥ë¹„ ì²´í¬
             for (int i = 0; i < EquipmentSlots.Length; i++)
             {
                 if (EquipmentSlots[i] != null && EquipmentSlots[i].ID == equipData.ID)
                 {
-                    // ·¹º§¾÷ ½ÇÇà
+                    // ë ˆë²¨ì—… ì‹¤í–‰
                     LevelUpEquipmentAtIndex(i);
                     return;
                 }
             }
 
-            // ºó ½½·Ô Ã¼Å©
+            // ë¹ˆ ìŠ¬ë¡¯ ì²´í¬
             int emptyIndex = -1;
             for (int i = 0; i < EquipmentSlots.Length; i++)
             {
@@ -79,33 +94,34 @@ namespace BattleShip
                 }
             }
 
-            // ÀåÂø ¶Ç´Â º¯°æ
+            // ì¥ì°© ë˜ëŠ” ë³€ê²½
             if (emptyIndex != -1)
             {
                 EquipItemAtIndex(equipData, emptyIndex);
             }
             else
             {
-                Debug.Log("[Equipment] ½½·ÔÀÌ °¡µæ Ã¡½À´Ï´Ù! (½º¿Ò ·ÎÁ÷ ¹ßµ¿)");
+                Debug.Log("[Equipment] ìŠ¬ë¡¯ì´ ê°€ë“ ì°¼ìŠµë‹ˆë‹¤! (ìŠ¤ì™‘ ë¡œì§ ë°œë™)");
                 SwapItem(equipData, 0);
             }
         }
 
-        // È­¹° È¹µæ Ã³¸®
+        // í™”ë¬¼ íšë“ ì²˜ë¦¬
         private void HandleCargo(BaseCargoData cargoData)
         {
             CollectedCargo.Add(cargoData);
-            Debug.Log($"[Cargo] {cargoData.Name} È­¹° ÀûÀç ¿Ï·á.");
+            Debug.Log($"[Cargo] {cargoData.Name} í™”ë¬¼ ì ì¬ ì™„ë£Œ.");
             ApplyStats(cargoData.effectPerStack, true);
         }
 
         private void EquipItemAtIndex(BaseEquipmentData data, int index)
         {
             EquipmentSlots[index] = data;
-            Debug.Log($"[Equip] {data.Name}À»(¸¦) {index}¹ø ½½·Ô¿¡ ÀåÂøÇß½À´Ï´Ù.");
+            _equipmentLevels[index] = 1;
+            Debug.Log($"[Equip] {data.Name}ì„(ë¥¼) {index}ë²ˆ ìŠ¬ë¡¯ì— ì¥ì°©í–ˆìŠµë‹ˆë‹¤.");
 
-            // ½ºÅÈ Àû¿ë (+°ª)
-            ApplyStats(data.baseStats, true); // true: ´õÇÏ±â
+            // ìŠ¤íƒ¯ ì ìš© (+ê°’)
+            ApplyStats(data.baseStats, true); // true: ë”í•˜ê¸°
         }
 
         private void LevelUpEquipmentAtIndex(int index)
@@ -115,15 +131,25 @@ namespace BattleShip
 
             if (_equipmentLevels[index] >= data.MaxLevel)
             {
-                Debug.Log($"[Equip] {data.Name}Àº(´Â) ÀÌ¹Ì ÃÖ´ë ·¹º§ÀÔ´Ï´Ù.");
+                Debug.Log($"[Equip] {data.Name}ì€(ëŠ”) ì´ë¯¸ ìµœëŒ€ ë ˆë²¨ì…ë‹ˆë‹¤.");
                 return;
             }
 
             _equipmentLevels[index]++;
-            Debug.Log($"[Equip] {data.Name} ·¹º§¾÷! (Lv.{_equipmentLevels[index]})");
-
-            // ¼ºÀå ½ºÅÈ Àû¿ë (Growth °ªÀ» ÇÑ¹ø ´õÇØÁÜ)
+            Debug.Log($"[Equip] {data.Name} ë ˆë²¨ì—…! (Lv.{_equipmentLevels[index]})");
             ApplyStats(data.growthPerLevel, true);
+
+            /*if (_equipmentLevels[index] >= data.MaxLevel)
+            {
+                Debug.Log($"[Equip] {data.Name}ì€(ëŠ”) ì´ë¯¸ ìµœëŒ€ ë ˆë²¨ì…ë‹ˆë‹¤.");
+                return;
+            }
+
+            _equipmentLevels[index]++;
+            Debug.Log($"[Equip] {data.Name} ë ˆë²¨ì—…! (Lv.{_equipmentLevels[index]})");
+
+            // ì„±ì¥ ìŠ¤íƒ¯ ì ìš© (Growth ê°’ì„ í•œë²ˆ ë”í•´ì¤Œ)
+            ApplyStats(data.growthPerLevel, true);*/
         }
 
         private void UnEquipItemAtIndex(int index)
@@ -133,12 +159,10 @@ namespace BattleShip
             BaseEquipmentData oldItem = EquipmentSlots[index];
             int currentLevel = _equipmentLevels[index];
 
-            Debug.Log($"[UnEquip] {oldItem.Name} ÇØÁ¦.");
-
-            // 1. ±âº» ½ºÅÈ Á¦°Å
+            // ê¸°ë³¸ ìŠ¤íƒ¯ ì œê±°
             ApplyStats(oldItem.baseStats, false);
 
-            // 2. ·¹º§¾÷À¸·Î ¿À¸¥ ½ºÅÈ ÀüºÎ Á¦°Å ( (·¹º§-1) * ¼ºÀåÄ¡ )
+            // ë ˆë²¨ì—…ìœ¼ë¡œ ì˜¤ë¥¸ ìŠ¤íƒ¯ ì „ë¶€ ì œê±° ( (ë ˆë²¨-1) * ì„±ì¥ì¹˜ )
             if (currentLevel > 1)
             {
                 for (int i = 0; i < currentLevel - 1; i++)
@@ -153,17 +177,17 @@ namespace BattleShip
 
         private void SwapItem(BaseEquipmentData newItem, int index)
         {
-            UnEquipItemAtIndex(index); // ±âÁ¸ Àåºñ ÇØÁ¦ (½ºÅÈ ÃÊ±âÈ­)
-            EquipItemAtIndex(newItem, index); // »õ Àåºñ ÀåÂø (1·¹º§ ½ºÅÈ)
+            UnEquipItemAtIndex(index); // ê¸°ì¡´ ì¥ë¹„ í•´ì œ (ìŠ¤íƒ¯ ì´ˆê¸°í™”)
+            EquipItemAtIndex(newItem, index); // ìƒˆ ì¥ë¹„ ì¥ì°© (1ë ˆë²¨ ìŠ¤íƒ¯)
         }
 
-        // --- ½ºÅÈ °è»ê±â (Stat Calculator) ---
-        // isAdding: true¸é ´É·ÂÄ¡ Ãß°¡, false¸é ´É·ÂÄ¡ Á¦°Å(Àåºñ ÇØÁ¦ ½Ã)
+        // ìŠ¤íƒ¯ ê³„ì‚°ê¸°
+        // isAdding: trueë©´ ëŠ¥ë ¥ì¹˜ ì¶”ê°€, falseë©´ ëŠ¥ë ¥ì¹˜ ì œê±°(ì¥ë¹„ í•´ì œ ì‹œ)
         private void ApplyStats(List<StatModifier> modifiers, bool isAdding)
         {
             if (PlayerDataLoad.playerData == null)
             {
-                Debug.LogWarning("PlayerDataLoad°¡ ÃÊ±âÈ­µÇÁö ¾Ê¾Æ ½ºÅÈÀ» Àû¿ëÇÒ ¼ö ¾ø½À´Ï´Ù.");
+                Debug.LogWarning("PlayerDataLoadê°€ ì´ˆê¸°í™”ë˜ì§€ ì•Šì•„ ìŠ¤íƒ¯ì„ ì ìš©í•  ìˆ˜ ì—†ìŠµë‹ˆë‹¤.");
                 return;
             }
 
@@ -174,28 +198,29 @@ namespace BattleShip
             {
                 float finalValue = 0f;
 
-                // ÆÛ¼¾Æ®(%) ¿©ºÎ¿¡ µû¸¥ °ª º¯È¯
+                // í¼ì„¼íŠ¸(%) ì—¬ë¶€ì— ë”°ë¥¸ ê°’ ë³€í™˜
                 if (mod.isPercentage)
                 {
-                    // 10 -> 0.1 (10%)·Î º¯È¯
+                    // 10 -> 0.1 (10%)ë¡œ ë³€í™˜
                     float percentage = mod.value / 100f;
 
                     switch (mod.targetStat)
                     {
-                        // [°è¼öÇü ½ºÅÈ]
-                        // ÀÌµ¿¼Óµµ, ¼±È¸¼Óµµ, µ¥¹ÌÁö µî
-                        // PlayerStat¿¡¼­ (1.0 + bonus)·Î °è»êÇÏ¹Ç·Î 0.1À» ´õÇÏ¸é µÊ
+                        // [ê³„ìˆ˜í˜• ìŠ¤íƒ¯]
+                        // ì´ë™ì†ë„, ì„ íšŒì†ë„, ë°ë¯¸ì§€ ë“±
+                        // PlayerStatì—ì„œ (1.0 + bonus)ë¡œ ê³„ì‚°í•˜ë¯€ë¡œ 0.1ì„ ë”í•˜ë©´ ë¨
                         case StatType.MoveSpeed:
                         case StatType.TurnSpeed:
                         case StatType.MagnetRange:
                         case StatType.Damage:
                         case StatType.WeaponRange:
+                        case StatType.Acceleration:
                             finalValue = percentage;
                             break;
 
-                        // [ÇÃ·§Çü ½ºÅÈ]
-                        // HP, MP, ¹æ¾î·Â µîÀº °íÁ¤°ªÀÌ¹Ç·Î
-                        // ±âº»°ª¿¡ ºñ·ÊÇÏ¿© Áõ°¡·® °è»ê (¿¹: ±âº»HP 100ÀÇ 10% = 10)
+                        // [í”Œë«í˜• ìŠ¤íƒ¯]
+                        // HP, MP, ë°©ì–´ë ¥ ë“±ì€ ê³ ì •ê°’ì´ë¯€ë¡œ
+                        // ê¸°ë³¸ê°’ì— ë¹„ë¡€í•˜ì—¬ ì¦ê°€ëŸ‰ ê³„ì‚° (ì˜ˆ: ê¸°ë³¸HP 100ì˜ 10% = 10)
                         case StatType.HP:
                             finalValue = playerStat.shipHP * percentage;
                             break;
@@ -210,16 +235,17 @@ namespace BattleShip
                             break;
 
                         default:
-                            finalValue = mod.value; // ¿¹¿Ü Ã³¸®
+                            finalValue = mod.value; // ì˜ˆì™¸ ì²˜ë¦¬
                             break;
                     }
                 }
                 else
                 {
-                    // °íÁ¤°ª (Flat)
-                    switch (mod.targetStat)
+                    // ê³ ì •ê°’ (Flat)
+                    finalValue = mod.value;
+                    /*switch (mod.targetStat)
                     {
-                        // ¼Óµµ °è¿­Àº °íÁ¤°ªÀ» ´õÇÏ·Á¸é ±âº» ¼Óµµ·Î ³ª´©¾î ºñÀ²·Î º¯È¯ÇØÁà¾ß ÇÔ (PlayerStat ±¸Á¶»ó)
+                        // ì†ë„ ê³„ì—´ì€ ê³ ì •ê°’ì„ ë”í•˜ë ¤ë©´ ê¸°ë³¸ ì†ë„ë¡œ ë‚˜ëˆ„ì–´ ë¹„ìœ¨ë¡œ ë³€í™˜í•´ì¤˜ì•¼ í•¨ (PlayerStat êµ¬ì¡°ìƒ)
                         case StatType.MoveSpeed:
                             finalValue = (playerStat.shipMoveSpeed > 0) ? (mod.value / playerStat.shipMoveSpeed) : 0;
                             break;
@@ -230,18 +256,15 @@ namespace BattleShip
                         default:
                             finalValue = mod.value;
                             break;
-                    }
+                    }*/
                 }
 
-                // ½ºÅÈ Àû¿ë (ÀåÂøÀÌ¸é +, ÇØÁ¦¸é -)
+                // ìŠ¤íƒ¯ ì ìš© (ì¥ì°©ì´ë©´ +, í•´ì œë©´ -)
                 float valueToApply = isAdding ? finalValue : -finalValue;
-
                 playerStat.AddBonus(mod.targetStat, valueToApply);
-
-                Debug.Log($"[Stat Applied] {mod.targetStat}: {valueToApply:F2} (Original: {mod.value}, Is%: {mod.isPercentage})");
             }
 
-            // [¼öÁ¤µÊ] ½ºÅÈ º¯°æ ÈÄ ÀÌº¥Æ® ¾Ë¸² (UI °»½Å µî)
+            // [ìˆ˜ì •ë¨] ìŠ¤íƒ¯ ë³€ê²½ í›„ ì´ë²¤íŠ¸ ì•Œë¦¼ (UI ê°±ì‹  ë“±)
             PlayerDataLoad.playerData.UpdateStatAndNotify();
         }
     }

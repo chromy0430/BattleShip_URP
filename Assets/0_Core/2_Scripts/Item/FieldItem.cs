@@ -1,5 +1,5 @@
-using UnityEngine;
-using StylizedWater3; // WaterBatchManager°¡ »ç¿ëÇÏ´Â ³×ÀÓ½ºÆäÀÌ½º
+ï»¿using UnityEngine;
+using StylizedWater3; // WaterBatchManagerê°€ ì‚¬ìš©í•˜ëŠ” ë„¤ì„ìŠ¤í˜ì´ìŠ¤
 using Battleship_Enum;
 
 namespace BattleShip
@@ -11,17 +11,17 @@ namespace BattleShip
         [SerializeField] private BaseItemData _itemData;
 
         [Header("Visual")]
-        [Tooltip("¾ÆÀÌÅÛÀÇ ¾ÆÀÌÄÜÀ» Ç¥½ÃÇÒ ½ºÇÁ¶óÀÌÆ® ·»´õ·¯ (»óÀÚ À§¿¡ ¶ç¿ï ¿ëµµ)")]
+        [Tooltip("ì•„ì´í…œì˜ ì•„ì´ì½˜ì„ í‘œì‹œí•  ìŠ¤í”„ë¼ì´íŠ¸ ë Œë”ëŸ¬ (ìƒì ìœ„ì— ë„ìš¸ ìš©ë„)")]
         [SerializeField] private SpriteRenderer _iconRenderer;
 
-        [Header("Floating Settings (ºÎ·Â ¼³Á¤)")]
-        [Tooltip("¼ö¸é ±âÁØ ³ôÀÌ ¿ÀÇÁ¼Â")]
+        [Header("Floating Settings (ë¶€ë ¥ ì„¤ì •)")]
+        [Tooltip("ìˆ˜ë©´ ê¸°ì¤€ ë†’ì´ ì˜¤í”„ì…‹")]
         [SerializeField] private float _heightOffset = 0.0f;
 
-        [Tooltip("ºÎ·Â °è»ê¿¡ »ç¿ëµÉ Ç¥¸é Å©±â")]
+        [Tooltip("ë¶€ë ¥ ê³„ì‚°ì— ì‚¬ìš©ë  í‘œë©´ í¬ê¸°")]
         [SerializeField] private Vector2 _surfaceSize = new Vector2(0.5f, 0.5f);
 
-        // --- IWaterFloatTarget ÀÎÅÍÆäÀÌ½º ±¸Çö ---
+        // --- IWaterFloatTarget ì¸í„°í˜ì´ìŠ¤ êµ¬í˜„ ---
         public Transform Transform => transform;
         public float HeightOffset => _heightOffset;
         public Vector2 SurfaceSize => _surfaceSize;
@@ -54,25 +54,25 @@ namespace BattleShip
 
         public void SetWaterObject(HeightQuerySystem.Interface heightInterface)
         {
-            // ÀÌ¹Ì °°Àº WaterObject¸é °»½ÅÇÏÁö ¾ÊÀ½ 
+            // ì´ë¯¸ ê°™ì€ WaterObjectë©´ ê°±ì‹ í•˜ì§€ ì•ŠìŒ 
             if (_heightInterface == heightInterface)
                 return;
 
             _heightInterface = heightInterface;
         }
 
-        // ¾ÆÀÌÅÛ ÃÊ±âÈ­ (DropManager°¡ È£Ãâ)
+        // ì•„ì´í…œ ì´ˆê¸°í™” (DropManagerê°€ í˜¸ì¶œ)
         public void Initialize(BaseItemData data)
         {
             _itemData = data;
 
-            // ¾ÆÀÌÄÜ ¼³Á¤
+            // ì•„ì´ì½˜ ì„¤ì •
             if (_iconRenderer != null && data != null && data.Icon != null)
             {
                 _iconRenderer.sprite = data.Icon;
 
-                // 3D ºä¿¡¼­ ¾ÆÀÌÄÜÀÌ Àß º¸ÀÌµµ·Ï Ä«¸Ş¶ó¸¦ ÇâÇÏ°Ô ÇÏ°Å³ª ´¯È÷´Â ¼³Á¤
-                // (ÀÏ´Ü xÃà 90µµ·Î ´¯Çô¼­ ¼ö¸é¿¡ ¶°ÀÖ´Â °ÍÃ³·³ º¸ÀÌ°Ô ¼³Á¤ ¿¹½Ã)
+                // 3D ë·°ì—ì„œ ì•„ì´ì½˜ì´ ì˜ ë³´ì´ë„ë¡ ì¹´ë©”ë¼ë¥¼ í–¥í•˜ê²Œ í•˜ê±°ë‚˜ ëˆ•íˆëŠ” ì„¤ì •
+                // (ì¼ë‹¨ xì¶• 90ë„ë¡œ ëˆ•í˜€ì„œ ìˆ˜ë©´ì— ë– ìˆëŠ” ê²ƒì²˜ëŸ¼ ë³´ì´ê²Œ ì„¤ì • ì˜ˆì‹œ)
                 _iconRenderer.transform.localRotation = Quaternion.Euler(90f, 0f, 0f);
             }
         }
@@ -93,8 +93,6 @@ namespace BattleShip
 
             if (_itemData != null)
             {
-                Debug.Log($"[FieldItem] È¹µæ: {_itemData.Name} ({_itemData.itemType})");
-
                 if (PlayerItemManager.Instance != null)
                 {
                     PlayerItemManager.Instance.ObtainItem(_itemData);
