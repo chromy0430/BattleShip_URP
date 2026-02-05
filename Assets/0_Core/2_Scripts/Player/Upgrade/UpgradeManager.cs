@@ -29,9 +29,11 @@ public class UpgradeManager : MonoBehaviour
     [Tooltip("연출 재생 시간 (초)")]
     [SerializeField] private float animationDuration = 2.0f;
 
-    [Header("아이템 풀")]
+    [Header("레벨업 시 획득 가능한 무기, 장비")]
     public List<BaseWeaponData> allWeapons; // 레벨업 시 획득 가능한 무기
     public List<BaseEquipmentData> allEquipments; // // 레벨업 시 획득 가능한 장비
+
+    [Header("부유물 상자를 통해 획득 가능한 화물")]
     public List<BaseCargoData> allCargos;
 
     [Header("참조")]
