@@ -4526,7 +4526,10 @@ MonoBehaviour:
   cardParent: {fileID: 1883882871}
   levelUpCardPrefab: {fileID: 7862328100609600961, guid: 93f97c7590bf89544a46c9e221daf47e, type: 3}
   allUpgrades:
+  - {fileID: 11400000, guid: 6591b300d941c3443ab4ab3acea67357, type: 2}
+  - {fileID: 11400000, guid: 2039bcc8fa0b0054f95b28d39215c7ff, type: 2}
   - {fileID: 11400000, guid: 11c604564777e1049b4f914acb16d572, type: 2}
+  - {fileID: 11400000, guid: b395014c7a949574bbdd1939d1807454, type: 2}
   - {fileID: 11400000, guid: 5cd4395509627c541b4949511b4c627d, type: 2}
   - {fileID: 11400000, guid: 517cea5984cdba24cb1c9297fc28515d, type: 2}
   - {fileID: 11400000, guid: ba331017ba68a494b9bb5eedcd8c28f5, type: 2}
@@ -4534,9 +4537,6 @@ MonoBehaviour:
   - {fileID: 11400000, guid: d850c0521c11359499b44267db55e196, type: 2}
   - {fileID: 11400000, guid: 22559e91d5e313e498f6aacd43f123d2, type: 2}
   - {fileID: 11400000, guid: 080044595c005c5419766efbd736b556, type: 2}
-  - {fileID: 11400000, guid: 2039bcc8fa0b0054f95b28d39215c7ff, type: 2}
-  - {fileID: 11400000, guid: 6591b300d941c3443ab4ab3acea67357, type: 2}
-  - {fileID: 11400000, guid: b395014c7a949574bbdd1939d1807454, type: 2}
   canChoice: 3
   lootBoxPanel: {fileID: 569551609}
   lootBoxCardParent: {fileID: 1904379946}
@@ -4545,8 +4545,8 @@ MonoBehaviour:
   lootRetrievalPanel: {fileID: 0}
   animationDuration: 2
   allWeapons:
-  - {fileID: 11400000, guid: 5aaa673bce0663048a3ca3a6358572a7, type: 2}
   - {fileID: 11400000, guid: 6e2f02ad61df99e40876305ac88db82c, type: 2}
+  - {fileID: 11400000, guid: 5aaa673bce0663048a3ca3a6358572a7, type: 2}
   - {fileID: 11400000, guid: 22b018c1326a1f04c99750b2ab52e628, type: 2}
   allEquipments:
   - {fileID: 11400000, guid: 3d7b4d38791dfaf43806b6b0c24d0940, type: 2}
