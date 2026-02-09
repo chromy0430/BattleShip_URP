@@ -15,7 +15,7 @@ MonoBehaviour:
   ID: Wpn_Missile_01
   Name: "\uBBF8\uC0AC\uC77C"
   Description: "\uC801\uC744 \uB05D\uAE4C\uC9C0 \uCD94\uACA9\uD558\uB294 \uBBF8\uC0AC\uC77C"
-  Icon: {fileID: 0}
+  Icon: {fileID: 21300002, guid: 358b5d9f23bc9413e87c9948acc67ee1, type: 3}
   itemType: 0
   ShopCost: 0
   DefaultLevel: 1

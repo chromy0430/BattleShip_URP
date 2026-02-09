@@ -510,7 +510,7 @@ float4 ForwardPass(Varyings input, FRONT_FACE_TYPE_REAL vertexFace : FRONT_FACE_
 	#endif
 	//interSecGradient = terrainDepth;
 	
-	water.intersection = SampleIntersection(uv.xy + (offsetVector * _IntersectionDistortion), (TIME * -_Direction),
+	water.intersection = SampleIntersection(_IntersectionNoise, sampler_IntersectionNoise, uv.xy + (offsetVector * _IntersectionDistortion), (TIME * -_Direction),
 		_IntersectionTiling, interSecGradient, _IntersectionFalloff, _IntersectionSpeed, _IntersectionRippleDist, _IntersectionRippleStrength, _IntersectionRippleSpeed, _IntersectionClipping, _IntersectionSharp) * _IntersectionColor.a;
 
 	#if UNDERWATER_ENABLED
@@ -518,7 +518,7 @@ float4 ForwardPass(Varyings input, FRONT_FACE_TYPE_REAL vertexFace : FRONT_FACE_
 	water.intersection *= water.vFace;
 	#endif
 
-	#if _WAVES && !_DISABLE_DEPTH_TEX
+	#if _WAVES && !_DISABLE_DEPTH_TEX && !_RIVER
 	//Prevent from peering through waves when camera is at the water level
 	if(positionWS.y < scene.positionWS.y) water.intersection = 0;
 	#endif
@@ -790,6 +790,9 @@ float4 ForwardPass(Varyings input, FRONT_FACE_TYPE_REAL vertexFace : FRONT_FACE_
 	#if !_UNLIT
 	//Blend between smooth geometry normal and normal map for diffuse lighting
 	water.diffuseNormal = lerp(water.waveNormal, water.tangentWorldNormal, _NormalStrength);
+	#else
+	//Defensive init: ensures lighting never reads an undefined normal (important on WebGPU)
+	water.diffuseNormal = water.vertexNormal;
 	#endif
 
 	#if _FLAT_SHADING
@@ -894,9 +897,14 @@ float4 ForwardPass(Varyings input, FRONT_FACE_TYPE_REAL vertexFace : FRONT_FACE_
     inputData.bakedGI = SAMPLE_GI(input.staticLightmapUV, input.vertexSH, inputData.normalWS);
     #endif
 	
-
 	//Lightmap(static+dynamic) or SH
 	//return float4(inputData.bakedGI, 1.0);
+	
+	//WebGPU safety: APV isn't entirely supported and will propagate NaNs into bakedGI. Resulting in the water turning invisible.
+	#if defined(SHADER_API_WEBGPU) && (defined(PROBE_VOLUMES_L1) || defined(PROBE_VOLUMES_L2))
+	//Fallback to SH/Light probes
+	inputData.bakedGI = SampleSH(inputData.normalWS);
+	#endif
 	
 	#endif
 

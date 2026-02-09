@@ -13,9 +13,6 @@
 TEXTURE2D(_FoamTex);
 SAMPLER(sampler_FoamTex);
 
-#define FOAM_CHANNEL 0
-#define BUBBLES_CHANNEL 1
-
 //WIP
 //#define DISTANCE_FOAM 1
 
@@ -53,6 +50,7 @@ float2 SampleFoamTexture(TEXTURE2D_PARAM(tex, samplerName), float3 positionWS, f
 	float2 foam = SampleFoamLayer(TEXTURE2D_ARGS(tex, samplerName), uv, tiling, time, speed, subTiling, subSpeed);
 
 	#if _SURFACE_FOAM_DUAL
+	UNITY_BRANCH
 	if(distanceFoamOn)
 	{
 		float fadeFactor = DistanceFadeMask(positionWS, distanceStart, distanceEnd);
@@ -66,13 +64,13 @@ float2 SampleFoamTexture(TEXTURE2D_PARAM(tex, samplerName), float3 positionWS, f
 		float2 distanceFoam = SAMPLE_TEXTURE2D(tex, samplerName, distanceUV.xy).rg;
 		//distanceFoam *= 2.0;
 		#endif
-
 		
 		foam = lerp(distanceFoam, foam, fadeFactor);
 		//foam = distanceFoam;
 	}
 	#endif
 	
+	UNITY_BRANCH
 	if(slopeFoamOn)
 	{
 		float2 slopeUV = uv;
@@ -102,24 +100,24 @@ float2 SampleFoamTexture(float3 positionWS, float2 uv, float2 tiling, float subT
 TEXTURE2D(_IntersectionNoise);
 SAMPLER(sampler_IntersectionNoise);
 
-float SampleIntersection(float2 uv, float2 time, float tiling, float gradient, float falloff, float speed, half rippleDistance, float rippleStrength, float rippleSpeed, float clipping, bool sharp)
+float SampleIntersection(TEXTURE2D_PARAM(noiseTex, samplerName), float2 uv, float2 time, float tiling, float gradient, float falloff, float speed, half rippleDistance, float rippleStrength, float rippleSpeed, float clipping, bool sharp)
 {
 	float intersection = 0;
 	float dist = saturate(gradient / falloff);
-	
+
 	float2 nUV = uv * tiling;
-	half noise1 = SAMPLE_TEXTURE2D(_IntersectionNoise, sampler_IntersectionNoise, nUV + (time.xy * speed)).r;
+	half noise1 = SAMPLE_TEXTURE2D(noiseTex, samplerName, nUV + (time.xy * speed)).r;
 
 	half noise2 = 0;
 	#if _ADVANCED_SHADING
-	noise2 = SAMPLE_TEXTURE2D(_IntersectionNoise, sampler_IntersectionNoise, (nUV * 0.8) - (time.xy * speed)).r;
+	noise2 = SAMPLE_TEXTURE2D(noiseTex, samplerName, (nUV * 0.8) - (time.xy * speed)).r;
 	#endif
-	
+
 	#if UNITY_COLORSPACE_GAMMA
 	noise1 = SRGBToLinear(noise1);
 	noise2 = SRGBToLinear(noise2);
 	#endif
-	
+
 	float sine = sin((time.y * rippleSpeed) - (gradient * rippleDistance)) * rippleStrength;
 
 	half noise = saturate((max(noise1, noise2) + sine) * dist);
@@ -137,4 +135,17 @@ float SampleIntersection(float2 uv, float2 time, float tiling, float gradient, f
 
 	return intersection;
 }
+
+//Shader Graph
+#if defined(UNITY_TEXTURE_INCLUDED) && !SHADERGRAPH_PREVIEW
+void SampleIntersection_float(UnityTexture2D noiseTex, UnitySamplerState samplerName, float2 uv, float2 time, float tiling, float gradient, float falloff, float speed, half rippleDistance, float rippleStrength, float rippleSpeed, float clipping, bool sharp,
+	out float intersectionFoam)
+{
+	#if SHADERGRAPH_PREVIEW
+	intersectionFoam = 0;
+	#else
+	intersectionFoam = SampleIntersection(TEXTURE2D_ARGS(noiseTex.tex, samplerName.samplerstate), uv, time, tiling, gradient, falloff, speed, rippleDistance, rippleStrength, rippleSpeed, clipping, sharp);
+	#endif
+}
+#endif
 #endif

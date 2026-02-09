@@ -272,6 +272,7 @@
 			%multi_compile dynamic effects%
 
             #if UNDERWATER_ENABLED && _RIVER
+			#undef UNDERWATER_ENABLED
             #define UNDERWATER_ENABLED 0
             #endif
 

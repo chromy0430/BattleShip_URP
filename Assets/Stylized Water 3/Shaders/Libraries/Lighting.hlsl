@@ -9,10 +9,6 @@
 #include "Common.hlsl"
 #include "Reflections.hlsl"
 
-#if !_UNLIT
-#define LIT
-#endif
-
 #define SPECULAR_POWER_RCP 0.01562 // 1.0/32
 #define SPECULAR_STEP_THRESHOLD 0.2
 
@@ -173,7 +169,8 @@ float3 ApplyLighting(inout SurfaceData surfaceData, inout float3 sceneColor, Lig
 	float causticsAttentuation = 1.0;
 	#endif
 	
-#ifdef LIT
+	half3 diffuseColor = 0;
+#if !defined(_UNLIT)
 	#if _CAUSTICS && !defined(LIGHTMAP_ON)
 	if(isMatchingLightLayer)
 	{
@@ -201,7 +198,7 @@ float3 ApplyLighting(inout SurfaceData surfaceData, inout float3 sceneColor, Lig
 		half3 attenuatedLightColor = mainLight.color * (mainLight.distanceAttenuation * mainLight.shadowAttenuation);
 		directLight = LightingLambert(attenuatedLightColor, mainLight.direction, water.diffuseNormal);
 	}
-	half3 diffuseColor = inputData.bakedGI + directLight;
+	diffuseColor = inputData.bakedGI + directLight;
 	
 #if _ADDITIONAL_LIGHTS //Per pixel lights
 	#ifndef _SPECULARHIGHLIGHTS_OFF
@@ -268,7 +265,7 @@ float3 ApplyLighting(inout SurfaceData surfaceData, inout float3 sceneColor, Lig
 #endif
 
 #else //Unlit
-	const half3 diffuseColor = 1;
+	diffuseColor = 1.0;
 #endif
 
 	#if _CAUSTICS

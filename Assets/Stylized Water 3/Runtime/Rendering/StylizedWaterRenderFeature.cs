@@ -331,6 +331,7 @@ namespace StylizedWater3
                     if (allocate == false)
                     {
                         allocate |= RenderTargetDebugger.CurrentRT.rt.name != textureDesc.name;
+                        //RTMF :') Update to a supported Unity 6.0 version if this throws an error
                         allocate |= RenderTargetDebugger.CurrentRT.rt.graphicsFormat != textureDesc.format;
                         allocate |= RenderTargetDebugger.CurrentRT.rt.width != textureDesc.width;
                         allocate |= RenderTargetDebugger.CurrentRT.rt.height != textureDesc.height;

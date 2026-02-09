@@ -122,6 +122,17 @@ namespace StylizedWater3
                                          "Disable MSAA, or use the Vulkan graphics API", UniversalRenderPipeline.asset);
                     }
                 }
+                
+                #if UNITY_6000_1_OR_NEWER
+                if (EditorUserBuildSettings.activeBuildTarget == BuildTarget.WebGL && UniversalRenderPipeline.asset.lightProbeSystem == LightProbeSystem.ProbeVolumes)
+                {
+                    if (PlayerSettings.GetGraphicsAPIs(EditorUserBuildSettings.activeBuildTarget)[0] ==
+                        GraphicsDeviceType.WebGPU)
+                    {
+                        Debug.LogWarning("[Stylized Water 3] WebGL builds using the WebGPU graphics API do not support Adaptive Probe Volumes. Shader will fall back to standard SH/Light Probes.");
+                    }
+                }
+                #endif
 
                 //Check if the displacement pre-pass is enabled anywhere
                 heightPrePassEnabled = HeightPrePassEnabled();

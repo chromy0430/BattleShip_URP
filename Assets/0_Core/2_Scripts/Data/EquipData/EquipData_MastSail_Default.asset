@@ -24,10 +24,10 @@ MonoBehaviour:
   equipSlot: 3
   baseStats:
   - targetStat: 1
-    value: 3
+    value: 1
     isPercentage: 0
   - targetStat: 2
-    value: 2
+    value: 1
     isPercentage: 0
   growthPerLevel:
   - targetStat: 1

@@ -46,6 +46,7 @@ namespace StylizedWater3.Demo
         
         [SerializeField]
         private string[] sceneGUIDS = Array.Empty<string>();
+        [SerializeField]
         private string[] scenePaths = Array.Empty<string>();
 
         #if UNITY_EDITOR
@@ -202,8 +203,8 @@ namespace StylizedWater3.Demo
                     
                     if (Application.isPlaying)
                     {
-                        //SceneManager.LoadScene(path, LoadSceneMode.Additive);
-                        StartCoroutine(LoadScene(path));
+                        SceneManager.LoadScene(path, LoadSceneMode.Additive);
+                        //StartCoroutine(LoadScene(path));
                     }
                     else
                     {

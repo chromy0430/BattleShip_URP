@@ -1,16 +1,18 @@
-using System.Text;
+ï»¿using System.Text;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class WeaponInfoSlot : MonoBehaviour
 {
-    [Header("UI Components")]
-    [SerializeField] private Image iconImage; // ¹«±â ¾ÆÀÌÄÜ
-    [SerializeField] private TextMeshProUGUI nameText; // ¹«±â ÀÌ¸§
-    [SerializeField] private TextMeshProUGUI LevelText; // ¹«±â ÇöÀç ·¹º§
-    [SerializeField] private TextMeshProUGUI damageText; // ¹«±â ÇÇÇØ·®
-    [SerializeField] private TextMeshProUGUI fireRateText; // ¹«±â ÃÊ´ç ¹ß»ç ¼Óµµ
+    [Header("UI ì»´í¬ë„ŒíŠ¸")]
+    [SerializeField] private Image iconImage; // ë¬´ê¸° ì•„ì´ì½˜
+    [SerializeField] private TextMeshProUGUI levelText; // ë¬´ê¸° í˜„ì¬ ë ˆë²¨
+
+    [Header("ë¬´ê¸° ìŠ¬ë¡¯ ì´ë¯¸ì§€")]
+    [SerializeField] private Sprite emptySlotIcon; // ë¹ˆ ìŠ¬ë¡¯ì¼ ë•Œ ë³´ì—¬ì¤„ ì´ë¯¸ì§€ (íˆ¬ëª… or ê¸°ë³¸ ì•„ì´ì½˜)
+    [SerializeField] private Color emptyColor = new Color(0f, 0f, 0f, 64f / 255f); // ë¹ˆ ìŠ¬ë¡¯ ìƒ‰ìƒ (ë°˜íˆ¬ëª…)
+    [SerializeField] private Color activeColor = Color.white; // í™œì„± ìŠ¬ë¡¯ ìƒ‰ìƒ
 
     private WeaponMount _targetMount;
 
@@ -20,24 +22,66 @@ public class WeaponInfoSlot : MonoBehaviour
         RefreshUI();
     }
 
-    // µ¥ÀÌÅÍ °»½Å
+    // ë°ì´í„° ê°±ì‹ 
     public void RefreshUI()
     {
-        if (_targetMount == null || _targetMount.RuntimeStat == null) return;
+        if (_targetMount == null) return;
 
-        WeaponStat stat = _targetMount.RuntimeStat;
+        // ë¬´ê¸°ê°€ ì—†ëŠ” ê²½ìš° ë¹ˆ ìŠ¬ë¡¯ ì²˜ë¦¬
+        if (!_targetMount.HasWeapon())
+        {
+            SetEmptyState();
+            return;
+        }
 
-        // ¾ÆÀÌÄÜ ¼³Á¤
-        if (stat.Icon != null) iconImage.sprite = stat.Icon;
+        // ë¬´ê¸°ê°€ ìˆëŠ” ê²½ìš° ì •ë³´ í‘œì‹œ
+        SetActiveState(_targetMount.RuntimeStat);
+    }
 
-        nameText.text = stat.Name;
+    // ë¹ˆ ìŠ¬ë¡¯ í•¨ìˆ˜
+    private void SetEmptyState()
+    {
+        if (iconImage != null)
+        {
+            if (emptySlotIcon != null)
+            {
+                iconImage.sprite = emptySlotIcon;
+                iconImage.color = emptyColor; // ë°˜íˆ¬ëª…í•˜ê²Œ             
+            }
+            else
+            {
+                iconImage.sprite = null;
+                iconImage.color = emptyColor;
+            }
+        }
 
-        LevelText.text = $"Lv.{stat.WeaponLevel}";
+        iconImage.enabled = true;
 
-        // ½ºÅÈ Ç¥½Ã
-        damageText.text = $"DMG: {stat.Damage}";
+        if (levelText != null)
+        {
+            levelText.SetText("");
+        }
+    }
 
-        // ¼Ò¼öÁ¡ 2ÀÚ¸®±îÁö¸¸ ¿¹»Ú°Ô Ç¥½Ã (F2)
-        fireRateText.text = $"SPD: {stat.FireRate:F2}";
+    // ë¬´ê¸° íšë“ ì‹œ ë³€ê²½
+    private void SetActiveState(WeaponStat stat)
+    {
+        if (stat == null) return;
+
+        // ì•„ì´ì½˜ ì„¤ì •
+        if (iconImage != null)
+        {
+            iconImage.enabled = true;
+            iconImage.color = activeColor;
+            if (stat.Icon != null)
+            {
+                iconImage.sprite = stat.Icon;
+            }
+        }
+
+        if (levelText != null)
+        {
+            levelText.SetText($"Lv. {stat.WeaponLevel}");
+        }
     }
 }

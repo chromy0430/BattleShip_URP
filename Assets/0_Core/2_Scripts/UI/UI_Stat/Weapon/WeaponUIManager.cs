@@ -1,63 +1,68 @@
-using System.Collections.Generic;
+ï»¿using System.Collections.Generic;
 using UnityEngine;
 
 public class WeaponUIManager : MonoBehaviour
 {
-    [Header("References")]
+    [Header("ì°¸ì¡°")]
     [SerializeField] private AutoAttackController attackController;
-    [SerializeField] private Transform slotParent; // ½½·ÔµéÀÌ µé¾î°¥ Grid Layout Group
-    [SerializeField] private GameObject weaponSlotPrefab; // WeaponInfoSlot ÇÁ¸®ÆÕ
-
-    private List<WeaponInfoSlot> _spawnedSlots = new List<WeaponInfoSlot>();
+    [SerializeField] private Transform slotParent; // ìŠ¬ë¡¯ë“¤ì´ ë“¤ì–´ê°ˆ Grid Layout Group
     
+    //[SerializeField] private GameObject weaponSlotPrefab; // WeaponInfoSlot í”„ë¦¬íŒ¹
 
-
+    private List<WeaponInfoSlot> _uiSlots = new List<WeaponInfoSlot>();
+    
     private void Start()
     {
         CreateWeaponSlots();
 
-        /*if (InitManager.Instance != null)
-            InitManager.Instance.upgradeManager.onChangedWeaponStat += RefreshAllSlots; 
+        if (UpgradeManager.Instance != null)
+        {
+            UpgradeManager.Instance.onChangedWeaponStat += RefreshAllSlots;
+        }
         else
         {
-            Debug.Log("Init Manager ÀÎ½ºÅÏ½º ¾ø´Â »óÅÂ");
-        }*/
+            Debug.LogWarning("[WeaponUIManager] UpgradeManager ì¸ìŠ¤í„´ìŠ¤ë¥¼ ì°¾ì„ ìˆ˜ ì—†ìŠµë‹ˆë‹¤.");
+        }
     }
 
     private void OnDisable()
     {
-        //if (InitManager.Instance != null)
-        //    InitManager.Instance.upgradeManager.onChangedWeaponStat -= RefreshAllSlots;
-    }
-
-    // 1. Ã³À½ ½½·Ô »ı¼º
-    public void CreateWeaponSlots()
-    {
-        // ±âÁ¸ ½½·Ô Ã»¼Ò
-        foreach (var slot in _spawnedSlots) Destroy(slot.gameObject);
-        _spawnedSlots.Clear();
-
-        // ½ÇÁ¦ ¹«±â ¸®½ºÆ® °¡Á®¿À±â
-        List<WeaponMount> mounts = attackController.GetWeaponMounts();
-
-        foreach (var mount in mounts)
+        if (UpgradeManager.Instance != null)
         {
-            GameObject go = Instantiate(weaponSlotPrefab, slotParent);
-            WeaponInfoSlot slotScript = go.GetComponent<WeaponInfoSlot>();
-
-            // ½½·Ô¿¡ ½ÇÁ¦ ¹«±â(WeaponMount)¸¦ ¿¬°á
-            slotScript.Initialize(mount);
-
-            _spawnedSlots.Add(slotScript);
+            UpgradeManager.Instance.onChangedWeaponStat -= RefreshAllSlots;
         }
     }
 
-    // 2. ¾÷±×·¹ÀÌµå ÈÄ ¼öÄ¡¸¸ °»½Å (½½·Ô °¹¼ö´Â ±×´ë·Î)
+    // ì²˜ìŒ ìŠ¬ë¡¯ ìƒì„±
+    public void CreateWeaponSlots()
+    {
+        if (attackController == null)
+        {
+            Debug.LogError("[WeaponUIManager] AutoAttackControllerê°€ ì—°ê²°ë˜ì§€ ì•Šì•˜ìŠµë‹ˆë‹¤!");
+            return;
+        }
+
+        // ìŠ¬ë¡¯ ë°ì´í„° ì¶”ê°€
+        _uiSlots.Clear();
+        WeaponInfoSlot[] foundSlots = slotParent.GetComponentsInChildren<WeaponInfoSlot>();
+        _uiSlots.AddRange(foundSlots);
+
+        List<WeaponMount> mounts = attackController.GetWeaponMounts();
+        int count = Mathf.Min(_uiSlots.Count, mounts.Count);
+
+        for (int i = 0; i < count; i++)
+        {
+            // ië²ˆì§¸ ìŠ¬ë¡¯ UIì— ië²ˆì§¸ ë¬´ê¸° ë§ˆìš´íŠ¸ë¥¼ ì—°ê²°
+            _uiSlots[i].Initialize(mounts[i]);
+        }
+    }
+
+    // ì—…ê·¸ë ˆì´ë“œ í›„ ë‚´ìš© ê°±ì‹ 
     public void RefreshAllSlots()
     {
-        foreach (var slot in _spawnedSlots)
+        foreach (var slot in _uiSlots)
         {
-            slot.RefreshUI();
+            if (slot != null) slot.RefreshUI();
         }
     }
 }

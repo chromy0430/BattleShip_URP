@@ -32,7 +32,7 @@ namespace StylizedWater3
         /// <returns></returns>
         public static bool IsSupported()
         {
-            #if UNITY_WEBGL
+            #if UNITY_WEBGL && !UNITY_6000_1_OR_NEWER
             return false;
             #else
             return SystemInfo.supportsComputeShaders;

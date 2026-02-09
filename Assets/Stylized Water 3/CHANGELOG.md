@@ -1,3 +1,11 @@
+3.2.5 (February 5th 2026)
+
+Added:
+- Support for GPU Height Queries when using WebGPU in Unity 6.1 (experimental).
+
+Fixed:
+- Intersection foam cutting off at a certain height on river materials
+
 3.2.4 (January 5th 2026)
 
 Fixed:
