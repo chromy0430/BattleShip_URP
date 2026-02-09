@@ -26,7 +26,7 @@ MonoBehaviour:
   HPRecovery: 1
   ExpReward: 50
   ModelPrefab:
-    m_AssetGUID: 4a8280c5be5e1fc4fa9bbf1c2817ae1b
+    m_AssetGUID: 7061685a04bff8a48ab2a4e5bb7b58e6
     m_SubObjectName: 
     m_SubObjectType: 
     m_SubObjectGUID: 

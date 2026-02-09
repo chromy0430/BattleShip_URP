@@ -26,7 +26,8 @@ public class EnemyBatchManager : MonoBehaviour
 
     [Header("Buoyancy Update")]
     [SerializeField] private int buoyancyFrameInterval = 4;
-    private bool shouldUpdateBuoyancy = false;
+    [SerializeField] private bool shouldUpdateBuoyancy = false;
+    [SerializeField] private float buoyancyStrength = 10;
     private void Awake()
     {
         Instance = this;
@@ -100,7 +101,7 @@ public class EnemyBatchManager : MonoBehaviour
 
         if (_enemies.Count == 0) return;
 
-        float deltaTime = Time.fixedDeltaTime;
+       float deltaTime = Time.fixedDeltaTime;
 
         for (int i = 0; i < _enemies.Count; i++)
         {
@@ -127,10 +128,9 @@ public class EnemyBatchManager : MonoBehaviour
             }*/
 
             Vector3 currentPos = e.rb.position;
-            Vector3 diff = playerPos - currentPos;
-            diff.y = 0;
+            Vector3 diff = playerPos - currentPos;     
+            //diff.y = 0;
             float distSqr = diff.sqrMagnitude;
-
             shouldUpdateBuoyancy = ((Time.frameCount + e.buoyancyFrameOffset) % buoyancyFrameInterval) == 0;
 
             if (shouldUpdateBuoyancy)
@@ -142,6 +142,7 @@ public class EnemyBatchManager : MonoBehaviour
             HandleMovement(e, playerPos, deltaTime);
         }
     }
+
 
     /// <summary>
     /// 물 높이를 계산하고 Y축 속도를 제어
@@ -156,48 +157,48 @@ public class EnemyBatchManager : MonoBehaviour
             return;
         }
 
-        HeightQuerySystem.Sampler currentSampler;
-        int currentSampleCount;
+            HeightQuerySystem.Sampler currentSampler;
+            int currentSampleCount;
 
-        if (distSqr < highQualityDistSqr)
-        {
-            currentSampler = _samplerHigh;
-            currentSampleCount = 4;
+            if (distSqr < highQualityDistSqr)
+            {
+                currentSampler = _samplerHigh;
+                currentSampleCount = 4;
 
-            float halfSize = e.surfaceSize * 0.5f;
-            currentSampler.SetSamplePosition(0, currentPos + new Vector3(-halfSize, 0, 0));
-            currentSampler.SetSamplePosition(1, currentPos + new Vector3(halfSize, 0, 0));
-            currentSampler.SetSamplePosition(2, currentPos + new Vector3(0, 0, -halfSize));
-            currentSampler.SetSamplePosition(3, currentPos + new Vector3(0, 0, halfSize));
-        }
-        else
-        {
-            // [Low Quality] 1점 샘플링
-            currentSampler = _samplerLow;
-            currentSampleCount = 1;
-            currentSampler.SetSamplePosition(0, currentPos);
-        }
+                float halfSize = e.surfaceSize * 0.5f;
+                currentSampler.SetSamplePosition(0, currentPos + new Vector3(-halfSize, 0, 0));
+                currentSampler.SetSamplePosition(1, currentPos + new Vector3(halfSize, 0, 0));
+                currentSampler.SetSamplePosition(2, currentPos + new Vector3(0, 0, -halfSize));
+                currentSampler.SetSamplePosition(3, currentPos + new Vector3(0, 0, halfSize));
+            }
+            else
+            {
+                // [Low Quality] 1점 샘플링
+                currentSampler = _samplerLow;
+                currentSampleCount = 1;
+                currentSampler.SetSamplePosition(0, currentPos);
+            }
 
-        Gerstner.ComputeHeight(currentSampler, heightInterface);
+            Gerstner.ComputeHeight(currentSampler, heightInterface);
 
-        float avgHeight = 0f;
+            float avgHeight = 0f;
 
-        if (currentSampleCount == 4)
-        {
-            avgHeight = (currentSampler.heightValues[0] + currentSampler.heightValues[1] +
-                         currentSampler.heightValues[2] + currentSampler.heightValues[3]) * 0.25f;
-        }
-        else
-        {
-            avgHeight = currentSampler.heightValues[0];
-        }
+            if (currentSampleCount == 4)
+            {
+                avgHeight = (currentSampler.heightValues[0] + currentSampler.heightValues[1] +
+                             currentSampler.heightValues[2] + currentSampler.heightValues[3]) * 0.25f;
+            }
+            else
+            {
+                avgHeight = currentSampler.heightValues[0];
+            }
 
         // 부력 물리 적용
-        float targetY = avgHeight + e.heightOffset;
+        float targetY = avgHeight + e.heightOffset;     
         float heightDiff = targetY - currentPos.y;
 
         Vector3 velFinal = e.rb.linearVelocity;
-        velFinal.y = heightDiff * 2.0f; // 10.0f는 부력 강도 (필요 시 조절)
+        velFinal.y = heightDiff * buoyancyStrength; // 10.0f는 부력 강도 (필요 시 조절)
         e.rb.linearVelocity = velFinal;
     }
 

@@ -1,6 +1,4 @@
-﻿using Mono.Cecil.Cil;
-using StylizedWater3;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.InputSystem;
 
 [RequireComponent(typeof(Rigidbody))]

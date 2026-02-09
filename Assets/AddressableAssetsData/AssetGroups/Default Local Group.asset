@@ -15,8 +15,8 @@ MonoBehaviour:
   m_GroupName: Default Local Group
   m_GUID: 5edce1880350af84e91cce7bdb095f89
   m_SerializeEntries:
-  - m_GUID: 4a8280c5be5e1fc4fa9bbf1c2817ae1b
-    m_Address: Assets/0_Core/3_Prefabs/Enemy/Enemy.prefab
+  - m_GUID: 7061685a04bff8a48ab2a4e5bb7b58e6
+    m_Address: Assets/0_Core/3_Prefabs/Enemy/Prefab_Enemy_ExplosionShip.prefab
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
