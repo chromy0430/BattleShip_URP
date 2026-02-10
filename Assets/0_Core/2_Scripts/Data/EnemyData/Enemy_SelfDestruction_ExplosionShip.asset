@@ -20,7 +20,7 @@ MonoBehaviour:
   TurnSpeed: 10
   SizeRadius: 1
   Damage: 15
-  Shield: 10
+  DEF: 1
   MaxHP: 300
   Level: 1
   HPRecovery: 1

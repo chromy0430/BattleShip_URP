@@ -22,9 +22,13 @@ MonoBehaviour:
   BaseMagnetRange: 5
   BaseSPR: 0
   ShopCost: 0
-  BaseSurfaceSize: {x: 0, y: 0}
-  BaseHeightOffset: 0
   BaseMoveSpeed: 10
   BaseTurnSpeed: 5
   shipVisual: {fileID: 7150253761806565065, guid: 2c3dab0da11380d4eab0d781c2154404, type: 3}
   shipIcon: {fileID: 0}
+  ColliderCenter: {x: 0, y: 1, z: -0.5}
+  ColliderSize: {x: 2.8, y: 2, z: 10}
+  BaseSurfaceSize: {x: 3, y: 8}
+  BaseHeightOffset: -0.6
+  rollAmount: 0.2
+  smoothing: 0.15

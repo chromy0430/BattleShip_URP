@@ -1,11 +1,11 @@
-using UnityEngine;
+ï»¿using UnityEngine;
 using UnityEngine.AddressableAssets;
 using Battleship_Enum;
 
 [CreateAssetMenu(fileName = "EnemyData", menuName = "BattleShip/Enemy Data")]
 public class EnemyData : ScriptableObject
 {
-    [Header("Àû ¼Ó¼º")]
+    [Header("ì  ì†ì„±")]
     public string EnemyID;
     public string EnemyName;
     [TextArea] public string Description;
@@ -14,22 +14,22 @@ public class EnemyData : ScriptableObject
     public float TurnSpeed;
     public float SizeRadius;
 
-    [Header("Àû ´É·ÂÄ¡")]
+    [Header("ì  ëŠ¥ë ¥ì¹˜")]
     public int Damage;
-    public int Shield;
+    public int DEF;
     public int MaxHP;
     public int Level;
     public int HPRecovery;
     public int ExpReward;
 
-    [Header("¾îµå·¹¼­ºí")]
+    [Header("ì–´ë“œë ˆì„œë¸”")]
     public AssetReferenceGameObject ModelPrefab;
     public AssetReference DeathAnim;
 
-    [Header("Àû Å¸ÀÔ")]
+    [Header("ì  íƒ€ì…")]
     public EnemyAttackType AttackType;
     public EnemySizeType SizeType;
 
-    [Header("·¹ÀÌ´õ ¾ÆÀÌÄÜ")]
+    [Header("ë ˆì´ë” ì•„ì´ì½˜")]
     public Sprite MinimapIcon;
 }

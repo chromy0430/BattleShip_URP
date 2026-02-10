@@ -75,7 +75,6 @@ public class UpgradeManager : MonoBehaviour
     {
         // 씬 내의 활성화된 모든 WeaponMount를 찾아서 리스트에 등록
         _activeWeaponMounts = FindObjectsByType<WeaponMount>(FindObjectsSortMode.None).AsValueEnumerable().ToList();
-        Debug.Log($"[UpgradeManager] 무기 목록 갱신 완료. 총 {_activeWeaponMounts.Count}개");
     }
 
     private void OnDisable()
@@ -256,7 +255,7 @@ public class UpgradeManager : MonoBehaviour
         int pStat = 30;
         int pWpUp = 40;
         int pNewWp = 20;
-        int pEquip = 10;
+        //int pEquip = 10;
 
         bool isFull = (currentWeaponCount >= maxWeaponCount);
         bool isInitial = (currentWeaponCount <= 1);
@@ -267,7 +266,7 @@ public class UpgradeManager : MonoBehaviour
             pStat = 37;
             pWpUp = 60;
             pNewWp = 2;
-            pEquip = 1;
+            //pEquip = 1;
         }
         else if (isInitial)
         {
@@ -275,7 +274,7 @@ public class UpgradeManager : MonoBehaviour
             pStat = 20;
             pWpUp = 30;
             pNewWp = 35;
-            pEquip = 15;
+            //pEquip = 15;
         }
 
         // 4. 주사위 굴리기 (Cumulative Probability)

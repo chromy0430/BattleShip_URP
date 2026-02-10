@@ -20,6 +20,31 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 8e65f59bdc560cd4f825cc73c9c037d3
+    m_Address: Assets/0_Core/3_Prefabs/Enemy/Prefab_Enemy_ArcherShip.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: a03c5a2621657ad498f26b7f749e6535
+    m_Address: Assets/0_Core/3_Prefabs/Enemy/Prefab_Enemy_MineLayerShip_nothing.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: b43e8125a10879541933638a80478870
+    m_Address: Assets/0_Core/3_Prefabs/Enemy/Prefab_RammerShip.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: d17c0dc4319f2e04a965354ebf7753fd
+    m_Address: Assets/0_Core/3_Prefabs/Enemy/Prefab_Enemy_CannonShip.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: f2df0cd9f7c67dc42a1c9528157a28d1
+    m_Address: Assets/0_Core/3_Prefabs/Enemy/Prefab_Enemy_SpeedSterShip.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   m_ReadOnly: 0
   m_Settings: {fileID: 11400000, guid: 3654360dc50164e4cbdef9b2ebd21a88, type: 2}
   m_SchemaSet:

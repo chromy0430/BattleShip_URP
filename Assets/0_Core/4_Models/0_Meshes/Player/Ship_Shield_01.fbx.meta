@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 3513df8d97a436644b7104ceb8c8354e
+guid: 7fe3a402ed7ee4e479e6bc1726fb2cb4
 ModelImporter:
   serializedVersion: 24200
   internalIDToNameTable: []
@@ -7,8 +7,8 @@ ModelImporter:
   - first:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
-      name: Material
-    second: {fileID: 2100000, guid: 5b0595c660f891440856b2686cb181e9, type: 2}
+      name: Ship_Shield_01
+    second: {fileID: 2100000, guid: 0087cb7b19d07734b8bb7c050da5b973, type: 2}
   materials:
     materialImportMode: 2
     materialName: 0
@@ -84,7 +84,7 @@ ModelImporter:
     blendShapeNormalImportMode: 1
     normalSmoothingSource: 0
   referencedClips: []
-  importAnimation: 1
+  importAnimation: 0
   humanDescription:
     serializedVersion: 3
     human: []
@@ -103,7 +103,7 @@ ModelImporter:
     skeletonHasParents: 1
   lastHumanDescriptionAvatarSource: {instanceID: 0}
   autoGenerateAvatarMappingIfUnspecified: 1
-  animationType: 2
+  animationType: 0
   humanoidOversampling: 1
   avatarSetup: 0
   addHumanoidExtraRootOnlyWhenUsingAvatar: 1

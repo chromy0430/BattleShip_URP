@@ -1,18 +1,21 @@
-using StylizedWater3;
+Ôªøusing StylizedWater3;
 using Unity.Collections;
 using UnityEngine;
 
 public class PlayerFloating : MonoBehaviour, IWaterFloatTarget
 {
-    [Header("Water Floating")]
-    [SerializeField] private Vector2 surfaceSize = new Vector2(1.5f, 8f);
-    [SerializeField] private float heightOffset = 0f;
+    [Header("Î∞∞ Îç∞Ïù¥ÌÑ∞")]
+    private BaseShipData shipData;
+    
 
-    [Header("Rotation & Smoothing")]
-    [Range(0f, 8f)][SerializeField] private float rollAmount = 1.0f; // ∆ƒµµ ¡§∑ƒ ∞≠µµ
-    [SerializeField] private float smoothing = 0.15f;
+    [Header("Î∂ÄÎ†• Í¥ÄÎ†®")]
+    [SerializeField] private Vector2 surfaceSize = new Vector2(1.5f, 8f); // Î∂ÄÎ†• Î©¥Ï†Å
+    [SerializeField] private float heightOffset = 0f; // Î∂ÄÎ†• Í∏∞Ï§Ä ÎÜíÏù¥
+    [Range(0f, 8f)][SerializeField] private float rollAmount = 1.0f; // Î∂ÄÎ†• Í∞ïÎèÑ
+    [SerializeField] private float smoothing = 0.15f; // Î∂ÄÎ†• Í∞ïÎèÑ Î≥¥Í∞Ñ
 
     private Rigidbody _rb;
+    private BoxCollider _boxCollider;
     private Vector3 _currentNormal = Vector3.up;
     private Vector3 _targetNormal = Vector3.up;
     private float _currentHeight;
@@ -25,18 +28,38 @@ public class PlayerFloating : MonoBehaviour, IWaterFloatTarget
     public bool IsActive => _isActive;
     private HeightQuerySystem.Interface _heightInterface;
 
-    private void Awake() => _rb = GetComponent<Rigidbody>();
+    private void Awake()
+    {
+        _rb = GetComponent<Rigidbody>();
+        _boxCollider = GetComponent<BoxCollider>();
+    }
 
     private void Start()
     {
-        // ¡ﬂæ” ∏≈¥œ¿˙ø° ¿⁄Ω≈¿ª µÓ∑œ
+        
+        if (PlayerDataLoad.playerData != null)
+        {            
+            shipData = PlayerDataLoad.playerData.shipData;
+            surfaceSize = shipData.BaseSurfaceSize;
+            heightOffset = shipData.BaseHeightOffset;
+            rollAmount = shipData.rollAmount;
+            smoothing = shipData.smoothing;
+
+            if (_boxCollider != null)
+            {
+                _boxCollider.center = shipData.ColliderCenter;
+                _boxCollider.size = shipData.ColliderSize;
+            }
+        }
+
+        // Ï§ëÏïô Îß§ÎãàÏ†ÄÏóê ÏûêÏã†ÏùÑ Îì±Î°ù
         if (WaterBatchManager.Instance != null)
         {
             WaterBatchManager.Instance.Register(this);
         }
         else
         {
-            Debug.LogError("WaterBatchManager∞° æ¿ø° ¡∏¿Á«œ¡ˆ æ Ω¿¥œ¥Ÿ!");
+            Debug.LogError("WaterBatchManagerÍ∞Ä Ïî¨Ïóê Ï°¥Ïû¨ÌïòÏßÄ ÏïäÏäµÎãàÎã§!");
         }
 
         _currentHeight = transform.position.y;
@@ -50,7 +73,7 @@ public class PlayerFloating : MonoBehaviour, IWaterFloatTarget
     private void OnDisable()
     {
         _isActive = false;
-        // ∫Ò»∞º∫»≠ Ω√ ∏≈¥œ¿˙ ∏Ò∑œø°º≠ ¡¶∞≈«œø© ø¨ªÍ ≥∂∫Ò πÊ¡ˆ
+        // ÎπÑÌôúÏÑ±Ìôî Ïãú Îß§ÎãàÏ†Ä Î™©Î°ùÏóêÏÑú Ï†úÍ±∞ÌïòÏó¨ Ïó∞ÏÇ∞ ÎÇ≠ÎπÑ Î∞©ÏßÄ
         if (WaterBatchManager.Instance != null)
         {
             WaterBatchManager.Instance.Unregister(this);
@@ -84,7 +107,7 @@ public class PlayerFloating : MonoBehaviour, IWaterFloatTarget
     {
         if (!_isActive) return;
 
-        // ∫ŒµÂ∑ØøÓ ∫∏∞£ (Smoothing) ¿˚øÎ
+        // Î∂ÄÎìúÎü¨Ïö¥ Î≥¥Í∞Ñ (Smoothing) Ï†ÅÏö©
         if (smoothing > 0)
         {
             _currentHeight = Mathf.Lerp(_currentHeight, _targetHeight, Time.fixedDeltaTime / smoothing);
@@ -100,7 +123,7 @@ public class PlayerFloating : MonoBehaviour, IWaterFloatTarget
         nextPos.y = _currentHeight;
 
         Vector3 flatNormal = Vector3.ProjectOnPlane(_targetNormal, transform.right);
-        // »∏¿¸∞™ ªÍ√‚
+        // ÌöåÏ†ÑÍ∞í ÏÇ∞Ï∂ú
         Quaternion waveRotation = Quaternion.FromToRotation(Vector3.up, flatNormal);
 
         Vector3 finalEuler = new Vector3(waveRotation.eulerAngles.x, transform.eulerAngles.y, 0f);
@@ -116,7 +139,7 @@ public class PlayerFloating : MonoBehaviour, IWaterFloatTarget
             _rb.MovePosition(nextPos);
         }
 
-        // π∞∏Æ¿˚ ¿˚øÎ (MovePosition/Rotation)
+        // Î¨ºÎ¶¨Ï†Å Ï†ÅÏö© (MovePosition/Rotation)
         //Vector3 nextPos = _rb.position;
         //nextPos.y = _currentHeight;
 

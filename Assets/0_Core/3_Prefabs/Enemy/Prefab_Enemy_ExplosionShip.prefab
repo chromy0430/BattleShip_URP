@@ -46,7 +46,7 @@ MeshFilter:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6727300055146699501}
-  m_Mesh: {fileID: -1550514412580984892, guid: 9cde2cc9b45ba7544b9bab75ab8b90b0, type: 3}
+  m_Mesh: {fileID: -767925920274333907, guid: bc61391dd98c70e41ac15fd4f3fa3332, type: 3}
 --- !u!23 &8026389322704218095
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -115,8 +115,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 0.8, y: 0.8, z: 0.8}
-  m_Center: {x: 0, y: 0, z: 0}
+  m_Size: {x: 4, y: 3, z: 9.2}
+  m_Center: {x: 0, y: 1.5, z: 0.5}
 --- !u!54 &3954217609335754843
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -453,8 +453,8 @@ MonoBehaviour:
   moveSpeed: 11
   turnSpeed: 5
   stopDistance: 2
-  surfaceSize: 1
-  heightOffset: -1.5
+  surfaceSize: 2
+  heightOffset: -1.1
   cachedTransform: {fileID: 0}
   rb: {fileID: 0}
   status: {fileID: 0}
@@ -474,7 +474,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2595698028741008750, guid: f769116666165df4489d195d20b7c753, type: 3}
       propertyPath: heightScale
-      value: 0.15
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2595698028741008750, guid: f769116666165df4489d195d20b7c753, type: 3}
+      propertyPath: scaleNormalByHeight
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2595698028741008750, guid: f769116666165df4489d195d20b7c753, type: 3}
+      propertyPath: scaleHeightByTransform
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5241866392727583673, guid: f769116666165df4489d195d20b7c753, type: 3}
       propertyPath: m_LocalPosition.x
@@ -518,7 +526,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5373185277775375218, guid: f769116666165df4489d195d20b7c753, type: 3}
       propertyPath: spawnRatePerUnit
-      value: 2
+      value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 7238373187286716619, guid: f769116666165df4489d195d20b7c753, type: 3}
       propertyPath: spawnRatePerUnit

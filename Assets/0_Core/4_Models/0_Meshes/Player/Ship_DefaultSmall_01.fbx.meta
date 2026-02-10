@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 8f8ebc7e6b568a44a985ee9116d691f3
+guid: c4ea93c88aff38845ab4fae1d698b725
 ModelImporter:
   serializedVersion: 24200
   internalIDToNameTable: []
@@ -7,8 +7,8 @@ ModelImporter:
   - first:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
-      name: ship_sail_01
-    second: {fileID: 2100000, guid: 970ee264b09150944b6008d29e679ece, type: 2}
+      name: Ship_DefaultSmall_01
+    second: {fileID: 2100000, guid: 5b0e93813fef89f4485e7d1ae604238b, type: 2}
   materials:
     materialImportMode: 2
     materialName: 0
@@ -84,7 +84,7 @@ ModelImporter:
     blendShapeNormalImportMode: 1
     normalSmoothingSource: 0
   referencedClips: []
-  importAnimation: 1
+  importAnimation: 0
   humanDescription:
     serializedVersion: 3
     human: []
@@ -103,7 +103,7 @@ ModelImporter:
     skeletonHasParents: 1
   lastHumanDescriptionAvatarSource: {instanceID: 0}
   autoGenerateAvatarMappingIfUnspecified: 1
-  animationType: 2
+  animationType: 0
   humanoidOversampling: 1
   avatarSetup: 0
   addHumanoidExtraRootOnlyWhenUsingAvatar: 1

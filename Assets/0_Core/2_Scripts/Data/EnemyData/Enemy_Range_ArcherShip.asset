@@ -1,0 +1,42 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d654fca31a0277741a51c091f52e0280, type: 3}
+  m_Name: Enemy_Range_ArcherShip
+  m_EditorClassIdentifier: BattleShip.Data::EnemyData
+  EnemyID: Enemy_ArcherShip
+  EnemyName: ArcherShip
+  Description: "\uD654\uC0B4\uC744 \uBE60\uB974\uAC8C \uC5F0\uC0AC\uD558\uBA70 \uD50C\uB808\uC774\uC5B4
+    \uAF2C\uB9AC\uB97C \uB178\uB9B0\uB2E4."
+  MoveSpeed: 11
+  TurnSpeed: 10
+  SizeRadius: 1
+  Damage: 10
+  DEF: 5
+  MaxHP: 250
+  Level: 1
+  HPRecovery: 1
+  ExpReward: 100
+  ModelPrefab:
+    m_AssetGUID: 8e65f59bdc560cd4f825cc73c9c037d3
+    m_SubObjectName: 
+    m_SubObjectType: 
+    m_SubObjectGUID: 
+    m_EditorAssetChanged: 0
+  DeathAnim:
+    m_AssetGUID: 
+    m_SubObjectName: 
+    m_SubObjectType: 
+    m_SubObjectGUID: 
+    m_EditorAssetChanged: 0
+  AttackType: 1
+  SizeType: 0
+  MinimapIcon: {fileID: 21300000, guid: bdd4826af18e9834cb6387092a10aa36, type: 3}

@@ -30,7 +30,7 @@ public class Enemy : MonoBehaviour, IEnemy
         _enemyData = data;
 
         maxHealth = data.MaxHP;
-        _Shield = data.Shield;
+        _Shield = data.DEF;
 
         CurrentHealth = maxHealth;
 

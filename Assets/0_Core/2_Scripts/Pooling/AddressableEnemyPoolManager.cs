@@ -1,9 +1,9 @@
-using UnityEngine;
+ï»¿using UnityEngine;
 using UnityEngine.AddressableAssets;
 using UnityEngine.ResourceManagement.AsyncOperations;
 using UnityEngine.Pool;
 using System.Collections.Generic;
-using Cysharp.Threading.Tasks; // UniTask È°¿ë ±ÇÀå
+using Cysharp.Threading.Tasks; // UniTask í™œìš© ê¶Œì¥
 
 public class AddressableEnemyPoolManager : MonoBehaviour
 {
@@ -13,16 +13,16 @@ public class AddressableEnemyPoolManager : MonoBehaviour
     public struct SpawnWeightInfo
     {
         public EnemyData data;
-        public int weight; // °¡ÁßÄ¡ (³ôÀ»¼ö·Ï ÀÚÁÖ ³ª¿È)
+        public int weight; // ê°€ì¤‘ì¹˜ (ë†’ì„ìˆ˜ë¡ ìì£¼ ë‚˜ì˜´)
     }
 
     [Header("Spawn Configuration")]
     public List<SpawnWeightInfo> stageEnemies = new List<SpawnWeightInfo>();
 
-    // ·±Å¸ÀÓ Ç® ÀúÀå¼Ò: Key´Â EnemyData (¶Ç´Â ID)
+    // ëŸ°íƒ€ì„ í’€ ì €ì¥ì†Œ: KeyëŠ” EnemyData (ë˜ëŠ” ID)
     private Dictionary<EnemyData, IObjectPool<GameObject>> _pools = new Dictionary<EnemyData, IObjectPool<GameObject>>();
 
-    // ·ÎµåµÈ ÇÁ¸®ÆÕ Ä³½Ì (¸Ş¸ğ¸® ÇØÁ¦¸¦ À§ÇØ µé°í ÀÖÀ½)
+    // ë¡œë“œëœ í”„ë¦¬íŒ¹ ìºì‹± (ë©”ëª¨ë¦¬ í•´ì œë¥¼ ìœ„í•´ ë“¤ê³  ìˆìŒ)
     private Dictionary<EnemyData, GameObject> _loadedPrefabs = new Dictionary<EnemyData, GameObject>();
 
     private void Awake()
@@ -33,12 +33,12 @@ public class AddressableEnemyPoolManager : MonoBehaviour
 
     private void Start()
     {
-        // °ÔÀÓ ½ÃÀÛ ½Ã ¸®½ºÆ®¿¡ ÀÖ´Â ÀûµéÀ» ¹Ì¸® ·ÎµåÇÕ´Ï´Ù.
+        // ê²Œì„ ì‹œì‘ ì‹œ ë¦¬ìŠ¤íŠ¸ì— ìˆëŠ” ì ë“¤ì„ ë¯¸ë¦¬ ë¡œë“œí•©ë‹ˆë‹¤.
         PreloadEnemyAssets().Forget();
     }
 
     /// <summary>
-    /// ½ºÅ×ÀÌÁö¿¡ µîÀåÇÒ ÀûµéÀÇ ¿¡¼ÂÀ» ¹Ì¸® ´Ù¿î·Îµå/·ÎµåÇÏ°í Ç®À» »ı¼ºÇÕ´Ï´Ù.
+    /// ìŠ¤í…Œì´ì§€ì— ë“±ì¥í•  ì ë“¤ì˜ ì—ì…‹ì„ ë¯¸ë¦¬ ë‹¤ìš´ë¡œë“œ/ë¡œë“œí•˜ê³  í’€ì„ ìƒì„±í•©ë‹ˆë‹¤.
     /// </summary>
     private async UniTaskVoid PreloadEnemyAssets()
     {
@@ -46,7 +46,7 @@ public class AddressableEnemyPoolManager : MonoBehaviour
         {
             if (info.data == null || _pools.ContainsKey(info.data)) continue;
 
-            // 1. Addressables·Î ÇÁ¸®ÆÕ ·Îµå (ºñµ¿±â)
+            // 1. Addressablesë¡œ í”„ë¦¬íŒ¹ ë¡œë“œ (ë¹„ë™ê¸°)
             var handle = info.data.ModelPrefab.LoadAssetAsync<GameObject>();
             await handle.Task;
 
@@ -55,7 +55,7 @@ public class AddressableEnemyPoolManager : MonoBehaviour
                 GameObject loadedPrefab = handle.Result;
                 _loadedPrefabs[info.data] = loadedPrefab;
 
-                // 2. ObjectPool »ı¼º
+                // 2. ObjectPool ìƒì„±
                 var pool = new ObjectPool<GameObject>(
                     createFunc: () => CreateEnemy(loadedPrefab, info.data),
                     //actionOnGet: (obj) => obj.SetActive(true),
@@ -70,26 +70,26 @@ public class AddressableEnemyPoolManager : MonoBehaviour
             }
             else
             {
-                Debug.LogError($"Failed to load enemy: {info.data.EnemyName}");
+                Debug.LogError($"ì  ë°ì´í„° ë¡œë“œ ì‹¤íŒ¨ : {info.data.EnemyName}");
             }
         }
 
-        Debug.Log("All Enemy Assets Loaded & Pools Created.");
+        Debug.Log("ë°ì´í„° ë¡œë“œ ì„±ê³µ.");
     }
 
     private GameObject CreateEnemy(GameObject prefab, EnemyData data)
     {
         GameObject obj = Instantiate(prefab, transform);
-        // Àû ÃÊ±âÈ­ (µ¥ÀÌÅÍ ÁÖÀÔ)
+        // ì  ì´ˆê¸°í™” (ë°ì´í„° ì£¼ì…)
         if (obj.TryGetComponent<Enemy>(out var enemy))
         {
-            enemy.Initialize(data); // Enemy ½ºÅ©¸³Æ®¿¡ ÀÌ ÇÔ¼ö¸¦ Ãß°¡ÇØ¾ß ÇÔ
+            enemy.Initialize(data); // Enemy ìŠ¤í¬ë¦½íŠ¸ì— ì´ í•¨ìˆ˜ë¥¼ ì¶”ê°€í•´ì•¼ í•¨
         }
         return obj;
     }
 
     /// <summary>
-    /// ¿ÜºÎ(SpawnSystem)¿¡¼­ ÀûÀ» ¿äÃ»ÇÒ ¶§ »ç¿ë
+    /// ì™¸ë¶€(SpawnSystem)ì—ì„œ ì ì„ ìš”ì²­í•  ë•Œ ì‚¬ìš©
     /// </summary>
     public GameObject GetEnemy(EnemyData data, Vector3 position, Quaternion rotation)
     {
@@ -108,7 +108,7 @@ public class AddressableEnemyPoolManager : MonoBehaviour
     }
 
     /// <summary>
-    /// ÀûÀ» Ç®·Î ¹İÈ¯
+    /// ì ì„ í’€ë¡œ ë°˜í™˜
     /// </summary>
     public void ReturnEnemy(GameObject obj, EnemyData data)
     {
@@ -118,16 +118,16 @@ public class AddressableEnemyPoolManager : MonoBehaviour
         }
         else
         {
-            Destroy(obj); // Ç®¿¡ ¾øÀ¸¸é ÆÄ±«
+            Destroy(obj); // í’€ì— ì—†ìœ¼ë©´ íŒŒê´´
         }
     }
 
-    // ¾À ÀüÈ¯ ½Ã ¸Ş¸ğ¸® Á¤¸®
+    // ì”¬ ì „í™˜ ì‹œ ë©”ëª¨ë¦¬ ì •ë¦¬
     private void OnDestroy()
     {
         foreach (var kvp in _loadedPrefabs)
         {
-            // Addressables ¸Ş¸ğ¸® ÇØÁ¦
+            // Addressables ë©”ëª¨ë¦¬ í•´ì œ
             if (kvp.Key.ModelPrefab.IsValid())
             {
                 kvp.Key.ModelPrefab.ReleaseAsset();

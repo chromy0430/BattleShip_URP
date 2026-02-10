@@ -31,6 +31,11 @@ public class InitManager : MonoBehaviour
     }
     #endregion
 
+    private void OnEnable()
+    {
+        weaponUIManager.RefreshAllSlots();
+    }
+
     private void Start()
     {
         #region 초기화 풀링

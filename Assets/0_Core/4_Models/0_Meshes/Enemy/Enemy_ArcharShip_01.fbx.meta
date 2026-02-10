@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 9cde2cc9b45ba7544b9bab75ab8b90b0
+guid: 66cd2e8c7cbbd0e409705316571617fb
 ModelImporter:
   serializedVersion: 24200
   internalIDToNameTable: []
@@ -8,7 +8,7 @@ ModelImporter:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
       name: Enemy
-    second: {fileID: 2100000, guid: 982146450a7272c4ebdbc393cd68b229, type: 2}
+    second: {fileID: 2100000, guid: 25b52c76cd5fa7a4187e62b4e78de559, type: 2}
   materials:
     materialImportMode: 2
     materialName: 0
@@ -84,7 +84,7 @@ ModelImporter:
     blendShapeNormalImportMode: 1
     normalSmoothingSource: 0
   referencedClips: []
-  importAnimation: 0
+  importAnimation: 1
   humanDescription:
     serializedVersion: 3
     human: []
@@ -103,7 +103,7 @@ ModelImporter:
     skeletonHasParents: 1
   lastHumanDescriptionAvatarSource: {instanceID: 0}
   autoGenerateAvatarMappingIfUnspecified: 1
-  animationType: 0
+  animationType: 2
   humanoidOversampling: 1
   avatarSetup: 0
   addHumanoidExtraRootOnlyWhenUsingAvatar: 1
