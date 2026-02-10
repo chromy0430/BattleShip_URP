@@ -33,8 +33,8 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 99, y: 0, z: 99}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
+  m_LocalScale: {x: 0.6, y: 0.6, z: 0.6}
+  m_ConstrainProportionsScale: 1
   m_Children:
   - {fileID: 1696217328252644001}
   m_Father: {fileID: 0}
@@ -103,7 +103,7 @@ BoxCollider:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6727300055146699501}
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 13400000, guid: f215f829c4a4d06488164ea53b81a462, type: 2}
   m_IncludeLayers:
     serializedVersion: 2
     m_Bits: 0
@@ -126,8 +126,8 @@ Rigidbody:
   m_GameObject: {fileID: 6727300055146699501}
   serializedVersion: 5
   m_Mass: 1
-  m_LinearDamping: 0
-  m_AngularDamping: 0.5
+  m_LinearDamping: 1
+  m_AngularDamping: 1
   m_CenterOfMass: {x: 0, y: 0, z: 0}
   m_InertiaTensor: {x: 1, y: 1, z: 1}
   m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
@@ -140,7 +140,7 @@ Rigidbody:
   m_ImplicitCom: 1
   m_ImplicitTensor: 1
   m_UseGravity: 0
-  m_IsKinematic: 0
+  m_IsKinematic: 1
   m_Interpolate: 0
   m_Constraints: 80
   m_CollisionDetection: 0
@@ -453,9 +453,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::EnemyChaser
   moveSpeed: 11
   turnSpeed: 5
-  stopDistance: 2
+  stopDistance: 5
   surfaceSize: 2
-  heightOffset: -1.1
+  heightOffset: -0.6
   cachedTransform: {fileID: 0}
   rb: {fileID: 0}
   status: {fileID: 0}
@@ -469,6 +469,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 5361482556793331198}
     m_Modifications:
+    - target: {fileID: 3299562207912838905, guid: 1d697ae8508b6bc43a5970fb39f51784, type: 3}
+      propertyPath: m_Layer
+      value: 6
+      objectReference: {fileID: 0}
     - target: {fileID: 3299562207912838911, guid: 1d697ae8508b6bc43a5970fb39f51784, type: 3}
       propertyPath: m_LocalPosition.y
       value: 0
@@ -480,6 +484,10 @@ PrefabInstance:
     - target: {fileID: 5511481773808677448, guid: 1d697ae8508b6bc43a5970fb39f51784, type: 3}
       propertyPath: m_Name
       value: Boat Wake (Trail based)
+      objectReference: {fileID: 0}
+    - target: {fileID: 5511481773808677448, guid: 1d697ae8508b6bc43a5970fb39f51784, type: 3}
+      propertyPath: m_Layer
+      value: 6
       objectReference: {fileID: 0}
     - target: {fileID: 5511481773808677454, guid: 1d697ae8508b6bc43a5970fb39f51784, type: 3}
       propertyPath: m_LocalPosition.x

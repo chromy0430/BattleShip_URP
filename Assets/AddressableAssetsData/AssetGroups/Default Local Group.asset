@@ -31,7 +31,7 @@ MonoBehaviour:
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: b43e8125a10879541933638a80478870
-    m_Address: Assets/0_Core/3_Prefabs/Enemy/Prefab_RammerShip.prefab
+    m_Address: Assets/0_Core/3_Prefabs/Enemy/Prefab_Enemy_RammerShip.prefab
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0

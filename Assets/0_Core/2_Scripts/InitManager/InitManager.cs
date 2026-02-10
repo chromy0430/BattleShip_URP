@@ -39,6 +39,26 @@ public class InitManager : MonoBehaviour
     private void Start()
     {
         #region 초기화 풀링
+        InitializePooling();
+
+        if (upgradeManager != null)
+        {
+            // 약간의 딜레이를 주어 다른 시스템(UI 등)이 모두 준비된 후 띄우는 것이 안전함
+            ShowSelectionDelayed().Forget();
+        }
+        else
+        {
+            Debug.Log("업그레이드 매니저 없음");
+        }
+
+            #endregion
+            #region UI 초기화
+            weaponUIManager.RefreshAllSlots();
+        #endregion
+    }
+
+    private void InitializePooling()
+    {
         if (ObjectPoolManager.Instance != null)
         {
             foreach (var data in allWeaponDatas)
@@ -46,28 +66,17 @@ public class InitManager : MonoBehaviour
                 ObjectPoolManager.Instance.CreatePool(data.ProjectilePrefab, 500);
                 ObjectPoolManager.Instance.CreatePool(data.ShotEffect, 500);
             }
-
-            /*foreach (var enemy in allEnemyPrefabs)
-            {
-                ObjectPoolManager.Instance.CreatePool(enemy, 1000);
-            }*/
-
-            // 데미지 폰트 풀링
             ObjectPoolManager.Instance.CreatePool(DamageFont, 2000);
-
-            // 드랍템 풀링
             if (enemyManager != null)
-                        ObjectPoolManager.Instance.CreatePool(enemyManager.m_EnemyDropPrefab, 1000);
+                ObjectPoolManager.Instance.CreatePool(enemyManager.m_EnemyDropPrefab, 1000);
         }
-        else
-        {
-            Debug.Log("ObjectPoolManager 없음");
-        }
-        #endregion
-        #region UI 초기화
-        weaponUIManager.RefreshAllSlots();
-        #endregion
     }
 
+    private async UniTaskVoid ShowSelectionDelayed()
+    {
+        // 0.1초 정도 대기 (Start 로직들이 꼬이지 않게 안전장치)
+        await UniTask.Delay(100);
 
+        upgradeManager.ShowStartingWeaponSelection();
+    }
 }

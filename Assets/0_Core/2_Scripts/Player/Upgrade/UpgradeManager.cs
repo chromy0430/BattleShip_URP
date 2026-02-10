@@ -9,8 +9,11 @@ using ZLinq;
 public class UpgradeManager : MonoBehaviour
 {
     public static UpgradeManager Instance { get; private set; }
-    public event Action onChangedWeaponStat;    
-         
+    public event Action onChangedWeaponStat;
+
+    [Header("시작 무기")]
+    public List<BaseWeaponData> startingWeaponPool;
+
     [Header("레벨업 UI")]
     [SerializeField] private Transform cardParent;      
     [SerializeField] private GameObject levelUpCardPrefab;     
@@ -70,18 +73,60 @@ public class UpgradeManager : MonoBehaviour
 
         RefreshWeaponList();
     }
-
-    public void RefreshWeaponList()
-    {
-        // 씬 내의 활성화된 모든 WeaponMount를 찾아서 리스트에 등록
-        _activeWeaponMounts = FindObjectsByType<WeaponMount>(FindObjectsSortMode.None).AsValueEnumerable().ToList();
-    }
-
+    
     private void OnDisable()
     {
         if (PlayerExpManager.Instance != null)
             PlayerExpManager.Instance.OnLevelUp -= HandleLevelUp;
     }
+
+    #region 시작 시 무기 선택
+
+    public void ShowStartingWeaponSelection()
+    {
+        _isProcessing = false;
+
+        // UI 초기화
+        if (inputBlockerPanel != null) inputBlockerPanel.SetActive(false);
+        if (lootBoxPanel != null) lootBoxPanel.SetActive(false);
+        foreach (Transform child in cardParent) Destroy(child.gameObject);
+
+        // 랜덤 3개 뽑기 (중복 없이)
+        List<BaseWeaponData> randomPicks = GetRandomStartingWeapons(canChoice); // 보통 3개
+
+        // 카드 생성
+        foreach (var weaponData in randomPicks)
+        {
+            GameObject go = Instantiate(levelUpCardPrefab, cardParent);
+            UpgradeCardUI cardUI = go.GetComponent<UpgradeCardUI>();
+
+            // 선택 시 실행할 콜백 함수 연결 -> ApplyStartingWeapon
+            cardUI.Setup(weaponData, ApplyStartingWeapon, "New Start!");
+        }
+
+        // UI 띄우기 및 시간 정지
+        cardParent.gameObject.SetActive(true);
+        Time.timeScale = 0;
+    }
+
+    // 시작 무기 선택 시 실행됨
+    private void ApplyStartingWeapon(BaseItemData itemData)
+    {
+        if (_isProcessing) return;
+        _isProcessing = true;
+        if (inputBlockerPanel != null) inputBlockerPanel.SetActive(true);
+
+        Debug.Log($"[Start] 시작 무기 선택 완료: {itemData.Name}");
+
+        if (PlayerItemManager.Instance != null)
+        {
+            // 선택한 무기 1개만 즉시 획득
+            PlayerItemManager.Instance.ObtainItemImmediate(itemData);
+        }
+
+        CloseAllUI(); // UI 닫고 게임 시작(TimeScale = 1)
+    }
+    #endregion
 
     #region 레벨업 시스템
     private void HandleLevelUp(int newLevel)
@@ -444,6 +489,12 @@ public class UpgradeManager : MonoBehaviour
     #endregion
 
     #region 헬퍼 함수
+    public void RefreshWeaponList()
+    {
+        // 씬 내의 활성화된 모든 WeaponMount를 찾아서 리스트에 등록
+        _activeWeaponMounts = FindObjectsByType<WeaponMount>(FindObjectsSortMode.None).AsValueEnumerable().ToList();
+    }
+
     private void CloseAllUI()
     {
         if (cardParent != null)
@@ -483,6 +534,24 @@ public class UpgradeManager : MonoBehaviour
             pool.RemoveAt(randomIndex); // 중복 방지
         }
 
+        return results;
+    }
+
+    // 시작 무기 풀에서 랜덤 n개 뽑기
+    private List<BaseWeaponData> GetRandomStartingWeapons(int count)
+    {
+        List<BaseWeaponData> pool = new List<BaseWeaponData>(startingWeaponPool);
+        List<BaseWeaponData> results = new List<BaseWeaponData>();
+
+        if (pool.Count == 0) return results;
+
+        count = Mathf.Min(count, pool.Count);
+        for (int i = 0; i < count; i++)
+        {
+            int idx = UnityEngine.Random.Range(0, pool.Count);
+            results.Add(pool[idx]);
+            pool.RemoveAt(idx);
+        }
         return results;
     }
     #endregion

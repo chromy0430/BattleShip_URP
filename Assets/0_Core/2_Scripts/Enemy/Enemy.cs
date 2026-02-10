@@ -49,7 +49,7 @@ public class Enemy : MonoBehaviour, IEnemy
             RadarSystem.Instance.AddTarget(gameObject, _enemyData.MinimapIcon);
         }
 
-        transform.localScale = new Vector3(1, 1, 1) * (data.SizeType == EnemySizeType.Large ? 2f : 1);
+        transform.localScale = transform.localScale * (data.SizeType == EnemySizeType.Large ? 2f : 1);
     }
 
     private void Awake()
