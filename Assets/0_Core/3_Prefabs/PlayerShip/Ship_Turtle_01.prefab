@@ -10,15 +10,15 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: -8679921383154817045, guid: 18e3352f677796142b734b7e628038e3, type: 3}
       propertyPath: m_LocalScale.x
-      value: 0.8
+      value: 0.7
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 18e3352f677796142b734b7e628038e3, type: 3}
       propertyPath: m_LocalScale.y
-      value: 0.8
+      value: 0.7
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 18e3352f677796142b734b7e628038e3, type: 3}
       propertyPath: m_LocalScale.z
-      value: 0.8
+      value: 0.7
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 18e3352f677796142b734b7e628038e3, type: 3}
       propertyPath: m_LocalPosition.x
@@ -72,6 +72,10 @@ PrefabInstance:
       propertyPath: 'm_Materials.Array.data[0]'
       value: 
       objectReference: {fileID: 2100000, guid: e2931dc0fd9ac4842b3f906fc9caf4b9, type: 2}
+    - target: {fileID: -5754084199372789682, guid: 18e3352f677796142b734b7e628038e3, type: 3}
+      propertyPath: m_Mesh
+      value: 
+      objectReference: {fileID: 3873147181637557630, guid: ae66d170fec805d4f9010a850d1f6622, type: 3}
     - target: {fileID: 919132149155446097, guid: 18e3352f677796142b734b7e628038e3, type: 3}
       propertyPath: m_Name
       value: Ship_Turtle_01

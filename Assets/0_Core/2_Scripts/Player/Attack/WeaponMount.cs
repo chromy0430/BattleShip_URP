@@ -37,7 +37,6 @@ public class WeaponMount : MonoBehaviour
             if (_runtimeStat == null)
             {
                 _runtimeStat = new WeaponStat(_weaponData);
-                Debug.Log("무기 스탯 생성");
             }
 
             

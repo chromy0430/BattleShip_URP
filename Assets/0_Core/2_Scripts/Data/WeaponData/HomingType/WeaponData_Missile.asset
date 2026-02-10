@@ -22,7 +22,7 @@ MonoBehaviour:
   MaxLevel: 15
   weaponType: 2
   weaponAttribute: 0
-  Damage: 310
+  Damage: 200
   Range: 50
   EnemyCount: 1
   PierceCount: 0

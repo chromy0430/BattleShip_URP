@@ -16,9 +16,7 @@ Material:
   - _ENVIRONMENTREFLECTIONS_OFF
   - _INTERSECTION_FOAM
   - _NORMALMAP
-  - _RECEIVE_SHADOWS_OFF
   - _SURFACE_FOAM_SINGLE
-  - _UNLIT
   - _WAVES
   m_InvalidKeywords:
   - ADVANCED_LIGHTING
@@ -28,7 +26,6 @@ Material:
   - _FOAM
   - _FOAMON_ON
   - _RECEIVEDYNAMICEFFECTSFOAM_ON
-  - _RECEIVEDYNAMICEFFECTSHEIGHT_ON
   - _RECEIVEDYNAMICEFFECTSNORMAL_ON
   - _RECEIVEDYNAMICEFFECTS_ON
   - _SHARP_INERSECTION
@@ -225,7 +222,7 @@ Material:
     - _IntersectionTiling: 0.16999984
     - _IntersectionWaveDist: 33.28
     - _LightingMode: 0
-    - _LightingOn: 0
+    - _LightingOn: 1
     - _Metallic: 0
     - _Metallicness: 0.1
     - _NORMALMAPOn: 1
@@ -246,9 +243,9 @@ Material:
     - _PointSpotLightReflectionStrength: 10
     - _QueueOffset: 0
     - _ReceiveDynamicEffectsFoam: 2
-    - _ReceiveDynamicEffectsHeight: 1
+    - _ReceiveDynamicEffectsHeight: 0
     - _ReceiveDynamicEffectsNormal: 1
-    - _ReceiveShadows: 0
+    - _ReceiveShadows: 1
     - _ReflectionBlur: 0
     - _ReflectionDistortion: 0.086
     - _ReflectionFresnel: 5
@@ -279,8 +276,8 @@ Material:
     - _SlopeThreshold: 0.25
     - _Smoothness: 0.5
     - _SmoothnessTextureChannel: 0
-    - _SparkleIntensity: 1
-    - _SparkleSize: 0.6
+    - _SparkleIntensity: 0
+    - _SparkleSize: 0
     - _SpecularHighlights: 1
     - _SpecularReflectionsOn: 1
     - _Speed: 1

@@ -1,4 +1,4 @@
-using MoreMountains.Feedbacks;
+﻿using MoreMountains.Feedbacks;
 using System.Runtime.CompilerServices;
 using UnityEngine;
 
@@ -30,9 +30,7 @@ public class PlayerModelVisualization : MonoBehaviour
     }
 
     private void DamageFeedback()
-    {
-        if (modelFeedback == null) return;
-
-        modelFeedback.PlayFeedbacks();
+    {       
+        modelFeedback?.PlayFeedbacks();
     }
 }

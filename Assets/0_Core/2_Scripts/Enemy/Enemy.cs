@@ -20,7 +20,11 @@ public class Enemy : MonoBehaviour, IEnemy
     public MMF_Player flickerFeedback;
 
     [SerializeField] private Rigidbody _rb;
-    public GameObject DamageObject; // 데미지 폰트
+    public GameObject damageObject; // 데미지 폰트
+
+    public GameObject wakeTrailObject;
+    private TrailRenderer _wakeTrail;
+
     private bool _isKnockbacked = false; // 넉백 상태
     public bool IsKnockbacked => _isKnockbacked;
     public bool canAttack;
@@ -54,12 +58,21 @@ public class Enemy : MonoBehaviour, IEnemy
         //_isAlive = false;
         flickerFeedback = GetComponent<MMF_Player>();
         _rb = GetComponent<Rigidbody>();
+
+        if (wakeTrailObject != null)
+        {
+            _wakeTrail = wakeTrailObject.GetComponentInChildren<TrailRenderer>();            
+        }
     }
 
     private void OnEnable()
     {
         CurrentHealth = maxHealth;
         _isAlive = true;
+
+        if (wakeTrailObject != null) wakeTrailObject.SetActive(true);
+        ResetTrailRoutine().Forget();
+
 
         if (EnemyManager.Instance != null)
         {
@@ -84,6 +97,12 @@ public class Enemy : MonoBehaviour, IEnemy
         if (RadarSystem.Instance != null)
         {
             RadarSystem.Instance.RemoveTarget(this.gameObject);
+        }
+
+        if (_wakeTrail != null)
+        {
+            _wakeTrail.Clear();
+            _wakeTrail.enabled = false;
         }
     }
 
@@ -111,7 +130,7 @@ public class Enemy : MonoBehaviour, IEnemy
 
         flickerFeedback?.PlayFeedbacks();
 
-        var damageFont = ObjectPoolManager.Instance.Get(DamageObject);
+        var damageFont = ObjectPoolManager.Instance.Get(damageObject);
         damageFont.GetComponent<DamageTMP>().Initialize
             (
                 Base_Canvas.Instance.transform,
@@ -139,6 +158,8 @@ public class Enemy : MonoBehaviour, IEnemy
     {
         _isAlive = false;
 
+        if (wakeTrailObject != null) wakeTrailObject.SetActive(false);
+
         if (_rb != null)
         {
             _rb.interpolation = RigidbodyInterpolation.None;
@@ -157,10 +178,10 @@ public class Enemy : MonoBehaviour, IEnemy
         {
             AddressableEnemyPoolManager.Instance.ReturnEnemy(this.gameObject, _enemyData);
         }
-        else
+        /*else
         {
             ObjectPoolManager.Instance.Return(this.gameObject);
-        }
+        }*/
 
         //ObjectPoolManager.Instance.Return(this.gameObject);
     }
@@ -201,5 +222,24 @@ public class Enemy : MonoBehaviour, IEnemy
         // UniTask.Delay는 비동기적으로 작동하며, 해당 시간만큼 대기합니다.
         await UniTask.Delay(TimeSpan.FromSeconds(delay));
         canAttack = true;
+    }
+
+    private async UniTaskVoid ResetTrailRoutine()
+    {
+        if (_wakeTrail == null) return;
+
+        // 일단 끄고 초기화
+        _wakeTrail.enabled = false;
+        _wakeTrail.Clear();
+
+        // 위치 이동이 완전히 끝날 때까지 1프레임 대기 (EndOfFrame)
+        await UniTask.WaitForEndOfFrame(this);
+
+        // 다시 초기화 후 활성화
+        if (_isAlive) // 살아있는지 체크 (대기 중에 죽었을 수도 있음)
+        {
+            _wakeTrail.Clear(); // 켜기 직전에 한 번 더 지움 (확실하게)
+            _wakeTrail.enabled = true;
+        }
     }
 }

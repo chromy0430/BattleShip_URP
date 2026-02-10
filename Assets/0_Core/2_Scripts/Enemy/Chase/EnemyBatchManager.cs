@@ -10,24 +10,25 @@ public class EnemyBatchManager : MonoBehaviour
     
     [SerializeField] private Transform _playerTransform;
 
-    [Header("Water System Settings")]
+    [Header("부력 시스템 관련")]
     [SerializeField] private HeightQuerySystem.Interface heightInterface;
     [SerializeField] private WaveProfile waveProfile;
-    //private HeightQuerySystem.Sampler _sampler;
-
     private HeightQuerySystem.Sampler _samplerHigh; // 고품질용 (4개)
     private HeightQuerySystem.Sampler _samplerLow;
+    //private HeightQuerySystem.Sampler _sampler;
 
-    [Header("Optimization Settings")]
+    [Header("최적화 관련")]
     [SerializeField] private float highQualityDistSqr = 30f * 30f; // 30m 이내는 고품질
     private const float UPDATE_DISTANCE_THRESHOLD = 10.0f;
     private float _updateDistanceSqr;
     private Vector3 _lastQueryPosition;
 
-    [Header("Buoyancy Update")]
+    [Header("부력 관련")]
     [SerializeField] private int buoyancyFrameInterval = 4;
-    [SerializeField] private bool shouldUpdateBuoyancy = false;
-    [SerializeField] private float buoyancyStrength = 10;
+    [SerializeField] private float buoyancyStrength = 3.0f;
+    [SerializeField] private float waterDrag = 2.0f;
+    [SerializeField] private float waveAlignmentStrength = 0.5f;
+
     private void Awake()
     {
         Instance = this;
@@ -47,7 +48,6 @@ public class EnemyBatchManager : MonoBehaviour
 
     private void Start()
     {
-        // 레이스 컨디션 발생 - 후에 로직 변경
         if (PlayerManager.Instance != null)
         {
             _playerTransform = PlayerManager.Instance.PlayerTransform;
@@ -98,7 +98,6 @@ public class EnemyBatchManager : MonoBehaviour
             _lastQueryPosition = playerPos;
         }
         if (heightInterface.HasMissingReferences()) return;
-
         if (_enemies.Count == 0) return;
 
        float deltaTime = Time.fixedDeltaTime;
@@ -109,37 +108,29 @@ public class EnemyBatchManager : MonoBehaviour
 
             if (e == null) continue;
 
-            if (!e.status.IsAlive) 
+            if (!e.status.IsAlive || e.status.IsKnockbacked)
             {
-                e.rb.linearVelocity = Vector3.Lerp(e.rb.linearVelocity, Vector3.zero, deltaTime * 2f);
+                // 약간의 감속만 적용
+                if (!e.status.IsAlive)
+                    e.rb.linearVelocity = Vector3.Lerp(e.rb.linearVelocity, Vector3.zero, deltaTime * 0.5f);
                 continue;
             }
-
-            if (e.status.IsKnockbacked)
-            {
-                continue;
-            }
-
-            // 적 생존 여부 확인
-            /*if (e == null || !e.status.IsAlive)
-            {
-                if (e != null) e.rb.linearVelocity = Vector3.Lerp(e.rb.linearVelocity, Vector3.zero, deltaTime * 2f);
-                continue;
-            }*/
 
             Vector3 currentPos = e.rb.position;
             Vector3 diff = playerPos - currentPos;     
-            //diff.y = 0;
+            diff.y = 0;
             float distSqr = diff.sqrMagnitude;
-            shouldUpdateBuoyancy = ((Time.frameCount + e.buoyancyFrameOffset) % buoyancyFrameInterval) == 0;
+
+            bool shouldUpdateBuoyancy = ((Time.frameCount + e.buoyancyFrameOffset) % buoyancyFrameInterval) == 0;
 
             if (shouldUpdateBuoyancy)
             {
-                HandleBuoyancy(e, currentPos, distSqr);
+                // [개선된 부력 로직]
+                HandleBuoyancyAdvanced(e, currentPos, distSqr);
             }
 
             // 이동 및 회전 처리 (X, Z축 제어)
-            HandleMovement(e, playerPos, deltaTime);
+            HandleMovement(e, diff, distSqr, deltaTime);
         }
     }
 
@@ -147,81 +138,82 @@ public class EnemyBatchManager : MonoBehaviour
     /// <summary>
     /// 물 높이를 계산하고 Y축 속도를 제어
     /// </summary>
-    private void HandleBuoyancy(EnemyChaser e, Vector3 currentPos, float distSqr)
+    private void HandleBuoyancyAdvanced(EnemyChaser e, Vector3 currentPos, float distSqr)
     {
-        if (!shouldUpdateBuoyancy)
+        HeightQuerySystem.Sampler currentSampler;
+        int currentSampleCount;
+        bool isHighQuality = distSqr < highQualityDistSqr;
+
+        if (isHighQuality)
         {
-            Vector3 vel = e.rb.linearVelocity;
-            vel.y = Mathf.Lerp(vel.y, 0f, 0.05f);
-            e.rb.linearVelocity = vel;
-            return;
+            currentSampler = _samplerHigh;
+            currentSampleCount = 4;
+            float halfSize = e.surfaceSize * 0.5f;
+            currentSampler.SetSamplePosition(0, currentPos + new Vector3(-halfSize, 0, 0));
+            currentSampler.SetSamplePosition(1, currentPos + new Vector3(halfSize, 0, 0));
+            currentSampler.SetSamplePosition(2, currentPos + new Vector3(0, 0, -halfSize));
+            currentSampler.SetSamplePosition(3, currentPos + new Vector3(0, 0, halfSize));
+        }
+        else
+        {
+            currentSampler = _samplerLow;
+            currentSampleCount = 1;
+            currentSampler.SetSamplePosition(0, currentPos);
         }
 
-            HeightQuerySystem.Sampler currentSampler;
-            int currentSampleCount;
+        Gerstner.ComputeHeight(currentSampler, heightInterface);
 
-            if (distSqr < highQualityDistSqr)
-            {
-                currentSampler = _samplerHigh;
-                currentSampleCount = 4;
+        float avgHeight = 0f;
+        Vector3 targetNormal = Vector3.up;
 
-                float halfSize = e.surfaceSize * 0.5f;
-                currentSampler.SetSamplePosition(0, currentPos + new Vector3(-halfSize, 0, 0));
-                currentSampler.SetSamplePosition(1, currentPos + new Vector3(halfSize, 0, 0));
-                currentSampler.SetSamplePosition(2, currentPos + new Vector3(0, 0, -halfSize));
-                currentSampler.SetSamplePosition(3, currentPos + new Vector3(0, 0, halfSize));
-            }
-            else
-            {
-                // [Low Quality] 1점 샘플링
-                currentSampler = _samplerLow;
-                currentSampleCount = 1;
-                currentSampler.SetSamplePosition(0, currentPos);
-            }
+        if (currentSampleCount == 4)
+        {
+            float h1 = currentSampler.heightValues[0];
+            float h2 = currentSampler.heightValues[1];
+            float h3 = currentSampler.heightValues[2];
+            float h4 = currentSampler.heightValues[3];
 
-            Gerstner.ComputeHeight(currentSampler, heightInterface);
+            avgHeight = (h1 + h2 + h3 + h4) * 0.25f;
 
-            float avgHeight = 0f;
+            // Stylized Water 3 내장 함수로 파도의 기울기 계산
+            targetNormal = HeightQuerySystem.DeriveNormal(h1, h2, h3, h4, 1.0f);
+        }
+        else
+        {
+            avgHeight = currentSampler.heightValues[0];
+            // 저품질은 기울기 계산 생략 (성능 최적화)
+        }
 
-            if (currentSampleCount == 4)
-            {
-                avgHeight = (currentSampler.heightValues[0] + currentSampler.heightValues[1] +
-                             currentSampler.heightValues[2] + currentSampler.heightValues[3]) * 0.25f;
-            }
-            else
-            {
-                avgHeight = currentSampler.heightValues[0];
-            }
-
-        // 부력 물리 적용
-        float targetY = avgHeight + e.heightOffset;     
+        float targetY = avgHeight + e.heightOffset;
         float heightDiff = targetY - currentPos.y;
+        Vector3 currentVel = e.rb.linearVelocity;
+        float buoyancyForce = (heightDiff * buoyancyStrength) - (currentVel.y * waterDrag);
+        currentVel.y += buoyancyForce * Time.fixedDeltaTime; // 가속도 적용
+        e.rb.linearVelocity = currentVel;
 
-        Vector3 velFinal = e.rb.linearVelocity;
-        velFinal.y = heightDiff * buoyancyStrength; // 10.0f는 부력 강도 (필요 시 조절)
-        e.rb.linearVelocity = velFinal;
+        if (isHighQuality && waveAlignmentStrength > 0)
+        {
+            Vector3 forward = e.transform.forward;
+            Vector3 projectedForward = Vector3.ProjectOnPlane(forward, targetNormal).normalized;
+            Quaternion targetRot = Quaternion.LookRotation(projectedForward, targetNormal);
+            e.rb.rotation = Quaternion.Slerp(e.rb.rotation, targetRot, Time.fixedDeltaTime * 2.0f * waveAlignmentStrength);
+        }
     }
 
     /// <summary>
     /// 플레이어를 추적하고 회전
     /// </summary>
-    private void HandleMovement(EnemyChaser e, Vector3 playerPos, float deltaTime)
+    private void HandleMovement(EnemyChaser e, Vector3 diff, float distSqr, float deltaTime)
     {
         e.rb.angularVelocity = Vector3.zero;
-
-        Vector3 currentPos = e.rb.position;
-        Vector3 diff = playerPos - currentPos;
-        diff.y = 0; // 높이 차 무시
-        float distSqr = diff.sqrMagnitude;
 
         // 회전
         if (distSqr > 1.0f)
         {
-            Quaternion targetRot = Quaternion.LookRotation(diff);
-
-            // Slerp로 부드럽게 회전
-            Quaternion nextRot = Quaternion.Slerp(e.rb.rotation, targetRot, deltaTime * e.turnSpeed);
-            e.rb.MoveRotation(nextRot);
+            Vector3 lookDir = diff.normalized;
+            Vector3 upDir = e.transform.up;
+            Quaternion targetLookRot = Quaternion.LookRotation(lookDir, upDir);
+            e.rb.MoveRotation(Quaternion.Slerp(e.rb.rotation, targetLookRot, deltaTime * e.turnSpeed));
         }
 
         // 이동
@@ -229,8 +221,7 @@ public class EnemyBatchManager : MonoBehaviour
 
         if (distSqr > e.stopDistance * e.stopDistance)
         {            
-            Vector3 moveDir = diff.normalized * e.moveSpeed;            
-
+            Vector3 moveDir = diff.normalized * e.moveSpeed; 
             currentVelocity.x = moveDir.x;
             currentVelocity.z = moveDir.z;
         }
