@@ -97,6 +97,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: -8582469702766288979, guid: d2f022eb00ed54f4dba5f7b2e58fe7b8, type: 3}
     - target: {fileID: 5895034854558281223, guid: 4a8280c5be5e1fc4fa9bbf1c2817ae1b, type: 3}
+      propertyPath: attackRange
+      value: 3.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 5895034854558281223, guid: 4a8280c5be5e1fc4fa9bbf1c2817ae1b, type: 3}
       propertyPath: surfaceSize
       value: 2
       objectReference: {fileID: 0}
@@ -106,7 +110,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5895034854558281223, guid: 4a8280c5be5e1fc4fa9bbf1c2817ae1b, type: 3}
       propertyPath: stopDistance
-      value: 5
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 6076464585128263352, guid: 4a8280c5be5e1fc4fa9bbf1c2817ae1b, type: 3}
       propertyPath: m_Layer
@@ -140,6 +144,10 @@ PrefabInstance:
       propertyPath: m_Material
       value: 
       objectReference: {fileID: 13400000, guid: f215f829c4a4d06488164ea53b81a462, type: 2}
+    - target: {fileID: 8492964644438529941, guid: 4a8280c5be5e1fc4fa9bbf1c2817ae1b, type: 3}
+      propertyPath: m_IsTrigger
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
