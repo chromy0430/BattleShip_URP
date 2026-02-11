@@ -24,11 +24,11 @@ MonoBehaviour:
   ShopCost: 10000
   BaseMoveSpeed: 13
   BaseTurnSpeed: 12
-  shipVisual: {fileID: 4403905711885151061, guid: 0c46d4e8f334d144dbc906804b32bb51, type: 3}
+  shipVisual: {fileID: 8115126078198601694, guid: 0c46d4e8f334d144dbc906804b32bb51, type: 3}
   shipIcon: {fileID: 0}
   ColliderCenter: {x: 0, y: 2.5, z: -0.5}
   ColliderSize: {x: 6, y: 4.5, z: 14}
   BaseSurfaceSize: {x: 8, y: 24}
-  BaseHeightOffset: -1.2
-  rollAmount: 0.2
-  smoothing: 2
+  BaseHeightOffset: -1.4
+  rollAmount: 0.15
+  smoothing: 1.5

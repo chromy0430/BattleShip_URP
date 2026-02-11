@@ -26,8 +26,9 @@ Material:
   m_ModifiedSerializedProperties: 0
   m_ValidKeywords:
   - _EMISSION
+  - _GLOSSINESS_FROM_BASE_ALPHA
   - _NORMALMAP
-  - _SPECULAR_COLOR
+  - _SPECGLOSSMAP
   m_InvalidKeywords: []
   m_LightmapFlags: 2
   m_EnableInstancingVariants: 0
@@ -42,11 +43,11 @@ Material:
     serializedVersion: 3
     m_TexEnvs:
     - _BaseMap:
-        m_Texture: {fileID: 2800000, guid: 06e5494def446bb419e4e67e4b9b36ec, type: 3}
+        m_Texture: {fileID: 2800000, guid: fd1e65729cd5f75449a524a3537c4ab4, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _BumpMap:
-        m_Texture: {fileID: 2800000, guid: 75e695a2b0eff624ba0ea27695dbf3a5, type: 3}
+        m_Texture: {fileID: 2800000, guid: ee0568aff0b2ac7468883c821b4f21ed, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _DetailAlbedoMap:
@@ -62,11 +63,11 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _EmissionMap:
-        m_Texture: {fileID: 2800000, guid: 513e2650dd19198499595097d287b2f0, type: 3}
+        m_Texture: {fileID: 2800000, guid: ff16e439983a2544eb017f3b199df406, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MainTex:
-        m_Texture: {fileID: 2800000, guid: 06e5494def446bb419e4e67e4b9b36ec, type: 3}
+        m_Texture: {fileID: 2800000, guid: fd1e65729cd5f75449a524a3537c4ab4, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MetallicGlossMap:
@@ -82,7 +83,7 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _SpecGlossMap:
-        m_Texture: {fileID: 0}
+        m_Texture: {fileID: 2800000, guid: 3e2e25abecff9ac4ebd12bc9e928d452, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - unity_Lightmaps:
@@ -125,8 +126,8 @@ Material:
     - _QueueOffset: 0
     - _ReceiveShadows: 1
     - _Shininess: 0
-    - _Smoothness: 0.3
-    - _SmoothnessSource: 0
+    - _Smoothness: 1
+    - _SmoothnessSource: 1
     - _SmoothnessTextureChannel: 0
     - _SpecSource: 0
     - _SpecularHighlights: 0

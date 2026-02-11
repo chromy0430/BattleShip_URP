@@ -16,8 +16,8 @@ MonoBehaviour:
   EnemyName: CannonShip
   Description: "\uB300\uAD6C\uACBD \uD3EC\uD0C4\uC744 \uC9C1\uC120 \uADA4\uC801\uC73C\uB85C
     \uB290\uB9AC\uAC8C \uBC1C\uC0AC\uD55C\uB2E4."
-  MoveSpeed: 11
-  TurnSpeed: 10
+  MoveSpeed: 10
+  TurnSpeed: 8
   SizeRadius: 1
   Damage: 20
   DEF: 5

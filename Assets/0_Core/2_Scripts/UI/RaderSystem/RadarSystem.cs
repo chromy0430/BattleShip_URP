@@ -1,4 +1,4 @@
-using MapAndRadarSystem;
+ï»¿using MapAndRadarSystem;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -7,21 +7,21 @@ public class RadarSystem : MonoBehaviour
 {
     public static RadarSystem Instance { get; set; }
 
-    [Header("Settings")]
-    public float RadarDistance = 50f; // Å½Áö ¹üÀ§
-    public int initPoolSize = 500; // ÃÊ±âÈ­ Ç®¸µ »ı¼º
+    [Header("ì„¤ì •")]
+    public float RadarDistance = 50f; // íƒì§€ ë²”ìœ„
+    public int initPoolSize = 500; // ì´ˆê¸°í™” í’€ë§ ìƒì„±
     [SerializeField] private float _mapRadius = 0.43f;
 
-    [Header("UI Components")]
-    public RectTransform RadarPointPrefab; // Àû ¾ÆÀÌÄÜ ÇÁ¸®ÆÕ
-    public Transform Root; // ¾ÆÀÌÄÜ »ı¼ºµÉ ºÎ¸ğ ¿ÀºêÁ§Æ®
-    public Image Background; // ·¹ÀÌ´õ¸Ê ¹è°æ (³ªÄ§¹İ ¿ªÇÒ)
-    public Transform PlayerView; // ÇÃ·¹ÀÌ¾î ¹æÇâÇ¥ È¸Àü
+    [Header("UI")]
+    public RectTransform RadarPointPrefab; // ì  ì•„ì´ì½˜ í”„ë¦¬íŒ¹
+    public Transform Root; // ì•„ì´ì½˜ ìƒì„±ë  ë¶€ëª¨ ì˜¤ë¸Œì íŠ¸
+    public Image Background; // ë ˆì´ë”ë§µ ë°°ê²½ (ë‚˜ì¹¨ë°˜ ì—­í• )
+    public Transform PlayerView; // í”Œë ˆì´ì–´ ë°©í–¥í‘œ íšŒì „
 
-    // È°¼ºÈ­µÈ Àûµé°ú ¸ÅÄªµÇ´Â UI ¾ÆÀÌÄÜ °ü¸®
+    // í™œì„±í™”ëœ ì ë“¤ê³¼ ë§¤ì¹­ë˜ëŠ” UI ì•„ì´ì½˜ ê´€ë¦¬
     private Dictionary<GameObject, RectTransform> _activeTargets = new Dictionary<GameObject, RectTransform>();
 
-    // Àç»ç¿ëÀ» À§ÇÑ Ç®
+    // ì¬ì‚¬ìš©ì„ ìœ„í•œ í’€
     private Queue<RectTransform> _iconPool = new Queue<RectTransform>();
 
     private void Awake()
@@ -42,36 +42,36 @@ public class RadarSystem : MonoBehaviour
     }
 
     /// <summary>
-    /// ÀûÀÌ È°¼ºÈ­µÉ ¶§ È£ÃâÇÏ¿© ·¹ÀÌ´õ µî·Ï
+    /// ì ì´ í™œì„±í™”ë  ë•Œ í˜¸ì¶œí•˜ì—¬ ë ˆì´ë” ë“±ë¡
     /// </summary>
     public void AddTarget(GameObject enemyObj, Sprite iconSprite)
     {
         if (enemyObj == null) return;
-        if (_activeTargets.ContainsKey(enemyObj)) return; // ÀÌ¹Ì µî·ÏµÊ
+        if (_activeTargets.ContainsKey(enemyObj)) return; // ì´ë¯¸ ë“±ë¡ë¨
 
-        // Ç®¿¡¼­ ¾ÆÀÌÄÜ °¡Á®¿À±â (¾øÀ¸¸é »ı¼º)
+        // í’€ì—ì„œ ì•„ì´ì½˜ ê°€ì ¸ì˜¤ê¸° (ì—†ìœ¼ë©´ ìƒì„±)
         RectTransform iconRect = GetIconFromPool();
 
-        // ¾ÆÀÌÄÜ ÀÌ¹ÌÁö ¼³Á¤
+        // ì•„ì´ì½˜ ì´ë¯¸ì§€ ì„¤ì •
         Image img = iconRect.GetComponent<Image>();
         if (img != null) img.sprite = iconSprite;
 
-        // °ü¸® ¸®½ºÆ®¿¡ µî·Ï
+        // ê´€ë¦¬ ë¦¬ìŠ¤íŠ¸ì— ë“±ë¡
         _activeTargets.Add(enemyObj, iconRect);
     }
 
     /// <summary>
-    /// ÀûÀÌ Á×°Å³ª ºñÈ°¼ºÈ­µÉ ¶§ ·¹ÀÌ´õ¿¡¼­ Á¦°Å
+    /// ì ì´ ì£½ê±°ë‚˜ ë¹„í™œì„±í™”ë  ë•Œ ë ˆì´ë”ì—ì„œ ì œê±°
     /// </summary>
     public void RemoveTarget(GameObject enemyObj)
     {
         if (enemyObj == null) return;
         if (_activeTargets.TryGetValue(enemyObj, out RectTransform iconRect))
         {
-            // ¾ÆÀÌÄÜÀ» Ç®·Î ¹İÈ¯ (ºñÈ°¼ºÈ­)
+            // ì•„ì´ì½˜ì„ í’€ë¡œ ë°˜í™˜ (ë¹„í™œì„±í™”)
             ReturnIconToPool(iconRect);
 
-            // °ü¸® ¸®½ºÆ®¿¡¼­ Á¦°Å
+            // ê´€ë¦¬ ë¦¬ìŠ¤íŠ¸ì—ì„œ ì œê±°
             _activeTargets.Remove(enemyObj);
         }
     }
@@ -82,17 +82,21 @@ public class RadarSystem : MonoBehaviour
 
         if (actor == null) return;
 
-        if (PlayerView != null)
-            PlayerView.localRotation = Quaternion.identity;
-
-        if(Background != null)
+        // 1. ë‚˜ì¹¨ë°˜(ë°°ê²½)ì€ ì ˆëŒ€ íšŒì „í•˜ì§€ ì•Šê³  ê³ ì • (ë¶ìª½ ê³ ì •)
+        if (Background != null)
         {
-            Background.rectTransform.localRotation = Quaternion.Euler(0, 0, actor.eulerAngles.y);
+            Background.rectTransform.localRotation = Quaternion.identity;
+        }
+
+        // 2. í”Œë ˆì´ì–´ í™”ì‚´í‘œ(PlayerView)ë§Œ íšŒì „
+        // ìœ ë‹ˆí‹° 3D íšŒì „(Yì¶•, ì‹œê³„ë°©í–¥+) -> UI 2D íšŒì „(Zì¶•, ë°˜ì‹œê³„ë°©í–¥+) ë³€í™˜ì„ ìœ„í•´ ë§ˆì´ë„ˆìŠ¤(-) ë¶™ì„
+        if (PlayerView != null)
+        {
+            PlayerView.localRotation = Quaternion.Euler(0, 0, -actor.eulerAngles.y);
         }
 
         float mapRadius = Background.rectTransform.sizeDelta.x * _mapRadius;
         Vector3 actorPos = actor.position;
-        float actorYRot = actor.eulerAngles.y;
 
         foreach (var pair in _activeTargets)
         {
@@ -108,16 +112,20 @@ public class RadarSystem : MonoBehaviour
             Vector3 targetPos = target.transform.position;
             float dist = Vector3.Distance(actorPos, targetPos);
 
-            // ·¹ÀÌ´õ ¹üÀ§ ¾È¿¡ ÀÖÀ» ¶§¸¸ Ç¥½Ã
+            // ë ˆì´ë” ë²”ìœ„ ì•ˆì— ìˆì„ ë•Œë§Œ í‘œì‹œ
             if (dist <= RadarDistance)
             {
+                // [í•µì‹¬ ë³€ê²½] North-Up ë°©ì‹ì´ë¯€ë¡œ í”Œë ˆì´ì–´ íšŒì „ê°’ì„ ê³±í•  í•„ìš”ê°€ ì—†ìŒ!
+                // ë‹¨ìˆœíˆ 3D ìƒì˜ ìƒëŒ€ ìœ„ì¹˜(X, Z)ë¥¼ UI ìƒì˜ ìœ„ì¹˜(X, Y)ë¡œ 1:1 ë§¤í•‘í•˜ë©´ ë¨.
                 Vector3 offset = targetPos - actorPos;
-                Vector3 localPos = Quaternion.Euler(0, -actorYRot, 0) * offset;
 
                 float scale = mapRadius / RadarDistance;
-                icon.anchoredPosition = new Vector2(localPos.x * scale, localPos.z * scale);
 
-                icon.localRotation = Quaternion.identity;                
+                // 3D X(ë™ìª½) -> UI X(ì˜¤ë¥¸ìª½)
+                // 3D Z(ë¶ìª½) -> UI Y(ìœ„ìª½)
+                icon.anchoredPosition = new Vector2(offset.x * scale, offset.z * scale);
+
+                icon.localRotation = Quaternion.identity;
 
                 if (!icon.gameObject.activeSelf) icon.gameObject.SetActive(true);
             }
@@ -132,20 +140,20 @@ public class RadarSystem : MonoBehaviour
     {
         if (RadarPointPrefab == null || Root == null)
         {
-            Debug.LogError("[RadarSystem] Prefab ¶Ç´Â Root°¡ ÇÒ´çµÇÁö ¾Ê¾Ò½À´Ï´Ù!");
+            Debug.LogError("[RadarSystem] Prefab ë˜ëŠ” Rootê°€ í• ë‹¹ë˜ì§€ ì•Šì•˜ìŠµë‹ˆë‹¤!");
             return;
         }
 
         for (int i = 0; i < initPoolSize; i++)
         {
             RectTransform icon = Instantiate(RadarPointPrefab, Root);
-            icon.gameObject.SetActive(false); // ºñÈ°¼ºÈ­ »óÅÂ·Î »ı¼º
+            icon.gameObject.SetActive(false); // ë¹„í™œì„±í™” ìƒíƒœë¡œ ìƒì„±
             icon.localScale = Vector3.one;
-            _iconPool.Enqueue(icon); // Å¥¿¡ ÀúÀå
+            _iconPool.Enqueue(icon); // íì— ì €ì¥
         }
     }
 
-    // Ç®¸µ ½Ã½ºÅÛ
+    // í’€ë§ ì‹œìŠ¤í…œ
     private RectTransform GetIconFromPool()
     {
         RectTransform icon;

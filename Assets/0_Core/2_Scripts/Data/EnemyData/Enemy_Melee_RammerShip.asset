@@ -16,8 +16,8 @@ MonoBehaviour:
   EnemyName: RammerShip
   Description: "\uACE0\uC18D\uC73C\uB85C \uB3CC\uC9C4\uD574 \uCDA9\uB3CC\uD558\uC5EC
     \uBC30\uB97C \uD30C\uAD34\uD55C\uB2E4."
-  MoveSpeed: 16
-  TurnSpeed: 10
+  MoveSpeed: 10
+  TurnSpeed: 9
   SizeRadius: 1
   Damage: 15
   DEF: 5

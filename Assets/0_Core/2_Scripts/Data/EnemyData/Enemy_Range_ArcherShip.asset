@@ -16,8 +16,8 @@ MonoBehaviour:
   EnemyName: ArcherShip
   Description: "\uD654\uC0B4\uC744 \uBE60\uB974\uAC8C \uC5F0\uC0AC\uD558\uBA70 \uD50C\uB808\uC774\uC5B4
     \uAF2C\uB9AC\uB97C \uB178\uB9B0\uB2E4."
-  MoveSpeed: 11
-  TurnSpeed: 10
+  MoveSpeed: 10
+  TurnSpeed: 8
   SizeRadius: 1
   Damage: 10
   DEF: 5
