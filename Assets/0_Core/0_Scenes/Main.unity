@@ -1685,10 +1685,12 @@ MonoBehaviour:
   waveProfile: {fileID: 11400000, guid: 343e9ebae18bc0f48811edac300d64d0, type: 2}
   highQualityDistSqr: 900
   buoyancyFrameInterval: 1
-  buoyancyStrength: 4
-  waterDrag: 2
   waveAlignmentStrength: 0.5
-  movementAcceleration: 3.5
+  separationRadius: 3
+  separationForce: 2
+  enemyLayer:
+    serializedVersion: 2
+    m_Bits: 64
 --- !u!114 &360754106
 MonoBehaviour:
   m_ObjectHideFlags: 0
