@@ -191,12 +191,31 @@ public class Enemy : MonoBehaviour, IEnemy
         if (!_isAlive || _rb == null) return;
 
         _isKnockbacked = true;
-        _rb.linearVelocity = Vector3.zero; // 기존 속도 초기화
-        force.y = 0;
-        _rb.AddForce(force, ForceMode.Impulse);
+        //_rb.linearVelocity = Vector3.zero; // 기존 속도 초기화
+        //force.y = 0;
+
+        Vector3 knockbackVelocity = force;
+        knockbackVelocity.y = 0;
+
+        float elapsed = 0f;
+
+        while (elapsed < duration)
+        {
+            if (!_isAlive) break;
+
+            float dt = Time.fixedDeltaTime;
+            elapsed += dt;
+
+            knockbackVelocity = Vector3.Lerp(knockbackVelocity, Vector3.zero, dt * 5.0f);
+            _rb.MovePosition(_rb.position + (knockbackVelocity * dt));
+
+            await UniTask.WaitForFixedUpdate();
+        }
+
+        /*_rb.AddForce(force, ForceMode.Impulse);
 
         // duration 동안 대기 후 상태 해제
-        await UniTask.Delay(System.TimeSpan.FromSeconds(duration));
+        await UniTask.Delay(System.TimeSpan.FromSeconds(duration));*/
 
         _isKnockbacked = false; 
     }
