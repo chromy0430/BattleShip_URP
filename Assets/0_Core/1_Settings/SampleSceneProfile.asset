@@ -78,6 +78,44 @@ MonoBehaviour:
   saturation:
     m_OverrideState: 0
     m_Value: 5
+--- !u!114 &-6781163505997772181
+MonoBehaviour:
+  m_ObjectHideFlags: 3
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cd671befdfe330a409e5a6bfe140f183, type: 3}
+  m_Name: SketchSettings
+  m_EditorClassIdentifier: Assembly-CSharp::DanielIlett.Sketch.SketchSettings
+  active: 0
+  sketchTexture:
+    m_OverrideState: 1
+    m_Value: {fileID: 2800000, guid: 13697936618a85b4eba75926c064dd3b, type: 3}
+    dimension: 1
+  sketchColor:
+    m_OverrideState: 1
+    m_Value: {r: 0.9339623, g: 0.7004717, b: 0.7004717, a: 1}
+  sketchTiling:
+    m_OverrideState: 0
+    m_Value: {x: 1, y: 1}
+  sketchThresholds:
+    m_OverrideState: 0
+    m_Value: {x: 0, y: 0.01}
+  crossHatching:
+    m_OverrideState: 0
+    m_Value: 1
+  blurAmount:
+    m_OverrideState: 1
+    m_Value: 95
+  blurStepSize:
+    m_OverrideState: 1
+    m_Value: 9
+  extendDepthSensitivity:
+    m_OverrideState: 1
+    m_Value: 0.00483
 --- !u!114 &-3970029605482867994
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -148,6 +186,28 @@ MonoBehaviour:
   rounded:
     m_OverrideState: 0
     m_Value: 0
+--- !u!114 &-612583520521691981
+MonoBehaviour:
+  m_ObjectHideFlags: 3
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 47e2f927a6eb73048aa5cdd0db54b7e2, type: 3}
+  m_Name: JoJoStylizedVolume
+  m_EditorClassIdentifier: Assembly-CSharp::JoJoStylizedVolume
+  active: 1
+  outlineThickness:
+    m_OverrideState: 1
+    m_Value: 0.32
+  threshold:
+    m_OverrideState: 1
+    m_Value: 0.1
+  outlineColor:
+    m_OverrideState: 1
+    m_Value: {r: 0, g: 0, b: 0, a: 1}
 --- !u!114 &11400000
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -168,6 +228,7 @@ MonoBehaviour:
   - {fileID: -7845341922580525138}
   - {fileID: -3970029605482867994}
   - {fileID: -3437874667178472073}
+  - {fileID: -6781163505997772181}
 --- !u!114 &849379129802519247
 MonoBehaviour:
   m_ObjectHideFlags: 3
