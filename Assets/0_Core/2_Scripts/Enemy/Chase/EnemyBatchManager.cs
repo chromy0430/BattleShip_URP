@@ -29,8 +29,10 @@ public class EnemyBatchManager : MonoBehaviour
     {
         Instance = this;
 
-        _samplerHigh = new HeightQuerySystem.Sampler(); _samplerHigh.SetSampleCount(4);
-        _samplerLow = new HeightQuerySystem.Sampler(); _samplerLow.SetSampleCount(1);
+        _samplerHigh = new HeightQuerySystem.Sampler();
+        _samplerHigh.SetSampleCount(4);
+        _samplerLow = new HeightQuerySystem.Sampler(); 
+        _samplerLow.SetSampleCount(1);
 
         if (heightInterface == null) heightInterface = new HeightQuerySystem.Interface();
         if (waveProfile != null) heightInterface.waveProfile = waveProfile;

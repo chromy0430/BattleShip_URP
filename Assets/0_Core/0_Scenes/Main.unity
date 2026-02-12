@@ -1595,6 +1595,7 @@ MonoBehaviour:
   highQualityDistSqr: 900
   moveSpeedMultiplier: 1
   waveAlignmentStrength: 2
+  acceleration: 50
 --- !u!114 &360754106
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3035,8 +3036,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 704386980}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0.0060693948, w: 0.9999816}
-  m_LocalPosition: {x: -10.64, y: -220.72282, z: 14.52}
+  m_LocalRotation: {x: -0.0014413918, y: 0, z: -0.0020105492, w: 0.99999696}
+  m_LocalPosition: {x: -10.64, y: -0.0037077526, z: 14.52}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -6943,8 +6944,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1751036400}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0.0060693948, w: 0.9999816}
-  m_LocalPosition: {x: -10.64, y: -220.72282, z: 21.01}
+  m_LocalRotation: {x: -0.0045895088, y: 0, z: -0.0024724258, w: 0.9999864}
+  m_LocalPosition: {x: -10.64, y: -0.06238057, z: 21.01}
   m_LocalScale: {x: 1, y: 2, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
