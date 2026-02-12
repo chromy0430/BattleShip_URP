@@ -8,34 +8,32 @@ public class Enemy : MonoBehaviour, IEnemy
 {
     [SerializeField] private int maxHealth = 100;
     [SerializeField] private int _Shield = 0;
-
-    private EnemyData _enemyData;
-
+        
+    public bool canAttack;
     public int CurrentHealth { get; private set; }
     public int MaxHealth => maxHealth; 
-
-    private bool _isAlive = false;
-    public Transform TargetTransform => transform;
+    public bool IsKnockbacked => _isKnockbacked;
     public bool IsAlive => _isAlive;
+
+    public Transform TargetTransform => transform;    
+    
     public MMF_Player flickerFeedback;
+    public GameObject damageObject; // 데미지 폰트
+    public GameObject wakeTrailObject;
+
 
     [SerializeField] private Rigidbody _rb;
-    public GameObject damageObject; // 데미지 폰트
-
-    public GameObject wakeTrailObject;
+    private EnemyData _enemyData;    
     private TrailRenderer _wakeTrail;
-
+    private bool _isAlive = false;
     private bool _isKnockbacked = false; // 넉백 상태
-    public bool IsKnockbacked => _isKnockbacked;
-    public bool canAttack;
+    
     public void Initialize(EnemyData data)
     {
         canAttack = true;
         _enemyData = data;
-
         maxHealth = data.MaxHP;
         _Shield = data.DEF;
-
         CurrentHealth = maxHealth;
 
         if (TryGetComponent<EnemyChaser>(out var chaser))
@@ -69,6 +67,7 @@ public class Enemy : MonoBehaviour, IEnemy
     {
         CurrentHealth = maxHealth;
         _isAlive = true;
+        canAttack = true;
 
         if (wakeTrailObject != null) wakeTrailObject.SetActive(true);
         ResetTrailRoutine().Forget();
@@ -232,15 +231,18 @@ public class Enemy : MonoBehaviour, IEnemy
                 canAttack = false;
                 pc.TakeDamage(_enemyData.Damage);
                 PlayerManager.Instance.Damaged();
-                ResumeAttackAbility();
+                ResumeAttackAbility().Forget();
             }
         }
     }
-    private async void ResumeAttackAbility(float delay = 0.5f)
+    private async UniTaskVoid ResumeAttackAbility(float delay = 0.5f)
     {
         // UniTask.Delay는 비동기적으로 작동하며, 해당 시간만큼 대기합니다.
-        await UniTask.Delay(TimeSpan.FromSeconds(delay));
-        canAttack = true;
+        await UniTask.Delay(TimeSpan.FromSeconds(delay), ignoreTimeScale: false);
+        if (_isAlive)
+        { 
+            canAttack = true;
+        }
     }
 
     private async UniTaskVoid ResetTrailRoutine()

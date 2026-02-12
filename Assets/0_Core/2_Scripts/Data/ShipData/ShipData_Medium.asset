@@ -1,0 +1,34 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 52fa85b7dde9fba43ab7a60e29e6cd68, type: 3}
+  m_Name: ShipData_Medium
+  m_EditorClassIdentifier: BattleShip.Data::BaseShipData
+  shipID: Ship_DefaultMedium
+  ShipName: "\uAE30\uBCF8 \uC911\uD615\uC120"
+  ShipDescription: "\uAE30\uBCF8\uC73C\uB85C \uC8FC\uC5B4\uC9C0\uB294 \uC911\uD615\uC120"
+  shipSize: 1
+  BaseHP: 600
+  BaseMP: 250
+  BaseDEF: 10
+  BaseMagnetRange: 7
+  BaseSPR: 10
+  ShopCost: 0
+  BaseMoveSpeed: 14
+  BaseTurnSpeed: 13
+  shipVisual: {fileID: 5109241354410044438, guid: e4c961997a335e242abf56087f939b50, type: 3}
+  shipIcon: {fileID: 0}
+  ColliderCenter: {x: 0, y: 2, z: 0}
+  ColliderSize: {x: 4.5, y: 4.5, z: 14}
+  BaseSurfaceSize: {x: 6, y: 15}
+  BaseHeightOffset: -1.3
+  rollAmount: 0.15
+  smoothing: 1

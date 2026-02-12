@@ -1,9 +1,9 @@
-using UnityEngine;
+ï»¿using UnityEngine;
 using System;
 
 public class PlayerCondition : MonoBehaviour
 {
-    [Header("»óÅÂ È®ÀÎ¿ë (ReadOnly)")]
+    [Header("ìƒíƒœ í™•ì¸ìš© (ReadOnly)")]
     [SerializeField] private int _currentHp;
     [SerializeField] private int _currentMp;
 
@@ -15,7 +15,7 @@ public class PlayerCondition : MonoBehaviour
     public int CurrentHp => _currentHp;
     public int CurrentMp => _currentMp;
 
-    // ÇöÀç°ª°ú ÃÖ´ë°ª UI, »ç¸Á ÀÌº¥Æ®
+    // í˜„ì¬ê°’ê³¼ ìµœëŒ€ê°’ UI, ì‚¬ë§ ì´ë²¤íŠ¸
     public event Action<int, int> OnHpChanged;
     public event Action<int, int> OnMpChanged;
     public event Action OnPlayerDead;
@@ -24,7 +24,7 @@ public class PlayerCondition : MonoBehaviour
 
     private void Start()
     {        
-        // °ÔÀÓ ½ÃÀÛ ½Ã ÃÖ´ëÄ¡
+        // ê²Œì„ ì‹œì‘ ì‹œ ìµœëŒ€ì¹˜
         if (PlayerDataLoad.playerData != null)
         {
             stat = PlayerDataLoad.playerData.CurrentPlayerStat;
@@ -35,10 +35,10 @@ public class PlayerCondition : MonoBehaviour
             _currentHp = _prevMaxHp;
             _currentMp = _prevMaxMp;
             
-            // ÀÌº¥Æ® ±¸µ¶
+            // ì´ë²¤íŠ¸ êµ¬ë…
             PlayerDataLoad.playerData.OnStatUpdated += HandleStatUpdated;
 
-            // UI ÃÊ±âÈ­
+            // UI ì´ˆê¸°í™”
             NotifyHpChanged();
             NotifyMpChanged();
         }
@@ -52,7 +52,7 @@ public class PlayerCondition : MonoBehaviour
         }
     }
 
-    // ¾÷±×·¹ÀÌµå·Î ÃÖ´ë Ã¼·Â/¸¶·ÂÀÌ ´Ã¾î³µÀ» ¶§ È£ÃâµÊ
+    // ì—…ê·¸ë ˆì´ë“œë¡œ ìµœëŒ€ ì²´ë ¥/ë§ˆë ¥ì´ ëŠ˜ì–´ë‚¬ì„ ë•Œ í˜¸ì¶œë¨
     private void HandleStatUpdated()
     {
         var stat = PlayerDataLoad.playerData.CurrentPlayerStat;
@@ -65,7 +65,7 @@ public class PlayerCondition : MonoBehaviour
         if (diffHp > 0)
         {
             _currentHp += diffHp;
-            Debug.Log($"[Condition] ÃÖ´ë Ã¼·Â Áõ°¡({diffHp})·Î ÀÎÇØ Ã¼·Â È¸º¹µÊ.");
+            Debug.Log($"[Condition] ìµœëŒ€ ì²´ë ¥ ì¦ê°€({diffHp})ë¡œ ì¸í•´ ì²´ë ¥ íšŒë³µë¨.");
         }
 
         if (diffMp > 0)
@@ -80,13 +80,12 @@ public class PlayerCondition : MonoBehaviour
         NotifyMpChanged();
     }
 
-    #region Ã¼·Â (HP) ·ÎÁ÷
+    #region ì²´ë ¥ (HP) ë¡œì§
     public void TakeDamage(int amount)
     {
-        if (_currentHp <= 0) return; // ÀÌ¹Ì »ç¸Á
+        if (_currentHp <= 0) return; // ì´ë¯¸ ì‚¬ë§
 
-        int finalDmg = amount - (stat.shipDEF + stat.bonusDEF);
-        // ¹æ¾î·Â Àû¿ë °ø½ÄÀÌ ÇÊ¿äÇÏ¸é ¿©±â¼­ stat.shipDEF µîÀ» °¡Á®¿Í °è»ê
+        int finalDmg = Mathf.Max(1, amount - (stat.shipDEF + stat.bonusDEF));
         _currentHp -= finalDmg;
 
         var damageFont = ObjectPoolManager.Instance.Get(DamageFont);
@@ -99,7 +98,7 @@ public class PlayerCondition : MonoBehaviour
             //_stat.Damage.ToString()
             );
 
-        Debug.Log($"ÇÇÇØ ÀÔÀ½, ÇöÀç Ã¼·Â {_currentHp}, ÇÇÇØ·® {finalDmg}");
+        Debug.Log($"í”¼í•´ ì…ìŒ, í˜„ì¬ ì²´ë ¥ {_currentHp}, í”¼í•´ëŸ‰ {finalDmg}");
 
 
         if (_currentHp <= 0)
@@ -120,22 +119,22 @@ public class PlayerCondition : MonoBehaviour
 
     private void Die()
     {
-        Debug.Log("ÇÃ·¹ÀÌ¾î »ç¸Á!");
+        Debug.Log("í”Œë ˆì´ì–´ ì‚¬ë§!");
         OnPlayerDead?.Invoke();
-        // ¿©±â¿¡ °ÔÀÓ ¿À¹ö Ã³¸® ·ÎÁ÷ Ãß°¡
+        // ì—¬ê¸°ì— ê²Œì„ ì˜¤ë²„ ì²˜ë¦¬ ë¡œì§ ì¶”ê°€
     }
     #endregion
 
-    #region ¸¶·Â (MP) ·ÎÁ÷
+    #region ë§ˆë ¥ (MP) ë¡œì§
     public bool UseMana(int amount)
     {
         if (_currentMp >= amount)
         {
             _currentMp -= amount;
             NotifyMpChanged();
-            return true; // »ç¿ë ¼º°ø
+            return true; // ì‚¬ìš© ì„±ê³µ
         }
-        return false; // ¸¶³ª ºÎÁ·
+        return false; // ë§ˆë‚˜ ë¶€ì¡±
     }
 
     public void RestoreMana(int amount)

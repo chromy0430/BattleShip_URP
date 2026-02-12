@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 52fa85b7dde9fba43ab7a60e29e6cd68, type: 3}
   m_Name: ShipData_Turtle
   m_EditorClassIdentifier: Assembly-CSharp::BaseShipData
-  shipID: TurtleShip
+  shipID: Ship_Turtle
   ShipName: "\uAC70\uBD81\uC120"
   ShipDescription: "\uC6C5\uC7A5\uD55C \uAC70\uBD81\uC120"
   shipSize: 2
@@ -22,8 +22,8 @@ MonoBehaviour:
   BaseMagnetRange: 8
   BaseSPR: 35
   ShopCost: 10000
-  BaseMoveSpeed: 13
-  BaseTurnSpeed: 12
+  BaseMoveSpeed: 12
+  BaseTurnSpeed: 11
   shipVisual: {fileID: 8115126078198601694, guid: 0c46d4e8f334d144dbc906804b32bb51, type: 3}
   shipIcon: {fileID: 0}
   ColliderCenter: {x: 0, y: 2.5, z: -0.5}

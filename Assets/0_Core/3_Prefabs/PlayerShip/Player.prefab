@@ -59,7 +59,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 2, y: 2, z: 2}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 1
   m_Children:
   - {fileID: 1785827680877675205}
@@ -181,8 +181,8 @@ MonoBehaviour:
   DebugActive: 0
   InScriptDrivenPause: 0
   FeedbacksList:
-  - rid: 2554554321800003671
-  - rid: 2554554321800003672
+  - rid: 2509455198597939316
+  - rid: 2509455198597939317
   KeepPlayModeChanges: 0
   PerformanceMode: 0
   RestoreInitialValuesOnDisable: 0
@@ -194,11 +194,11 @@ MonoBehaviour:
   references:
     version: 2
     RefIds:
-    - rid: 2554554321800003671
+    - rid: 2509455198597939316
       type: {class: MMF_Flicker, ns: MoreMountains.Feedbacks, asm: MoreMountains.Tools}
       data:
         Active: 1
-        UniqueID: 342805992
+        UniqueID: -901143874
         Label: Flicker
         OriginalLabel: Flicker
         ChannelMode: 0
@@ -215,7 +215,7 @@ MonoBehaviour:
           NumberOfRepeats: 0
           RepeatForever: 0
           DelayBetweenRepeats: 1
-          PlayCount: 0
+          PlayCount: 5
           LimitPlayCount: 0
           MaxPlayCount: 3
           SetPlayCountToZeroOnReset: 0
@@ -270,19 +270,19 @@ MonoBehaviour:
         DebugActive: 0
         BoundRenderer: {fileID: 613514349068810666}
         ExtraBoundRenderers: []
-        Mode: 0
-        PropertyName: _Tint
+        Mode: 1
+        PropertyName: _BaseColor
         FlickerDuration: 0.2
         FlickerPeriod: 0.04
-        FlickerColor: {r: 1, g: 0.078431375, b: 0.078431375, a: 1}
-        MaterialIndexes: 
-        UseMaterialPropertyBlocks: 0
-        SpriteRendererTextureProperty: _MainTex
-    - rid: 2554554321800003672
+        FlickerColor: {r: 0.09198113, g: 0.011714578, b: 0.011714578, a: 1}
+        MaterialIndexes: 00000000
+        UseMaterialPropertyBlocks: 1
+        SpriteRendererTextureProperty: _BaseColor
+    - rid: 2509455198597939317
       type: {class: MMF_FreezeFrame, ns: MoreMountains.Feedbacks, asm: MoreMountains.Tools}
       data:
-        Active: 1
-        UniqueID: 2056800522
+        Active: 0
+        UniqueID: 298010511
         Label: Freeze Frame
         OriginalLabel: Freeze Frame
         ChannelMode: 0
@@ -299,7 +299,7 @@ MonoBehaviour:
           NumberOfRepeats: 0
           RepeatForever: 0
           DelayBetweenRepeats: 1
-          PlayCount: 0
+          PlayCount: 5
           LimitPlayCount: 0
           MaxPlayCount: 3
           SetPlayCountToZeroOnReset: 0
@@ -369,7 +369,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &2735129734023003609
 Transform:
   m_ObjectHideFlags: 0
@@ -383,8 +383,8 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 6320978953045038258}
-  - {fileID: 1476817928802791372}
+  - {fileID: 4840888641980940516}
+  - {fileID: 9206687474802041729}
   m_Father: {fileID: 2171142783127658759}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &2460814802596757947
@@ -637,7 +637,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 42757c1606a60244a94f26b38062a7b4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::WeaponMount
-  _weaponData: {fileID: 11400000, guid: 6e2f02ad61df99e40876305ac88db82c, type: 2}
+  _weaponData: {fileID: 0}
   firePoint: {fileID: 6939262005843617006}
 --- !u!114 &3027726063150322345
 MonoBehaviour:
@@ -785,8 +785,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 2.8, y: 2, z: 10}
-  m_Center: {x: 0, y: 1, z: -0.5}
+  m_Size: {x: 4, y: 2.5, z: 8}
+  m_Center: {x: 0, y: 0.5, z: 0}
 --- !u!114 &4683933945338407186
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -881,9 +881,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c7a98f23cb4482340ae9e6e23486913a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerFloating
-  surfaceSize: {x: 3, y: 8}
-  heightOffset: -0.6
-  rollAmount: 0.2
+  surfaceSize: {x: 8, y: 24}
+  heightOffset: -1.5
+  rollAmount: 0.5
   smoothing: 0.15
 --- !u!114 &7050723356318128996
 MonoBehaviour:
@@ -936,7 +936,7 @@ MonoBehaviour:
   - {fileID: 0}
   - {fileID: 0}
   CollectedCargo: []
---- !u!1001 &2235607752660332299
+--- !u!1001 &1104224043337822890
 PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
@@ -944,85 +944,94 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 2735129734023003609}
     m_Modifications:
-    - target: {fileID: 2595698028741008750, guid: f769116666165df4489d195d20b7c753, type: 3}
-      propertyPath: foamAmount
-      value: 2
+    - target: {fileID: 3299562207912838904, guid: 1d697ae8508b6bc43a5970fb39f51784, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
       objectReference: {fileID: 0}
-    - target: {fileID: 5241866392727583673, guid: f769116666165df4489d195d20b7c753, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: 1.5
-      objectReference: {fileID: 0}
-    - target: {fileID: 5241866392727583673, guid: f769116666165df4489d195d20b7c753, type: 3}
+    - target: {fileID: 3299562207912838911, guid: 1d697ae8508b6bc43a5970fb39f51784, type: 3}
       propertyPath: m_LocalPosition.y
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 5241866392727583673, guid: f769116666165df4489d195d20b7c753, type: 3}
+    - target: {fileID: 3299562207912838911, guid: 1d697ae8508b6bc43a5970fb39f51784, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0.85
+      objectReference: {fileID: 0}
+    - target: {fileID: 5511481773808677448, guid: 1d697ae8508b6bc43a5970fb39f51784, type: 3}
+      propertyPath: m_Name
+      value: Boat Wake (Trail based)
+      objectReference: {fileID: 0}
+    - target: {fileID: 5511481773808677454, guid: 1d697ae8508b6bc43a5970fb39f51784, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5511481773808677454, guid: 1d697ae8508b6bc43a5970fb39f51784, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5511481773808677454, guid: 1d697ae8508b6bc43a5970fb39f51784, type: 3}
       propertyPath: m_LocalPosition.z
       value: 0.5
       objectReference: {fileID: 0}
-    - target: {fileID: 5241866392727583673, guid: f769116666165df4489d195d20b7c753, type: 3}
+    - target: {fileID: 5511481773808677454, guid: 1d697ae8508b6bc43a5970fb39f51784, type: 3}
       propertyPath: m_LocalRotation.w
       value: 1
       objectReference: {fileID: 0}
-    - target: {fileID: 5241866392727583673, guid: f769116666165df4489d195d20b7c753, type: 3}
+    - target: {fileID: 5511481773808677454, guid: 1d697ae8508b6bc43a5970fb39f51784, type: 3}
       propertyPath: m_LocalRotation.x
-      value: -0
+      value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 5241866392727583673, guid: f769116666165df4489d195d20b7c753, type: 3}
+    - target: {fileID: 5511481773808677454, guid: 1d697ae8508b6bc43a5970fb39f51784, type: 3}
       propertyPath: m_LocalRotation.y
-      value: -0
+      value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 5241866392727583673, guid: f769116666165df4489d195d20b7c753, type: 3}
+    - target: {fileID: 5511481773808677454, guid: 1d697ae8508b6bc43a5970fb39f51784, type: 3}
       propertyPath: m_LocalRotation.z
-      value: -0
+      value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 5241866392727583673, guid: f769116666165df4489d195d20b7c753, type: 3}
+    - target: {fileID: 5511481773808677454, guid: 1d697ae8508b6bc43a5970fb39f51784, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 5241866392727583673, guid: f769116666165df4489d195d20b7c753, type: 3}
+    - target: {fileID: 5511481773808677454, guid: 1d697ae8508b6bc43a5970fb39f51784, type: 3}
       propertyPath: m_LocalEulerAnglesHint.y
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 5241866392727583673, guid: f769116666165df4489d195d20b7c753, type: 3}
+    - target: {fileID: 5511481773808677454, guid: 1d697ae8508b6bc43a5970fb39f51784, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 5373185277775375218, guid: f769116666165df4489d195d20b7c753, type: 3}
-      propertyPath: spawnRatePerUnit
-      value: 2.5
+    - target: {fileID: 7515833284990999426, guid: 1d697ae8508b6bc43a5970fb39f51784, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
       objectReference: {fileID: 0}
-    - target: {fileID: 7770949301458780107, guid: f769116666165df4489d195d20b7c753, type: 3}
-      propertyPath: m_Layer
-      value: 9
+    - target: {fileID: 7756196049299078574, guid: 1d697ae8508b6bc43a5970fb39f51784, type: 3}
+      propertyPath: foamAmount
+      value: 2
       objectReference: {fileID: 0}
-    - target: {fileID: 7770949302194290017, guid: f769116666165df4489d195d20b7c753, type: 3}
-      propertyPath: m_Layer
-      value: 9
+    - target: {fileID: 7756196049299078574, guid: 1d697ae8508b6bc43a5970fb39f51784, type: 3}
+      propertyPath: heightScale
+      value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 9109887455258634425, guid: f769116666165df4489d195d20b7c753, type: 3}
-      propertyPath: m_Name
-      value: Boat Wake (Particle based)
-      objectReference: {fileID: 0}
-    - target: {fileID: 9109887455258634425, guid: f769116666165df4489d195d20b7c753, type: 3}
-      propertyPath: m_Layer
-      value: 9
-      objectReference: {fileID: 0}
-    - target: {fileID: 9109887455258634425, guid: f769116666165df4489d195d20b7c753, type: 3}
-      propertyPath: m_IsActive
+    - target: {fileID: 7756196049299078574, guid: 1d697ae8508b6bc43a5970fb39f51784, type: 3}
+      propertyPath: normalStrength
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 7756196049299078574, guid: 1d697ae8508b6bc43a5970fb39f51784, type: 3}
+      propertyPath: scaleNormalByHeight
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
-    m_RemovedGameObjects: []
+    m_RemovedGameObjects:
+    - {fileID: 7515833284990999427, guid: 1d697ae8508b6bc43a5970fb39f51784, type: 3}
     m_AddedGameObjects: []
     m_AddedComponents: []
-  m_SourcePrefab: {fileID: 100100000, guid: f769116666165df4489d195d20b7c753, type: 3}
---- !u!4 &6320978953045038258 stripped
+  m_SourcePrefab: {fileID: 100100000, guid: 1d697ae8508b6bc43a5970fb39f51784, type: 3}
+--- !u!4 &4840888641980940516 stripped
 Transform:
-  m_CorrespondingSourceObject: {fileID: 5241866392727583673, guid: f769116666165df4489d195d20b7c753, type: 3}
-  m_PrefabInstance: {fileID: 2235607752660332299}
+  m_CorrespondingSourceObject: {fileID: 5511481773808677454, guid: 1d697ae8508b6bc43a5970fb39f51784, type: 3}
+  m_PrefabInstance: {fileID: 1104224043337822890}
   m_PrefabAsset: {fileID: 0}
---- !u!1001 &6683464591925711989
+--- !u!1001 &3726744094684926415
 PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
@@ -1030,87 +1039,92 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 2735129734023003609}
     m_Modifications:
-    - target: {fileID: 2595698028741008750, guid: f769116666165df4489d195d20b7c753, type: 3}
-      propertyPath: foamAmount
-      value: 2
+    - target: {fileID: 3299562207912838904, guid: 1d697ae8508b6bc43a5970fb39f51784, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
       objectReference: {fileID: 0}
-    - target: {fileID: 5241866392727583673, guid: f769116666165df4489d195d20b7c753, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: -1.5
-      objectReference: {fileID: 0}
-    - target: {fileID: 5241866392727583673, guid: f769116666165df4489d195d20b7c753, type: 3}
+    - target: {fileID: 3299562207912838911, guid: 1d697ae8508b6bc43a5970fb39f51784, type: 3}
       propertyPath: m_LocalPosition.y
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 5241866392727583673, guid: f769116666165df4489d195d20b7c753, type: 3}
+    - target: {fileID: 3299562207912838911, guid: 1d697ae8508b6bc43a5970fb39f51784, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0.85
+      objectReference: {fileID: 0}
+    - target: {fileID: 5511481773808677448, guid: 1d697ae8508b6bc43a5970fb39f51784, type: 3}
+      propertyPath: m_Name
+      value: Boat Wake (Trail based)_1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5511481773808677454, guid: 1d697ae8508b6bc43a5970fb39f51784, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5511481773808677454, guid: 1d697ae8508b6bc43a5970fb39f51784, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5511481773808677454, guid: 1d697ae8508b6bc43a5970fb39f51784, type: 3}
       propertyPath: m_LocalPosition.z
       value: 0.5
       objectReference: {fileID: 0}
-    - target: {fileID: 5241866392727583673, guid: f769116666165df4489d195d20b7c753, type: 3}
+    - target: {fileID: 5511481773808677454, guid: 1d697ae8508b6bc43a5970fb39f51784, type: 3}
       propertyPath: m_LocalRotation.w
       value: 1
       objectReference: {fileID: 0}
-    - target: {fileID: 5241866392727583673, guid: f769116666165df4489d195d20b7c753, type: 3}
+    - target: {fileID: 5511481773808677454, guid: 1d697ae8508b6bc43a5970fb39f51784, type: 3}
       propertyPath: m_LocalRotation.x
-      value: -0
+      value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 5241866392727583673, guid: f769116666165df4489d195d20b7c753, type: 3}
+    - target: {fileID: 5511481773808677454, guid: 1d697ae8508b6bc43a5970fb39f51784, type: 3}
       propertyPath: m_LocalRotation.y
-      value: -0
+      value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 5241866392727583673, guid: f769116666165df4489d195d20b7c753, type: 3}
+    - target: {fileID: 5511481773808677454, guid: 1d697ae8508b6bc43a5970fb39f51784, type: 3}
       propertyPath: m_LocalRotation.z
-      value: -0
+      value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 5241866392727583673, guid: f769116666165df4489d195d20b7c753, type: 3}
+    - target: {fileID: 5511481773808677454, guid: 1d697ae8508b6bc43a5970fb39f51784, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 5241866392727583673, guid: f769116666165df4489d195d20b7c753, type: 3}
+    - target: {fileID: 5511481773808677454, guid: 1d697ae8508b6bc43a5970fb39f51784, type: 3}
       propertyPath: m_LocalEulerAnglesHint.y
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 5241866392727583673, guid: f769116666165df4489d195d20b7c753, type: 3}
+    - target: {fileID: 5511481773808677454, guid: 1d697ae8508b6bc43a5970fb39f51784, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 5373185277775375218, guid: f769116666165df4489d195d20b7c753, type: 3}
-      propertyPath: spawnRatePerUnit
+    - target: {fileID: 7515833284990999426, guid: 1d697ae8508b6bc43a5970fb39f51784, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 7756196049299078574, guid: 1d697ae8508b6bc43a5970fb39f51784, type: 3}
+      propertyPath: foamAmount
       value: 2
       objectReference: {fileID: 0}
-    - target: {fileID: 6010628862463200184, guid: f769116666165df4489d195d20b7c753, type: 3}
-      propertyPath: ClampVelocityModule.magnitude.scalar
-      value: 2
+    - target: {fileID: 7756196049299078574, guid: 1d697ae8508b6bc43a5970fb39f51784, type: 3}
+      propertyPath: heightScale
+      value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 7770949301458780107, guid: f769116666165df4489d195d20b7c753, type: 3}
-      propertyPath: m_Layer
-      value: 9
-      objectReference: {fileID: 0}
-    - target: {fileID: 7770949302194290017, guid: f769116666165df4489d195d20b7c753, type: 3}
-      propertyPath: m_Layer
-      value: 9
-      objectReference: {fileID: 0}
-    - target: {fileID: 9109887455258634425, guid: f769116666165df4489d195d20b7c753, type: 3}
-      propertyPath: m_Name
-      value: Boat Wake (Particle based)_1
-      objectReference: {fileID: 0}
-    - target: {fileID: 9109887455258634425, guid: f769116666165df4489d195d20b7c753, type: 3}
-      propertyPath: m_Layer
-      value: 9
-      objectReference: {fileID: 0}
-    - target: {fileID: 9109887455258634425, guid: f769116666165df4489d195d20b7c753, type: 3}
-      propertyPath: m_IsActive
+    - target: {fileID: 7756196049299078574, guid: 1d697ae8508b6bc43a5970fb39f51784, type: 3}
+      propertyPath: normalStrength
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 7756196049299078574, guid: 1d697ae8508b6bc43a5970fb39f51784, type: 3}
+      propertyPath: scaleNormalByHeight
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
-    m_RemovedGameObjects: []
+    m_RemovedGameObjects:
+    - {fileID: 7515833284990999427, guid: 1d697ae8508b6bc43a5970fb39f51784, type: 3}
     m_AddedGameObjects: []
     m_AddedComponents: []
-  m_SourcePrefab: {fileID: 100100000, guid: f769116666165df4489d195d20b7c753, type: 3}
---- !u!4 &1476817928802791372 stripped
+  m_SourcePrefab: {fileID: 100100000, guid: 1d697ae8508b6bc43a5970fb39f51784, type: 3}
+--- !u!4 &9206687474802041729 stripped
 Transform:
-  m_CorrespondingSourceObject: {fileID: 5241866392727583673, guid: f769116666165df4489d195d20b7c753, type: 3}
-  m_PrefabInstance: {fileID: 6683464591925711989}
+  m_CorrespondingSourceObject: {fileID: 5511481773808677454, guid: 1d697ae8508b6bc43a5970fb39f51784, type: 3}
+  m_PrefabInstance: {fileID: 3726744094684926415}
   m_PrefabAsset: {fileID: 0}
 --- !u!1001 &8122687871599978166
 PrefabInstance:
@@ -1134,7 +1148,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7525828635523097715, guid: 2c3dab0da11380d4eab0d781c2154404, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 1.5
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 7525828635523097715, guid: 2c3dab0da11380d4eab0d781c2154404, type: 3}
       propertyPath: m_LocalPosition.z

@@ -12,23 +12,23 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 52fa85b7dde9fba43ab7a60e29e6cd68, type: 3}
   m_Name: ShipData_Small
   m_EditorClassIdentifier: Assembly-CSharp::BaseShipData
-  shipID: DefaultSmall_01
+  shipID: Ship_DefaultSmall
   ShipName: "\uAE30\uBCF8 \uC18C\uD615\uC120"
   ShipDescription: "\uAE30\uBCF8\uC73C\uB85C \uC8FC\uC5B4\uC9C0\uB294 \uC18C\uD615\uC120"
   shipSize: 0
   BaseHP: 300
-  BaseMP: 100
+  BaseMP: 200
   BaseDEF: 5
-  BaseMagnetRange: 5
+  BaseMagnetRange: 3
   BaseSPR: 0
   ShopCost: 0
-  BaseMoveSpeed: 10
-  BaseTurnSpeed: 5
-  shipVisual: {fileID: 7150253761806565065, guid: 2c3dab0da11380d4eab0d781c2154404, type: 3}
+  BaseMoveSpeed: 15
+  BaseTurnSpeed: 14
+  shipVisual: {fileID: 6296204960816733298, guid: badbdb0501f799040ac383f8ce20dcb6, type: 3}
   shipIcon: {fileID: 0}
-  ColliderCenter: {x: 0, y: 1, z: -0.5}
-  ColliderSize: {x: 2.8, y: 2, z: 10}
-  BaseSurfaceSize: {x: 3, y: 8}
-  BaseHeightOffset: -0.6
+  ColliderCenter: {x: 0, y: 1.5, z: 0}
+  ColliderSize: {x: 3.5, y: 2.5, z: 8}
+  BaseSurfaceSize: {x: 4, y: 8}
+  BaseHeightOffset: -0.8
   rollAmount: 0.2
-  smoothing: 0.15
+  smoothing: 0.5

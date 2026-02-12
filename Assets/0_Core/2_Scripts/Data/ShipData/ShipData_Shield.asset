@@ -1,0 +1,36 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 52fa85b7dde9fba43ab7a60e29e6cd68, type: 3}
+  m_Name: ShipData_Shield
+  m_EditorClassIdentifier: BattleShip.Data::BaseShipData
+  shipID: Ship_Shield
+  ShipName: "\uBC29\uD328\uC120"
+  ShipDescription: "\uBC29\uD328\uC758 \uD615\uC0C1\uC744 \uB748 \uB3DB\uC73C\uB85C
+    \uB2E8\uB2E8\uD55C \uC7AC\uB8CC\uB97C \uC0AC\uC6A9\uD558\uC5EC \uC81C\uC791\uB41C
+    \uD568\uC120"
+  shipSize: 2
+  BaseHP: 1300
+  BaseMP: 250
+  BaseDEF: 50
+  BaseMagnetRange: 8
+  BaseSPR: 30
+  ShopCost: 4000
+  BaseMoveSpeed: 11
+  BaseTurnSpeed: 11
+  shipVisual: {fileID: 3349563085071643006, guid: 6cc25a3584f882f4b8306291a89a83fd, type: 3}
+  shipIcon: {fileID: 0}
+  ColliderCenter: {x: 0, y: 2.5, z: -1}
+  ColliderSize: {x: 4.5, y: 4.5, z: 17.5}
+  BaseSurfaceSize: {x: 9, y: 23}
+  BaseHeightOffset: -1.4
+  rollAmount: 0.15
+  smoothing: 1

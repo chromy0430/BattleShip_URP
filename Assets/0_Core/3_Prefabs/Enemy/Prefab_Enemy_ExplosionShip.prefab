@@ -111,7 +111,7 @@ BoxCollider:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_IsTrigger: 1
+  m_IsTrigger: 0
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
@@ -140,9 +140,9 @@ Rigidbody:
   m_ImplicitCom: 1
   m_ImplicitTensor: 1
   m_UseGravity: 0
-  m_IsKinematic: 1
-  m_Interpolate: 0
-  m_Constraints: 80
+  m_IsKinematic: 0
+  m_Interpolate: 1
+  m_Constraints: 84
   m_CollisionDetection: 0
 --- !u!114 &7344216166789066247
 MonoBehaviour:
@@ -451,15 +451,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c9d7e975fafe5a74383059dd84be33a1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyChaser
-  cachedTransform: {fileID: 0}
   moveSpeed: 11
   turnSpeed: 5
   stopDistance: 2
+  surfaceSize: 1
   heightOffset: -0.6
-  damage: 10
-  attackRate: 1
-  attackRange: 3.5
-  lastAttackTime: 0
+  cachedTransform: {fileID: 0}
+  rb: {fileID: 0}
+  status: {fileID: 0}
+  currentRotationVelocity: 0
+  buoyancyFrameOffset: 0
 --- !u!1001 &6626655239539497199
 PrefabInstance:
   m_ObjectHideFlags: 0
