@@ -5,7 +5,6 @@ using StylizedWater3;
 public class WaterBatchManager : MonoBehaviour
 {
     public static WaterBatchManager Instance { get; private set; }
-    private List<Transform> _targetTransforms = new List<Transform>(1000);
 
     // 물 높이 로직 관련
     [SerializeField] private HeightQuerySystem.Interface heightInterface;
@@ -53,26 +52,9 @@ public class WaterBatchManager : MonoBehaviour
         }
     }
 
-    // 카메라 프러스텀에서 벗어났을 때 아래로 내려가는 것 방지
-    /*private void LateUpdate()
-    {
-        foreach (var target in _targets)
-        {
-            if (!target.IsActive) continue;
-
-            if (transform.position.y < -1f)
-            {
-                Vector3 pos = transform.position;
-                pos.y = -.8f;
-                transform.position = pos;
-            }
-        }
-    }*/
-
     private void UpdateSamplePositions(IWaterFloatTarget target)
     {
         var pos = target.Transform.position;
-        //float half = target.SurfaceSize * 0.5f;
         var rot = target.Transform.rotation;
 
         float halfW = target.SurfaceSize.x * 0.5f;
@@ -99,17 +81,6 @@ public class WaterBatchManager : MonoBehaviour
             pos.y = h + target.HeightOffset;
             target.Transform.position = pos;
         }
-
-        /*// 계산된 값으로 높이 적용
-        float h =
-            (_sampler.heightValues[0] +
-             _sampler.heightValues[1] +
-             _sampler.heightValues[2] +
-             _sampler.heightValues[3]) * 0.25f;
-
-        var pos = target.Transform.position;
-        pos.y = h + target.HeightOffset;
-        target.Transform.position = pos;*/
     }
 
     // 리스트에 등록
