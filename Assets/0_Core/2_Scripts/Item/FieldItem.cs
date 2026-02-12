@@ -26,9 +26,9 @@ namespace BattleShip
         public float HeightOffset => _heightOffset;
         public Vector2 SurfaceSize => _surfaceSize;
         public bool IsActive => gameObject.activeInHierarchy;
+        public bool UseSimpleWaterPhysics => true;
 
         private HeightQuerySystem.Interface _heightInterface;
-
         private bool _isCollected = false;
 
         private void Awake()
@@ -53,26 +53,21 @@ namespace BattleShip
         }
 
         public void SetWaterObject(HeightQuerySystem.Interface heightInterface)
-        {
-            // 이미 같은 WaterObject면 갱신하지 않음 
+        { 
             if (_heightInterface == heightInterface)
                 return;
 
             _heightInterface = heightInterface;
         }
 
-        // 아이템 초기화 (DropManager가 호출)
+        // 아이템 초기화
         public void Initialize(BaseItemData data)
         {
             _itemData = data;
 
-            // 아이콘 설정
             if (_iconRenderer != null && data != null && data.Icon != null)
             {
                 _iconRenderer.sprite = data.Icon;
-
-                // 3D 뷰에서 아이콘이 잘 보이도록 카메라를 향하게 하거나 눕히는 설정
-                // (일단 x축 90도로 눕혀서 수면에 떠있는 것처럼 보이게 설정 예시)
                 _iconRenderer.transform.localRotation = Quaternion.Euler(90f, 0f, 0f);
             }
         }

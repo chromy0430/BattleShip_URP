@@ -16,7 +16,7 @@ public class EnemyDrop : MonoBehaviour, IWaterFloatTarget
     public float HeightOffset => heightOffset;
     public Vector2 SurfaceSize => surfaceSize;
     public bool IsActive => gameObject.activeInHierarchy;
-
+    public bool UseSimpleWaterPhysics => true;
     private HeightQuerySystem.Interface _heightInterface;
 
     private void Awake()
@@ -57,15 +57,12 @@ public class EnemyDrop : MonoBehaviour, IWaterFloatTarget
     public void Initialize(int exp)
     {
         this.expAmount = exp;
-        UpdateVisual(false);
+        UpdateVisual(true);
     }
 
     public void SetWaterObject(HeightQuerySystem.Interface heightInterface)
     {
-        // 이미 같은 WaterObject면 아무 것도 안 함
-        if (_heightInterface == heightInterface)
-            return;
-
+        if (_heightInterface == heightInterface)  return;
         _heightInterface = heightInterface;
     }
 
@@ -74,10 +71,8 @@ public class EnemyDrop : MonoBehaviour, IWaterFloatTarget
         return _heightInterface;
     }
 
-    // 변경 필수 - OnEnable 될때마다 Register 되기때문에 WaterBatchManager에 들어가면 CPU 병목 발생
     private void OnEnable()
     {
-        // 오브젝트 풀에서 꺼내질 때(활성화) 자동 등록
         if (PlayerManager.Instance != null)
         {
             PlayerManager.Instance.RegisterCoin(this);
@@ -91,7 +86,7 @@ public class EnemyDrop : MonoBehaviour, IWaterFloatTarget
     private void OnDisable()
     {
         transform.DOKill();
-        // 오브젝트 풀로 돌아갈 때(비활성화) 자동 해제
+
         if (PlayerManager.Instance != null)
         {
             PlayerManager.Instance.UnregisterCoin(this);

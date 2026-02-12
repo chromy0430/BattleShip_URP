@@ -1,12 +1,14 @@
-using StylizedWater3;
+ï»¿using StylizedWater3;
 using UnityEngine;
 
 public interface IWaterFloatTarget
 {
-    Transform Transform { get; } // ÇöÀç À§Ä¡
-    float HeightOffset { get; } // ÁöÁ¤ ³ôÀÌ
-    Vector2 SurfaceSize { get; } // ºÎ·ÂÀ» ¹ÞÀ» ¿ÀºêÁ§Æ® ¸é Å©±â
-    bool IsActive { get; } // È°¼ºÈ­ ¿©ºÎ
+    Transform Transform { get; } // í˜„ìž¬ ìœ„ì¹˜
+    float HeightOffset { get; } // ì§€ì • ë†’ì´
+    Vector2 SurfaceSize { get; } // ë¶€ë ¥ì„ ë°›ì„ ì˜¤ë¸Œì íŠ¸ ë©´ í¬ê¸°
+    bool IsActive { get; } // í™œì„±í™” ì—¬ë¶€
+    bool UseSimpleWaterPhysics => false;
 
     void SetWaterObject(HeightQuerySystem.Interface heightInterface);
+
 }

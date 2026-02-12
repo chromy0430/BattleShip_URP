@@ -9,15 +9,25 @@ public class WaterBatchManager : MonoBehaviour
     // 물 높이 로직 관련
     [SerializeField] private HeightQuerySystem.Interface heightInterface;
     [SerializeField] private WaveProfile waveProfile;
+
     private readonly List<IWaterFloatTarget> _targets = new();
-    private HeightQuerySystem.Sampler _sampler;
+
+    // 최적화를 위한 샘플러 구분
+    private HeightQuerySystem.Sampler _hqSampler;
+    private HeightQuerySystem.Sampler _lqSampler;
+
     Vector3 queryPos;
     private void Awake()
     {
         Instance = this;
 
-        _sampler = new HeightQuerySystem.Sampler();
-        _sampler.SetSampleCount(4);
+        // 플레이어용
+        _hqSampler = new HeightQuerySystem.Sampler();
+        _hqSampler.SetSampleCount(4);
+
+        // 아이템용
+        _lqSampler = new HeightQuerySystem.Sampler();
+        _lqSampler.SetSampleCount(1);
 
         heightInterface.waveProfile = waveProfile;
     }
@@ -44,42 +54,14 @@ public class WaterBatchManager : MonoBehaviour
         {
             if (!target.IsActive) continue;
 
-            UpdateSamplePositions(target);
-
-            Gerstner.ComputeHeight(_sampler, heightInterface);
-
-            ApplyHeight(target);
-        }
-    }
-
-    private void UpdateSamplePositions(IWaterFloatTarget target)
-    {
-        var pos = target.Transform.position;
-        var rot = target.Transform.rotation;
-
-        float halfW = target.SurfaceSize.x * 0.5f;
-        float halfL = target.SurfaceSize.y * 0.5f;
-
-        // 타겟 기준으로 부력 받는 위치에서 높이 계산
-        _sampler.SetSamplePosition(0, pos + (rot * new Vector3(-halfW, 0, 0))); 
-        _sampler.SetSamplePosition(1, pos + (rot * new Vector3(halfW, 0, 0)));  
-        _sampler.SetSamplePosition(2, pos + (rot * new Vector3(0, 0, -halfL))); 
-        _sampler.SetSamplePosition(3, pos + (rot * new Vector3(0, 0, halfL)));
-    }
-    private void ApplyHeight(IWaterFloatTarget target)
-    {
-        if (target is PlayerFloating player)
-        {
-            player.OnHeightCalculated(_sampler.heightValues);
-        }
-        else
-        {
-            // 일반 오브젝트는 기존처럼 단순 높이 적용
-            float h = (_sampler.heightValues[0] + _sampler.heightValues[1] +
-                       _sampler.heightValues[2] + _sampler.heightValues[3]) * 0.25f;
-            Vector3 pos = target.Transform.position;
-            pos.y = h + target.HeightOffset;
-            target.Transform.position = pos;
+            if (target.UseSimpleWaterPhysics)
+            {
+                ProcessLowQuality(target);
+            }
+            else
+            {
+                ProcessHighQuality(target);
+            }
         }
     }
 
@@ -94,15 +76,10 @@ public class WaterBatchManager : MonoBehaviour
         if (heightInterface.HasMissingReferences())
         {
             heightInterface.GetWaterObject(queryPos);
-            //Debug.LogWarning($"[WaterBatchManager] No WaterObject found for {target}");
-            //return;
         }
 
-        // 타겟에 WaterObject 캐싱
         target.SetWaterObject(heightInterface);
-
         _targets.Add(target);
-
     }
 
     // 리스트에서 해제
@@ -123,6 +100,60 @@ public class WaterBatchManager : MonoBehaviour
 
     private void OnDestroy()
     {
-        _sampler?.Dispose();
+        _hqSampler?.Dispose();
+        _lqSampler?.Dispose();
+    }
+
+
+    private void ProcessLowQuality(IWaterFloatTarget target)
+    {
+        _lqSampler.SetSamplePosition(0, target.Transform.position);
+        Gerstner.ComputeHeight(_lqSampler, heightInterface);
+        float h = _lqSampler.heightValues[0];
+        Vector3 pos = target.Transform.position;
+        pos.y = h + target.HeightOffset;
+        target.Transform.position = pos;
+    }
+
+    private void ProcessHighQuality(IWaterFloatTarget target)
+    {
+        UpdateSamplePositionsHQ(target);
+
+        Gerstner.ComputeHeight(_hqSampler, heightInterface);
+
+        ApplyHeightHQ(target);
+    }
+
+    private void UpdateSamplePositionsHQ(IWaterFloatTarget target)
+    {
+        var pos = target.Transform.position;
+        var rot = target.Transform.rotation;
+
+        float halfW = target.SurfaceSize.x * 0.5f;
+        float halfL = target.SurfaceSize.y * 0.5f;
+
+        // 타겟 기준으로 부력 받는 4개 위치 계산
+        _hqSampler.SetSamplePosition(0, pos + (rot * new Vector3(-halfW, 0, 0)));
+        _hqSampler.SetSamplePosition(1, pos + (rot * new Vector3(halfW, 0, 0)));
+        _hqSampler.SetSamplePosition(2, pos + (rot * new Vector3(0, 0, -halfL)));
+        _hqSampler.SetSamplePosition(3, pos + (rot * new Vector3(0, 0, halfL)));
+    }
+
+    private void ApplyHeightHQ(IWaterFloatTarget target)
+    {
+        if (target is PlayerFloating player)
+        {
+            // 플레이어는 파도에 따른 기울기(Tilt)까지 처리
+            player.OnHeightCalculated(_hqSampler.heightValues);
+        }
+        else
+        {
+            // Fallback: UseSimpleWaterPhysics가 false인데 PlayerFloating이 아닌 경우 (평균값 적용)
+            float h = (_hqSampler.heightValues[0] + _hqSampler.heightValues[1] +
+                       _hqSampler.heightValues[2] + _hqSampler.heightValues[3]) * 0.25f;
+            Vector3 pos = target.Transform.position;
+            pos.y = h + target.HeightOffset;
+            target.Transform.position = pos;
+        }
     }
 }

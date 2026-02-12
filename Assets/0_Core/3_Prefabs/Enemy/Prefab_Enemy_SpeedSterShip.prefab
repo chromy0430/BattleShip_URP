@@ -66,7 +66,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1416067811673937586, guid: 4a8280c5be5e1fc4fa9bbf1c2817ae1b, type: 3}
       propertyPath: m_Constraints
-      value: 84
+      value: 80
       objectReference: {fileID: 0}
     - target: {fileID: 1416067811673937586, guid: 4a8280c5be5e1fc4fa9bbf1c2817ae1b, type: 3}
       propertyPath: m_Interpolate

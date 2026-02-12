@@ -158,13 +158,18 @@ public class EnemyBatchManager : MonoBehaviour
                 if (moveDir.sqrMagnitude > 0.01f)
                 {
                     Quaternion lookRot = Quaternion.LookRotation(moveDir.normalized, Vector3.up);
+                    e.rb.MoveRotation(Quaternion.Slerp(e.rb.rotation, lookRot, deltaTime * e.turnSpeed));
+                }
+                /*if (moveDir.sqrMagnitude > 0.01f)
+                {
+                    Quaternion lookRot = Quaternion.LookRotation(moveDir.normalized, Vector3.up);
                     if (isHighQuality && waveAlignmentStrength > 0)
                     {
                         Quaternion waveRot = Quaternion.FromToRotation(Vector3.up, targetNormal);
                         lookRot = waveRot * lookRot;
                     }
                     e.rb.MoveRotation(Quaternion.Slerp(e.rb.rotation, lookRot, deltaTime * e.turnSpeed));
-                }
+                }*/
             }
         }
     }
