@@ -38,45 +38,30 @@ public class UpgradeManagerEditor : Editor
         GUILayout.EndHorizontal();
     }
 
-    // -----------------------------------------------------------------------
-    // 1. UpgradeData 로드
-    // -----------------------------------------------------------------------
     private void LoadAllUpgradeData()
     {
         List<UpgradeData> dataList = FindAssetsByType<UpgradeData>();
         UpdateSerializedList("allUpgrades", dataList);
     }
 
-    // -----------------------------------------------------------------------
-    // 2. WeaponData 로드
-    // -----------------------------------------------------------------------
     private void LoadAllWeaponData()
     {
         List<BaseWeaponData> dataList = FindAssetsByType<BaseWeaponData>();
         UpdateSerializedList("allWeapons", dataList);
     }
 
-    // -----------------------------------------------------------------------
-    // 3. EquipmentData 로드
-    // -----------------------------------------------------------------------
     private void LoadAllEquipmentData()
     {
         List<BaseEquipmentData> dataList = FindAssetsByType<BaseEquipmentData>();
         UpdateSerializedList("allEquipments", dataList);
     }
 
-    // -----------------------------------------------------------------------
-    // 4. CargoData 로드
-    // -----------------------------------------------------------------------
     private void LoadAllCargoData()
     {
         List<BaseCargoData> dataList = FindAssetsByType<BaseCargoData>();
         UpdateSerializedList("allCargos", dataList);
     }
 
-    // -----------------------------------------------------------------------
-    // [공통 유틸리티] 제네릭 에셋 검색 함수
-    // -----------------------------------------------------------------------
     private List<T> FindAssetsByType<T>() where T : ScriptableObject
     {
         string[] guids = AssetDatabase.FindAssets($"t:{typeof(T).Name}");
@@ -91,9 +76,6 @@ public class UpgradeManagerEditor : Editor
         return list;
     }
 
-    // -----------------------------------------------------------------------
-    // [공통 유틸리티] 리스트 갱신 함수
-    // -----------------------------------------------------------------------
     private void UpdateSerializedList<T>(string propertyName, List<T> newData) where T : Object
     {
         SerializedProperty listProperty = serializedObject.FindProperty(propertyName);

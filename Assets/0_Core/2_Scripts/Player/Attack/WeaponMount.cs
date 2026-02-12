@@ -244,23 +244,37 @@ public class WeaponMount : MonoBehaviour
         return _weaponData != null;
     }
 
+    public bool IsMaxLevel()
+    {
+        return (_runtimeStat != null && _weaponData != null && _runtimeStat.WeaponLevel >= _weaponData.MaxLevel);
+    }
+
     // 무기 레벨업
     public void LevelUp()
     {
-        if (_weaponData == null || _runtimeStat == null) return;
+        if (_runtimeStat == null) return;
 
         if (_runtimeStat.WeaponLevel >= _weaponData.MaxLevel)
         {
-            // 최고 레벨일 시 행동 로직 추가
+            // TODO 만렙일 경우 대비, 보상로직 추가 가능
+            // 만렙일 경우에 레벨업 시 체력, 마나 회복 또는 골드 증가
+
             return;
         }
 
+        // 무기 레벨업
         _runtimeStat.WeaponLevel++;
 
-        foreach (var modifier in _weaponData.growthPerLevel)
+        // 무기 강화 적용
+        if (_weaponData != null && _weaponData.growthPerLevel != null)
         {
-            ApplyUpgradeBonus(modifier.targetStat, modifier.value);
+            foreach (var modifier in _weaponData.growthPerLevel)
+            {
+                ApplyUpgradeBonus(modifier.targetStat, modifier.value);
+            }
         }
+
+        // TODO 무기 레벨업 시 이펙트, 사운드 추가시 여기서 추가
     }
 
     public void EquipWeapon(BaseWeaponData newData)

@@ -236,6 +236,7 @@ public class UpgradeManager : MonoBehaviour
                 if (mount.GetWeaponID() == data.relatedWeaponID)
                 {
                     mount.ApplyUpgradeBonus(data.targetStat, data.value);
+                    mount.LevelUp();
                     applied = true;
                 }
             }
@@ -250,7 +251,7 @@ public class UpgradeManager : MonoBehaviour
     {
         List<object> results = new List<object>();
 
-        // 1. 현재 상태 분석 (내 무기 목록)
+        // 내 무기 목록 체크
         int currentWeaponCount = 0;
         int maxWeaponCount = _activeWeaponMounts.Count;
         HashSet<string> myWeaponIDs = new HashSet<string>();
@@ -265,19 +266,37 @@ public class UpgradeManager : MonoBehaviour
             }
         }
 
-        // 2. 풀(Pool) 분류
 
-        // A. 스탯 강화 풀
+        // 스탯 강화
         List<UpgradeData> poolStat = allUpgrades.AsValueEnumerable()
     .Where(u => string.IsNullOrEmpty(u.relatedWeaponID) && IsUpgradeValid(u))
     .ToList();
 
-        // B. 무기 강화 풀
+        // 무기 강화
         List<UpgradeData> poolWeaponUp = allUpgrades.AsValueEnumerable()
-            .Where(u => !string.IsNullOrEmpty(u.relatedWeaponID) && myWeaponIDs.Contains(u.relatedWeaponID) && IsUpgradeValid(u))
-            .ToList();
+            .Where(u => 
+            {
+                // 무기 ID가 없거나, 내가 안 가진 무기면 탈락
+                if (string.IsNullOrEmpty(u.relatedWeaponID) || !myWeaponIDs.Contains(u.relatedWeaponID))
+                    return false;
 
-        // C. 신규 무기 (안 가진 것)
+                // 기본 유효성 체크 (횟수 제한 등)
+                if (!IsUpgradeValid(u))
+                    return false;
+
+                // 해당 무기가 이미 '만렙(MaxLevel)'이면 탈락
+                // _activeWeaponMounts 리스트에서 해당 ID를 가진 무기를 찾음
+                var targetMount = _activeWeaponMounts.FirstOrDefault(m => m.GetWeaponID() == u.relatedWeaponID);
+
+                // 무기가 있고, 만렙이라면강화 카드는
+                if (targetMount != null && targetMount.IsMaxLevel())
+                    return false;
+
+                return true;
+            })
+        .ToList();
+
+        // 신규 무기
         List<BaseWeaponData> poolNewWeapon = new List<BaseWeaponData>();
         if (allWeapons != null)
         {
@@ -286,43 +305,35 @@ public class UpgradeManager : MonoBehaviour
                 .ToList();
         }
 
-        // D. 장비 (전체)
+        // 장비 (전체)
         List<BaseEquipmentData> poolEquipment = new List<BaseEquipmentData>();
         if (allEquipments != null)
         {
-            // [중요] 나중에 로직에서 RemoveAt을 사용하므로, 원본(ScriptableObject 리스트)을 건드리지 않게
-            // 반드시 'ToList()'로 새로운 리스트 복사본을 만들어야 합니다.
             poolEquipment = allEquipments.AsValueEnumerable().ToList();
         }
 
-        // 3. 확률 설정 (단위: %)
-        // 기본값 (Normal)
+        // 확률 설정 (단위: %)
         int pStat = 30;
         int pWpUp = 40;
         int pNewWp = 20;
-        //int pEquip = 10;
 
         bool isFull = (currentWeaponCount >= maxWeaponCount);
         bool isInitial = (currentWeaponCount <= 1);
 
         if (isFull)
         {
-            // [요청 반영] 꽉 찼을 때: 스왑 기회 3% (무기 2% + 장비 1%)
             pStat = 37;
             pWpUp = 60;
             pNewWp = 2;
-            //pEquip = 1;
         }
         else if (isInitial)
         {
-            // 초반: 무기 획득 확률 높임
             pStat = 20;
             pWpUp = 30;
             pNewWp = 35;
-            //pEquip = 15;
         }
 
-        // 4. 주사위 굴리기 (Cumulative Probability)
+        // 주사위 굴리기
         for (int i = 0; i < count; i++)
         {
             int dice = UnityEngine.Random.Range(0, 100);
@@ -330,7 +341,7 @@ public class UpgradeManager : MonoBehaviour
 
             // 순서: 스탯 -> 무기강화 -> 신규무기 -> 장비
 
-            // 1. 스탯 강화 (0 ~ pStat)
+            // 스탯 강화
             if (dice < pStat)
             {
                 if (poolStat.Count > 0)
@@ -339,10 +350,10 @@ public class UpgradeManager : MonoBehaviour
                     selectedItem = poolStat[idx];
                     poolStat.RemoveAt(idx);
                 }
-                else dice += 100; // 풀 비었으면 다음으로
+                else dice += 100;
             }
 
-            // 2. 무기 강화 ( ~ pStat + pWpUp)
+            // 무기 강화
             if (selectedItem == null && dice < (pStat + pWpUp))
             {
                 if (poolWeaponUp.Count > 0)
@@ -354,7 +365,7 @@ public class UpgradeManager : MonoBehaviour
                 else dice += 100;
             }
 
-            // 3. 신규 무기 ( ~ pStat + pWpUp + pNewWp)
+            // 신규 무기
             if (selectedItem == null && dice < (pStat + pWpUp + pNewWp))
             {
                 if (poolNewWeapon.Count > 0)
@@ -366,21 +377,17 @@ public class UpgradeManager : MonoBehaviour
                 else dice += 100;
             }
 
-            // 4. 장비 (나머지)
+            // 장비
             if (selectedItem == null)
             {
                 if (poolEquipment.Count > 0)
                 {
                     int idx = UnityEngine.Random.Range(0, poolEquipment.Count);
                     selectedItem = poolEquipment[idx];
-                    // 장비는 중복 허용(레벨업)하므로 RemoveAt 안 해도 되지만,
-                    // 한 화면에 똑같은 장비 2개 뜨는게 싫다면 RemoveAt 사용.
-                    // 여기선 다양성을 위해 RemoveAt 사용
                     poolEquipment.RemoveAt(idx);
                 }
                 else
                 {
-                    // 정말 줄 게 없으면 최후의 수단: 스탯 강화
                     if (poolStat.Count > 0)
                     {
                         int idx = UnityEngine.Random.Range(0, poolStat.Count);
