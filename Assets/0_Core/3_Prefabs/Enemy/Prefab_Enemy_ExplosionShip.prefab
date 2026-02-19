@@ -72,7 +72,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 9ed5f795f93465448955050f4eff3a82, type: 2}
+  - {fileID: 2100000, guid: 7577953326964a14f91815e75533b2e4, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -454,11 +454,20 @@ MonoBehaviour:
   moveSpeed: 11
   turnSpeed: 5
   stopDistance: 2
+  stopDistanceJitter: 1.25
   surfaceSize: 1
   heightOffset: -0.6
+  drawLocalDebugGizmo: 1
+  drawDebugWhenSelectedOnly: 1
+  debugCircleSegments: 48
   cachedTransform: {fileID: 0}
   rb: {fileID: 0}
+  bodyCollider: {fileID: 0}
   status: {fileID: 0}
+  cachedWaterY: 0
+  effectiveStopDistance: 0
+  orbitAngleDeg: 0
+  orbitDirectionSign: 0
   currentRotationVelocity: 0
 --- !u!1001 &6626655239539497199
 PrefabInstance:

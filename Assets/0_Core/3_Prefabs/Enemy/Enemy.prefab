@@ -435,11 +435,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Enemy
   maxHealth: 20
   _Shield: 0
+  canAttack: 1
   flickerFeedback: {fileID: 7056665536012515985}
-  _rb: {fileID: 0}
   damageObject: {fileID: 5998229489655625853, guid: 9d2d63e853c5b3449929068d2c01b2ab, type: 3}
   wakeTrailObject: {fileID: 3883547053960890889}
-  canAttack: 1
+  _rb: {fileID: 0}
 --- !u!114 &5895034854558281223
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -455,13 +455,21 @@ MonoBehaviour:
   moveSpeed: 11
   turnSpeed: 5
   stopDistance: 2
+  stopDistanceJitter: 2
   surfaceSize: 1
   heightOffset: 0
+  drawLocalDebugGizmo: 1
+  drawDebugWhenSelectedOnly: 1
+  debugCircleSegments: 48
   cachedTransform: {fileID: 0}
   rb: {fileID: 0}
+  bodyCollider: {fileID: 0}
   status: {fileID: 0}
+  cachedWaterY: 0
+  effectiveStopDistance: 0
+  orbitAngleDeg: 0
+  orbitDirectionSign: 0
   currentRotationVelocity: 0
-  buoyancyFrameOffset: 0
 --- !u!1001 &5537653342976147434
 PrefabInstance:
   m_ObjectHideFlags: 0

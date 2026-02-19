@@ -282,7 +282,7 @@ PrefabInstance:
     - target: {fileID: -7511558181221131132, guid: 12ed77f26e4072746b4239a1f6e765da, type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
       value: 
-      objectReference: {fileID: 2100000, guid: e2931dc0fd9ac4842b3f906fc9caf4b9, type: 2}
+      objectReference: {fileID: 2100000, guid: 0df30beb8493c7149bc54b43a9aae907, type: 2}
     - target: {fileID: 919132149155446097, guid: 12ed77f26e4072746b4239a1f6e765da, type: 3}
       propertyPath: m_Name
       value: Prefab_Ship_Turtle

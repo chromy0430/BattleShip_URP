@@ -1592,9 +1592,36 @@ MonoBehaviour:
     waterLevelTransform: {fileID: 0}
     waterLevel: 0
   waveProfile: {fileID: 11400000, guid: 343e9ebae18bc0f48811edac300d64d0, type: 2}
-  highQualityDistSqr: 900
+  highQualityDistSqr: 1800
+  mediumQualityDistSqr: 3600
+  nearUpdateInterval: 1
+  mediumUpdateInterval: 1
+  farUpdateInterval: 4
+  verticalMoveThreshold: 0.01
+  waterHeightLerpSpeed: 5
+  enableSeparation: 1
+  separationRadius: 3.2
+  separationStrength: 2.2
+  maxSeparationNeighbors: 6
+  fallbackPlayerRadius: 6.5
+  fallbackEnemyRadius: 1.1
+  ringPadding: 2.8
+  slotInfluenceDistance: 16
+  orbitAngularSpeed: 20
+  orbitSpeedMultiplier: 0.85
+  radialCorrectionStrength: 2
+  drawDebugGizmos: 1
+  drawAllEnemyDebug: 0
+  maxDebugEnemies: 8
+  debugMaxDistance: 35
+  gizmoHeightOffset: 0.15
+  separationRadiusColor: {r: 1, g: 0.45, b: 0.15, a: 1}
+  engageRadiusColor: {r: 0.2, g: 1, b: 0.9, a: 1}
+  slotTargetColor: {r: 0.95, g: 0.95, b: 0.2, a: 1}
+  velocityColor: {r: 0.45, g: 0.8, b: 1, a: 1}
+  overlapBoundaryColor: {r: 1, g: 0.2, b: 0.2, a: 1}
+  overlapBoundaryPadding: 1
   moveSpeedMultiplier: 1
-  waveAlignmentStrength: 2
   acceleration: 50
 --- !u!114 &360754106
 MonoBehaviour:
@@ -1613,7 +1640,7 @@ MonoBehaviour:
   spawnDivisions: 12
   angleJitter: 5
   startSpawnInterval: 1
-  startSpawnCount: 6
+  startSpawnCount: 100
   minSpawnIntervalLimit: 0.1
   intervalReductionPerMinute: 0.2
   maxSpawnCountBatch: 12
@@ -3036,8 +3063,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 704386980}
   serializedVersion: 2
-  m_LocalRotation: {x: -0.0014413918, y: 0, z: -0.0020105492, w: 0.99999696}
-  m_LocalPosition: {x: -10.64, y: -0.0037077526, z: 14.52}
+  m_LocalRotation: {x: -0.037403237, y: 0, z: 0, w: 0.9993003}
+  m_LocalPosition: {x: -10.64, y: -0.01249439, z: 14.52}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -3078,9 +3105,9 @@ MonoBehaviour:
   surfaceSize: {x: 1, y: 1}
   followTarget: {fileID: 0}
   heightOffset: 0
-  rollAmount: 0.1
+  rollAmount: 1.5
   rotation: 0
-  smoothing: 0.1
+  smoothing: 2
   heightValue: 0
   rigidbody: {fileID: 0}
 --- !u!1 &719648478
@@ -6944,8 +6971,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1751036400}
   serializedVersion: 2
-  m_LocalRotation: {x: -0.0045895088, y: 0, z: -0.0024724258, w: 0.9999864}
-  m_LocalPosition: {x: -10.64, y: -0.06238057, z: 21.01}
+  m_LocalRotation: {x: -0.0024988032, y: 0, z: 0, w: 0.9999969}
+  m_LocalPosition: {x: -10.64, y: -0.012494132, z: 21.01}
   m_LocalScale: {x: 1, y: 2, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -8180,6 +8207,10 @@ PrefabInstance:
     - target: {fileID: 6953428160303544994, guid: cae5f9a344f3b9146aa3a4b34bccb45a, type: 3}
       propertyPath: m_LocalPosition.y
       value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 7984457395799256641, guid: cae5f9a344f3b9146aa3a4b34bccb45a, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 9123515468975888438, guid: cae5f9a344f3b9146aa3a4b34bccb45a, type: 3}
       propertyPath: m_CollisionDetection
