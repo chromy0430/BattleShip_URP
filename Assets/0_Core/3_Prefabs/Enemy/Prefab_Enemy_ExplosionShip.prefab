@@ -11,8 +11,6 @@ GameObject:
   - component: {fileID: 5361482556793331198}
   - component: {fileID: 2242977880454685188}
   - component: {fileID: 8026389322704218095}
-  - component: {fileID: 2467079621670279897}
-  - component: {fileID: 3954217609335754843}
   - component: {fileID: 7344216166789066247}
   - component: {fileID: 606962988404464449}
   - component: {fileID: 8742886453611738451}
@@ -96,54 +94,6 @@ MeshRenderer:
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!65 &2467079621670279897
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6727300055146699501}
-  m_Material: {fileID: 13400000, guid: f215f829c4a4d06488164ea53b81a462, type: 2}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 4, y: 3, z: 9.2}
-  m_Center: {x: 0, y: 1.5, z: 0.5}
---- !u!54 &3954217609335754843
-Rigidbody:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6727300055146699501}
-  serializedVersion: 5
-  m_Mass: 1
-  m_LinearDamping: 1
-  m_AngularDamping: 1
-  m_CenterOfMass: {x: 0, y: 0, z: 0}
-  m_InertiaTensor: {x: 1, y: 1, z: 1}
-  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ImplicitCom: 1
-  m_ImplicitTensor: 1
-  m_UseGravity: 0
-  m_IsKinematic: 0
-  m_Interpolate: 1
-  m_Constraints: 80
-  m_CollisionDetection: 0
 --- !u!114 &7344216166789066247
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -434,11 +384,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Enemy
   maxHealth: 20
   _Shield: 0
+  _attackRadius: 10
   canAttack: 1
   flickerFeedback: {fileID: 7344216166789066247}
   damageObject: {fileID: 5998229489655625853, guid: 9d2d63e853c5b3449929068d2c01b2ab, type: 3}
   wakeTrailObject: {fileID: 1696217328252644007}
-  _rb: {fileID: 0}
 --- !u!114 &8742886453611738451
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -454,21 +404,12 @@ MonoBehaviour:
   moveSpeed: 11
   turnSpeed: 5
   stopDistance: 2
-  stopDistanceJitter: 1.25
   surfaceSize: 2
   heightOffset: -0.8
-  drawLocalDebugGizmo: 1
-  drawDebugWhenSelectedOnly: 1
-  debugCircleSegments: 48
   cachedTransform: {fileID: 0}
-  rb: {fileID: 0}
-  bodyCollider: {fileID: 0}
   status: {fileID: 0}
   cachedWaterY: 0
-  effectiveStopDistance: 0
-  orbitAngleDeg: 0
-  orbitDirectionSign: 0
-  currentRotationVelocity: 0
+  currentVelocity: {x: 0, y: 0, z: 0}
 --- !u!1001 &6626655239539497199
 PrefabInstance:
   m_ObjectHideFlags: 0

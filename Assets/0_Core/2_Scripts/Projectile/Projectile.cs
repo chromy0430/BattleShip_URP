@@ -4,44 +4,34 @@ using System;
 using System.Threading;
 using UnityEngine;
 
-[RequireComponent(typeof(Rigidbody))]
-[RequireComponent(typeof(Collider))]
 public class Projectile : MonoBehaviour
 {
     #region 필드
     // 컴포넌트
     private IEnemy _target;  
     private WeaponStat _stat; // 무기 스탯
-    private Rigidbody _rb; // 리지드바디
-    private Collider _collider; // 콜라이더
     private CancellationTokenSource _lifeTimeCts; // 유니태스크 토큰
     private Transform _launcher; // 투사체 위치
-    
-    // 유도체 타겟 재탐색 관련
-    private int boundValue = 3;
-    private int currentbound = 0;
-    private static readonly Collider[] _searchBuffer = new Collider[10]; // 탐색할 최대 타겟 수
-    private int _currentTargetId;
-
-    // 관통 관련
-    private int _currentPierceCount;
+        
+    private int boundValue = 3; // 유도 재탐색 횟수
+    private int currentbound = 0; // 현재 탐색 수
+    private int _currentTargetId; // 탐색된 타겟 아이디
+    private int _currentPierceCount; // 관통 관련
 
     // 디버그 전용
     private bool debug = false;
     private Vector3 projectileSize;
 
-    [SerializeField] private LayerMask _targetMask;
-
     // 피해 관련
     private int _finalCachedDamage;
+
+    [Header("충돌 판정 반경")]
+    [SerializeField] private float hitRadius = 1.5f; // 콜라이더를 대체하는 수학적 충돌 반경
     #endregion
 
     #region 초기화
     private void Awake()
     {
-        TryGetComponent<Rigidbody>(out _rb);
-        TryGetComponent<Collider>(out _collider);
-        _rb.useGravity = false;
         debug = DebugManager.instance.IsDebug;
         projectileSize = this.transform.localScale;
     }
@@ -58,24 +48,15 @@ public class Projectile : MonoBehaviour
     /// </summary>
     public void Launch(WeaponStat data, IEnemy target, Transform firePoint)
     {
-        if (_collider != null)
-            _collider.enabled = true;
-
         this._stat = data;
         this._target = target;
         this._launcher = firePoint;
         this.currentbound = 0;
         this._currentPierceCount = 0;
 
-        if (PlayerDataLoad.Instance != null)
-        {
-            _finalCachedDamage = PlayerDataLoad.Instance.CurrentPlayerStat.GetFinalDamage(data.Damage);
-        }
-        else
-        {
-            _finalCachedDamage = data.Damage;
-            Debug.LogWarning("PlayerData 없음, 기존 피해량 사용");
-        }
+        _finalCachedDamage = PlayerDataLoad.Instance != null
+            ? PlayerDataLoad.Instance.CurrentPlayerStat.GetFinalDamage(data.Damage)
+            : data.Damage;
 
         if (target != null)
         {
@@ -91,133 +72,107 @@ public class Projectile : MonoBehaviour
         // 10초 후 자동 파괴(풀 반환) 로직 시작
         StartLifetimeLimit(3.0f, _lifeTimeCts.Token).Forget();
 
-        // 비유도 타입
-        if (!data.IsHoming)
-        {
-            Vector3 fireDirection = firePoint.forward;
-            fireDirection.y = 0f;
-            fireDirection.Normalize();
-            //_rb.AddForce(fireDirection * data.projectileSpeed, ForceMode.VelocityChange);
-            _rb.linearVelocity = fireDirection * data.projectileSpeed;
-            _rb.useGravity = false;
-        }
-        else //if (data.IsHoming)
-        {
-            HomingLoop(_lifeTimeCts.Token).Forget(); // 유도 타입
-        }
+        FlightLoop(_lifeTimeCts.Token).Forget();
     }
-
-    /// <summary>
-    /// 유도형 투사체 타겟 재탐색
-    /// </summary>
-    /// <returns></returns>
-    private IEnemy FindNewTarget()
-    {
-        currentbound++;
-        Vector3 searchOrigin = _launcher != null ? _launcher.position : transform.position;
-        float searchRadius = _stat.Range;
-
-        int count = Physics.OverlapSphereNonAlloc
-        (
-            searchOrigin, // 플레이어 중심 기준
-            searchRadius, // 무기 범위
-            _searchBuffer, // 최대 검색할 적 수
-            _targetMask // 타겟 레이어
-        );
-
-        IEnemy closestEnemy = null;
-        float minDistanceSqr = float.MaxValue;
-
-        for (int i = 0; i < count; i++)
-        {
-            if (_searchBuffer[i].TryGetComponent<IEnemy>(out var enemy) && enemy.IsAlive)
-            {
-                float distSqr = (enemy.TargetTransform.position - transform.position).sqrMagnitude;
-                if (distSqr < minDistanceSqr)
-                {
-                    minDistanceSqr = distSqr;
-                    closestEnemy = enemy;
-                }
-            }
-        }
-        return closestEnemy;
-    }
-
     #endregion
 
     #region UniTask 함수
     /// <summary>
-    /// 타겟을 추적하는 비동기 루프
+    /// 리지드바디를 대체하는 순수 수학 비행 루프
     /// </summary>
-    private async UniTaskVoid HomingLoop(CancellationToken token)
+    private async UniTaskVoid FlightLoop(CancellationToken token)
     {
         float currentSpeed = _stat.projectileSpeed;
         float maxRangeSqr = _stat.Range * _stat.Range;
-
-        //var rb = _rb;
-        //var tr = transform;
+        Vector3 direction = _launcher != null ? _launcher.forward : transform.forward;
+        direction.y = 0f;
+        direction.Normalize();
 
         while (!token.IsCancellationRequested)
         {
-            if (_rb == null || _launcher == null) break;
-            //if (rb == null || tr == null) break;
+            if (_launcher == null) break;
 
-            /*bool isTargetActive = _target != null && _target.IsAlive && _target.TargetTransform.gameObject.activeInHierarchy;
+            float deltaTime = Time.deltaTime;
 
-            if (!isTargetActive)
+            // 1. 방향 및 속도 연산
+            if (_stat.IsHoming)
             {
-                rb.useGravity = true; 
-                break;
-            }*/
-
-            if (currentbound > boundValue)
-            {
-                Disable().Forget();
-                break;
-            }
-
-            float distFromLauncherSqr = (transform.position - _launcher.position).sqrMagnitude;
-            if (distFromLauncherSqr > maxRangeSqr * 1.44f) // 사거리의 1.2배 지점에서 소멸
-            {
-                Disable().Forget();
-                break;
-            }
-
-            bool isTargetValid = _target != null && _target.IsAlive &&
-                                 _target.TargetTransform.gameObject.activeInHierarchy &&
-                                 _target.TargetTransform.gameObject.GetInstanceID() == _currentTargetId;
-
-            if (!isTargetValid)            
-            {             
-                _target = FindNewTarget();
-
-                if (_target != null) 
+                if (currentbound > boundValue || (transform.position - _launcher.position).sqrMagnitude > maxRangeSqr * 1.44f)
                 {
-                    _currentTargetId = _target.TargetTransform.gameObject.GetInstanceID();
+                    Disable().Forget(); break;
                 }
-                else
+
+                bool isTargetValid = _target != null && _target.IsAlive && _target.TargetTransform.gameObject.activeInHierarchy && _target.TargetTransform.gameObject.GetInstanceID() == _currentTargetId;
+
+                if (!isTargetValid)
                 {
-                    _rb.useGravity = true;
-                    break;
+                    _target = FindNewTarget();
+                    if (_target != null) _currentTargetId = _target.TargetTransform.gameObject.GetInstanceID();
+                    else break; // 타겟 없으면 직진
+                }
+
+                if (_target != null)
+                {
+                    Vector3 toTarget = _target.TargetTransform.position - transform.position;
+                    float distance = toTarget.magnitude;
+                    if (distance > 0.001f)
+                    {
+                        Vector3 desiredDir = toTarget / distance;
+                        desiredDir.y += 0.2f;
+                        Quaternion lookRotation = Quaternion.LookRotation(desiredDir);
+                        float proximityBonus = distance < 3.0f ? 2.0f : 1.0f;
+                        transform.rotation = Quaternion.Slerp(transform.rotation, lookRotation, _stat.HomingTurnSpeed * proximityBonus * deltaTime);
+                        direction = transform.forward;
+                    }
+                }
+                currentSpeed += _stat.Acceleration * deltaTime;
+            }
+
+            // 2. 이동 (Transform 직접 조작)
+            transform.position += direction * (currentSpeed * deltaTime);
+
+            // 3. 충돌 감지 (EnemyBatchManager의 공간 그리드 활용 - 콜라이더 대체)
+            if (EnemyBatchManager.Instance != null)
+            {
+                EnemyChaser hitEnemyChaser = EnemyBatchManager.Instance.GetClosestEnemyInRadius(transform.position, hitRadius);
+                if (hitEnemyChaser != null && hitEnemyChaser.status.IsAlive)
+                {
+                    OnHitTarget(hitEnemyChaser.status);
+
+                    if (_currentPierceCount > _stat.PierceCount)
+                    {
+                        Disable().Forget();
+                        break;
+                    }
                 }
             }
 
-
-            //Vector3 direction = (_target.TargetTransform.position - transform.position).normalized;
-            Vector3 toTarget = _target.TargetTransform.position - transform.position;
-            float distance = toTarget.magnitude;
-            Vector3 direction = toTarget / distance;
-            direction.y += 0.2f;
-
-            Quaternion lookRotation = Quaternion.LookRotation(direction);
-            float proximityBonus = distance < 3.0f ? 2.0f : 1.0f;
-
-            _rb.rotation = Quaternion.Slerp(_rb.rotation, lookRotation, _stat.HomingTurnSpeed * proximityBonus * Time.deltaTime);
-            currentSpeed += _stat.Acceleration * Time.deltaTime;
-            _rb.linearVelocity = transform.forward * currentSpeed;
-
-            await UniTask.Yield(PlayerLoopTiming.FixedUpdate, token);
+            await UniTask.Yield(PlayerLoopTiming.Update, token);
         }
+    }
+
+    private IEnemy FindNewTarget()
+    {
+        currentbound++;
+        // 탐색도 물리 OverlapSphere 대신 BatchManager에 요청 가능하지만, 현재 로직 유지해도 무방 (부하 미미함)
+        return EnemyBatchManager.Instance?.GetClosestEnemyInRadius(transform.position, _stat.Range)?.status;
+    }
+
+    private void OnHitTarget(IEnemy enemy)
+    {
+        if (enemy != null && enemy.IsAlive)
+        {
+            int dmg = debug ? 1 : _finalCachedDamage;
+            enemy.TakeDamage(dmg, out int finalDamage);
+        }
+
+        if (_stat.shotEffect != null)
+        {
+            var hitEffect = ObjectPoolManager.Instance.Get(_stat.shotEffect);
+            if (hitEffect != null) hitEffect.transform.position = transform.position;
+        }
+
+        _currentPierceCount++;
     }
 
     /// <summary>
@@ -225,15 +180,10 @@ public class Projectile : MonoBehaviour
     /// </summary>
     private async UniTaskVoid StartLifetimeLimit(float duration, CancellationToken token)
     {
-        // duration 만큼 대기
-        bool canceled = await UniTask.Delay(TimeSpan.FromSeconds(duration), cancellationToken: token)
-                                     .SuppressCancellationThrow();
-
-        if (!canceled)
-        {
-            Disable().Forget();
-        }
+        bool canceled = await UniTask.Delay(TimeSpan.FromSeconds(duration), cancellationToken: token).SuppressCancellationThrow();
+        if (!canceled) Disable().Forget();
     }
+
 
     /// <summary>
     /// 투사체 비활성화 함수
@@ -241,18 +191,8 @@ public class Projectile : MonoBehaviour
     /// <returns></returns>
     private async UniTaskVoid Disable()
     {
-        _rb.linearVelocity = Vector3.zero;
-        _rb.angularVelocity = Vector3.zero;
-
         _lifeTimeCts?.Cancel();
-
-        await transform.DOScale(Vector3.zero, 0.5f)
-                       .SetEase(Ease.OutQuint)
-                       .SetLink(this.gameObject) // 오브젝트 파괴 시 안전장치
-                       .ToUniTask(cancellationToken: this.GetCancellationTokenOnDestroy());
-
-
-        // 애니메이션 종료 후 풀 반환
+        await transform.DOScale(Vector3.zero, 0.5f).SetEase(Ease.OutQuint).SetLink(this.gameObject).ToUniTask(cancellationToken: this.GetCancellationTokenOnDestroy());
         ReturnToPool();
     }
     #endregion
@@ -271,48 +211,6 @@ public class Projectile : MonoBehaviour
             }
         }
     }
-
-    /// <summary>
-    /// 타겟 명중시 실행 (OnTriggerEnter) 
-    /// </summary>
-    private void OnHitTarget(IEnemy enemy) 
-    {
-        //if (_collider != null)  _collider.enabled = false;
-
-        if (enemy != null && enemy.IsAlive)
-        {
-            if (debug)
-            {
-                enemy.TakeDamage(1, out int finalDmg);
-            }
-            else
-            {
-                int dmg = (_stat != null) ? _finalCachedDamage : 0;
-                enemy.TakeDamage(dmg, out int finalDamage);                
-            }
-        }
-
-        // 피격 이펙트 (shotEffect) 생성
-        if (_stat.shotEffect != null)
-        {
-            var hitEffect = ObjectPoolManager.Instance.Get(_stat.shotEffect);
-            if (hitEffect != null)  hitEffect.transform.position = transform.position;
-        }
-
-        _currentPierceCount++;
-
-        if (_currentPierceCount > _stat.PierceCount)
-        {
-            if (_collider != null) _collider.enabled = false;
-            Disable().Forget();
-        }
-        else
-        {
-            _rb.linearVelocity *= 0.9f;
-        }
-
-        //Disable().Forget();
-    }
     #endregion
 
     #region 비활성화 
@@ -321,17 +219,12 @@ public class Projectile : MonoBehaviour
     /// </summary>
     private void ReturnToPool()
     {
-        if (_lifeTimeCts == null) return;
-
         _lifeTimeCts?.Cancel();
         _lifeTimeCts = null;
-
         transform.DOKill();
-
         ObjectPoolManager.Instance.Return(this.gameObject);
         transform.localScale = projectileSize;
     }
-      
 
     private void OnDisable()
     {

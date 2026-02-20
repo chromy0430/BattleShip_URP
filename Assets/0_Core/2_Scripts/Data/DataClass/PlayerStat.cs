@@ -1,9 +1,9 @@
-using Battleship_Enum;
+ï»¿using Battleship_Enum;
 using UnityEngine;
 
 public class PlayerStat
 {
-    // º¯ÇÏ´Â ´É·ÂÄ¡¸¸ ÁöÁ¤
+    // ë³€í•˜ëŠ” ëŠ¥ë ¥ì¹˜ë§Œ ì§€ì •
     public ShipSize shipSize;
     public const float MaxMoveSpeed = 30f;
     public const float MaxTurnSpeed = 12f;
@@ -19,12 +19,14 @@ public class PlayerStat
 
     public Vector2 shipSurfaceSize;
     public float shipHeightOffset;
+    public Vector3 shipColliderSize;
+    public Vector3 shipColliderCenter;
 
-    // º¸³Ê½º °ª
+    // ë³´ë„ˆìŠ¤ ê°’
     public float bonusMoveSpeed;
     public float bonusTurnSpeed;
     public float bonusMagnetRange;
-    public float bonusDamage; // °ö¿¬»ê) dmg * bonusDMG(0.1f * 100 = 10%) 
+    public float bonusDamage; // ê³±ì—°ì‚°) dmg * bonusDMG(0.1f * 100 = 10%) 
 
     public int bonusHP;
     public int bonusMP;
@@ -33,7 +35,7 @@ public class PlayerStat
 
     public PlayerStat(BaseShipData data)
     {
-        // ±âº» °ª
+        // ê¸°ë³¸ ê°’
         shipSize = data.shipSize;
 
         shipMoveSpeed = data.BaseMoveSpeed;
@@ -47,8 +49,10 @@ public class PlayerStat
 
         shipSurfaceSize = data.BaseSurfaceSize;
         shipHeightOffset = data.BaseHeightOffset;
+        shipColliderSize = data.ColliderSize;
+        shipColliderCenter = data.ColliderCenter;
 
-        // º¸³Ê½º °ª
+        // ë³´ë„ˆìŠ¤ ê°’
         bonusMoveSpeed = 0f;
         bonusTurnSpeed = 0f;
         bonusMagnetRange = 0f;
@@ -91,7 +95,7 @@ public class PlayerStat
                 break;
 
             default:
-                Debug.LogWarning($"[ShipStat] Ã³¸®µÇÁö ¾ÊÀº ½ºÅÈ Å¸ÀÔ: {type}");
+                Debug.LogWarning($"[ShipStat] ì²˜ë¦¬ë˜ì§€ ì•Šì€ ìŠ¤íƒ¯ íƒ€ì…: {type}");
                 break;
         }
     }
@@ -117,7 +121,7 @@ public class PlayerStat
             case StatType.SPR:
                 return shipSPR + bonusSPR;
 
-            // ... ÇÊ¿äÇÑ ¸¸Å­ Ãß°¡
+            // ... í•„ìš”í•œ ë§Œí¼ ì¶”ê°€
             default:
                 return 0f;
         }
@@ -128,13 +132,13 @@ public class PlayerStat
         switch (type)
         {
             case StatType.MoveSpeed:
-                // ÇöÀç ¼Óµµ°¡ Á¦ÇÑ°ª ÀÌ»óÀÌ¸é True
+                // í˜„ì¬ ì†ë„ê°€ ì œí•œê°’ ì´ìƒì´ë©´ True
                 return GetFinalMoveSpeed(shipMoveSpeed) >= MaxMoveSpeed;
 
             case StatType.TurnSpeed:
                 return GetFinalTurnSpeed(shipTurnSpeed) >= MaxTurnSpeed;
 
-            // Á¦ÇÑÀÌ ¾ø´Â ½ºÅÈÀº Ç×»ó False (°è¼Ó °­È­ °¡´É)
+            // ì œí•œì´ ì—†ëŠ” ìŠ¤íƒ¯ì€ í•­ìƒ False (ê³„ì† ê°•í™” ê°€ëŠ¥)
             default:
                 return false;
         }

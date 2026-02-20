@@ -111,8 +111,10 @@ public class WaterBatchManager : StaticInstance<WaterBatchManager>
         _lqSampler.SetSamplePosition(0, target.Transform.position);
         Gerstner.ComputeHeight(_lqSampler, heightInterface);
         float h = _lqSampler.heightValues[0];
+        float stregth = 1f;
         Vector3 pos = target.Transform.position;
-        pos.y = h + target.HeightOffset;
+        //pos.y = h + target.HeightOffset;
+        pos.y = Mathf.Lerp(pos.y, h + target.HeightOffset + 1f, stregth);
         target.Transform.position = pos;
     }
 

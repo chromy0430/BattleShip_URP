@@ -64,26 +64,6 @@ PrefabInstance:
       propertyPath: m_ConstrainProportionsScale
       value: 1
       objectReference: {fileID: 0}
-    - target: {fileID: 1416067811673937586, guid: 4a8280c5be5e1fc4fa9bbf1c2817ae1b, type: 3}
-      propertyPath: m_Constraints
-      value: 80
-      objectReference: {fileID: 0}
-    - target: {fileID: 1416067811673937586, guid: 4a8280c5be5e1fc4fa9bbf1c2817ae1b, type: 3}
-      propertyPath: m_Interpolate
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 1416067811673937586, guid: 4a8280c5be5e1fc4fa9bbf1c2817ae1b, type: 3}
-      propertyPath: m_IsKinematic
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 1416067811673937586, guid: 4a8280c5be5e1fc4fa9bbf1c2817ae1b, type: 3}
-      propertyPath: m_LinearDamping
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 1416067811673937586, guid: 4a8280c5be5e1fc4fa9bbf1c2817ae1b, type: 3}
-      propertyPath: m_AngularDamping
-      value: 1
-      objectReference: {fileID: 0}
     - target: {fileID: 1439743017183963828, guid: 4a8280c5be5e1fc4fa9bbf1c2817ae1b, type: 3}
       propertyPath: m_Name
       value: Prefab_Enemy_ArcherShip
@@ -95,6 +75,10 @@ PrefabInstance:
     - target: {fileID: 3883547053960890889, guid: 4a8280c5be5e1fc4fa9bbf1c2817ae1b, type: 3}
       propertyPath: m_Layer
       value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 4002769699586786137, guid: 4a8280c5be5e1fc4fa9bbf1c2817ae1b, type: 3}
+      propertyPath: _attackRadius
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 5417953537358622481, guid: 4a8280c5be5e1fc4fa9bbf1c2817ae1b, type: 3}
       propertyPath: m_Mesh
@@ -124,35 +108,8 @@ PrefabInstance:
       propertyPath: 'm_Materials.Array.data[0]'
       value: 
       objectReference: {fileID: 2100000, guid: 7577953326964a14f91815e75533b2e4, type: 2}
-    - target: {fileID: 8492964644438529941, guid: 4a8280c5be5e1fc4fa9bbf1c2817ae1b, type: 3}
-      propertyPath: m_Size.x
-      value: 4
-      objectReference: {fileID: 0}
-    - target: {fileID: 8492964644438529941, guid: 4a8280c5be5e1fc4fa9bbf1c2817ae1b, type: 3}
-      propertyPath: m_Size.y
-      value: 3
-      objectReference: {fileID: 0}
-    - target: {fileID: 8492964644438529941, guid: 4a8280c5be5e1fc4fa9bbf1c2817ae1b, type: 3}
-      propertyPath: m_Size.z
-      value: 9.2
-      objectReference: {fileID: 0}
-    - target: {fileID: 8492964644438529941, guid: 4a8280c5be5e1fc4fa9bbf1c2817ae1b, type: 3}
-      propertyPath: m_Center.y
-      value: 1.5
-      objectReference: {fileID: 0}
-    - target: {fileID: 8492964644438529941, guid: 4a8280c5be5e1fc4fa9bbf1c2817ae1b, type: 3}
-      propertyPath: m_Center.z
-      value: 0.5
-      objectReference: {fileID: 0}
-    - target: {fileID: 8492964644438529941, guid: 4a8280c5be5e1fc4fa9bbf1c2817ae1b, type: 3}
-      propertyPath: m_Material
-      value: 
-      objectReference: {fileID: 13400000, guid: f215f829c4a4d06488164ea53b81a462, type: 2}
-    - target: {fileID: 8492964644438529941, guid: 4a8280c5be5e1fc4fa9bbf1c2817ae1b, type: 3}
-      propertyPath: m_IsTrigger
-      value: 0
-      objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 0}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []

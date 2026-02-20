@@ -24,6 +24,10 @@ public class EnemyBatchManager : Singleton<EnemyBatchManager>
     [SerializeField, Min(1)] private int farUpdateInterval = 4;
 
     [Header("보이드 알고리즘")]
+    [SerializeField, Range(0.1f, 2.0f), Tooltip("배 충돌체 크기 조절 배율 (1.0 = 원본 크기)")]
+    private float playerBoxScale = 1.0f;
+    [SerializeField, Tooltip("플레이어 배 표면 주변의 AT 필드 두께")]
+    private float playerBoxBuffer = 1.0f;
     [SerializeField, Tooltip("배의 가장 긴 길이의 절반 (Size Z 9.2의 절반인 4.6 권장)")]
     private float physicalRadius = 4.6f;
     [SerializeField, Tooltip("부드럽게 밀어내기 시작하는 거리 (12 유지)")]
@@ -37,6 +41,10 @@ public class EnemyBatchManager : Singleton<EnemyBatchManager>
 
     private float _gridCellSize;
     private int _fixedTick;
+
+    private Vector3 _dynamicPlayerBoxSize = new Vector3(4.0f, 2.0f, 9.2f);
+    private Vector3 _dynamicPlayerBoxCenter = Vector3.zero;
+    private float _dynamicPlayerBoxBuffer = 1.0f;
 
     protected override void Awake()
     {
@@ -60,21 +68,41 @@ public class EnemyBatchManager : Singleton<EnemyBatchManager>
         {
             _playerTransform = PlayerManager.Instance.PlayerTransform;
         }
+
+        if (PlayerDataLoad.Instance != null)
+        {
+            UpdatePlayerBoxSize();
+            PlayerDataLoad.Instance.OnStatUpdated += UpdatePlayerBoxSize;
+        }
     }
 
     private void OnDestroy()
     {
         _samplerHigh?.Dispose();
         _samplerLow?.Dispose();
+
+        if (PlayerDataLoad.Instance != null)
+        {
+            PlayerDataLoad.Instance.OnStatUpdated -= UpdatePlayerBoxSize;
+        }
     }
 
     #region 등록
+    private void UpdatePlayerBoxSize()
+    {
+        if (PlayerDataLoad.Instance != null && PlayerDataLoad.Instance.CurrentPlayerStat != null)
+        {
+            _dynamicPlayerBoxSize = PlayerDataLoad.Instance.CurrentPlayerStat.shipColliderSize * playerBoxScale;
+            _dynamicPlayerBoxCenter = PlayerDataLoad.Instance.CurrentPlayerStat.shipColliderCenter;
+            _dynamicPlayerBoxBuffer = playerBoxBuffer * playerBoxScale;
+        }
+    }
+
     public void Register(EnemyChaser enemy)
     {
         if (enemy != null && !_aliveEnemies.Contains(enemy))
         {
             _aliveEnemies.Add(enemy);
-            IgnoreEnemyCollisions(enemy);
         }
     }
 
@@ -93,20 +121,9 @@ public class EnemyBatchManager : Singleton<EnemyBatchManager>
             _aliveEnemies.RemoveAt(lastIndex);
         }
     }
-
-    private void IgnoreEnemyCollisions(EnemyChaser newEnemy)
-    {
-        if (newEnemy.bodyCollider == null) return;
-        for (int i = 0; i < _aliveEnemies.Count; i++)
-        {
-            EnemyChaser other = _aliveEnemies[i];
-            if (other == null || other == newEnemy || other.bodyCollider == null) continue;
-            Physics.IgnoreCollision(newEnemy.bodyCollider, other.bodyCollider, true);
-        }
-    }
     #endregion
 
-    private void FixedUpdate()
+    private void Update()
     {
         if (_playerTransform == null && PlayerManager.Instance != null)
         {
@@ -114,11 +131,10 @@ public class EnemyBatchManager : Singleton<EnemyBatchManager>
         }
         if (_playerTransform == null || _aliveEnemies.Count == 0) return;
 
-        float deltaTime = Time.fixedDeltaTime;
+        float deltaTime = Time.deltaTime;
         Vector3 playerPos = _playerTransform.position;
 
         heightInterface.GetWaterObject(playerPos);
-
         RebuildSpatialGrid();
 
         for (int i = _aliveEnemies.Count - 1; i >= 0; i--)
@@ -134,62 +150,53 @@ public class EnemyBatchManager : Singleton<EnemyBatchManager>
 
             Vector3 currentPos = enemy.cachedTransform.position;
             float distSqr = (playerPos - currentPos).sqrMagnitude;
+            bool isHighQualityWater = distSqr < highQualityDistSqr;
 
             int updateInterval = GetUpdateInterval(distSqr);
-            if (((_fixedTick + i) % updateInterval) != 0)
+            if (((_fixedTick + i) % updateInterval) == 0)
             {
-                StabilizeVerticalPosition(enemy, enemy.cachedWaterY, deltaTime);
-                continue;
+                // updateInterval만큼의 시간이 곱해져야 가속도가 정상적으로 적용됨
+                float lodDeltaTime = deltaTime * updateInterval;
+                ApplySwarmMovement(enemy, _playerTransform, currentPos, lodDeltaTime, Mathf.Sqrt(distSqr));
+                ApplyRotation(enemy, playerPos, currentPos, lodDeltaTime);
             }
 
-            // 부력 계산
-            bool isHighQualityWater = distSqr < highQualityDistSqr;
-            enemy.cachedWaterY = CalculateWaterHeight(enemy, currentPos, isHighQualityWater);
-
-            // 스웜 로직 적용
-            ApplySwarmMovement(enemy, playerPos, currentPos, deltaTime, Mathf.Sqrt(distSqr));
-            ApplyRotation(enemy, playerPos, currentPos, deltaTime);
+            enemy.cachedTransform.position += enemy.currentVelocity * deltaTime;
+            enemy.cachedWaterY = CalculateWaterHeight(enemy, enemy.cachedTransform.position, isHighQualityWater);
+            StabilizeVerticalPosition(enemy, enemy.cachedWaterY, deltaTime);
         }
 
         _fixedTick++;
     }
 
     #region 보이드 관련
-    private void ApplySwarmMovement(EnemyChaser enemy, Vector3 playerPos, Vector3 currentPos, float deltaTime, float distToPlayer)
+    private void ApplySwarmMovement(EnemyChaser enemy, Transform playerTransform, Vector3 currentPos, float lodDeltaTime, float distToPlayer)
     {
-        Vector3 separationDir = CalculateSeparationVector(enemy, currentPos);
+        Vector3 separationDir = CalculateSeparationVector(enemy, currentPos, playerTransform);
 
-        // [핵심 1: Traffic Jam (교통 체증) 로직]
-        // 사방이 막혀서 분리 압력(separationDir의 크기)이 높아지면, 플레이어를 향한 돌진(Pursuit)을 멈춘다.
         float separationPressure = separationDir.magnitude;
         float pursuitMultiplier = Mathf.Clamp01(1f - (separationPressure / hardCollisionWeight));
 
         Vector3 pursuitDir = Vector3.zero;
         if (distToPlayer > enemy.stopDistance)
         {
-            // 막혀있으면 pursuitMultiplier가 0에 가까워져 전진하지 않음
-            pursuitDir = (playerPos - currentPos).normalized * pursuitMultiplier;
+            pursuitDir = (playerTransform.position - currentPos).normalized * pursuitMultiplier;
         }
 
-        // [핵심 2: 벡터 합성]
-        // 분리 벡터(separationDir)는 이미 가중치가 곱해져 반환되므로 바로 더해줍니다.
         Vector3 desiredDir = (pursuitDir + separationDir).normalized;
-
         Vector3 targetVelocity = desiredDir * enemy.moveSpeed;
 
-        // 관성을 가진 부드러운 가속 (Jitter 방지)
-        Vector3 currentVel = enemy.rb.linearVelocity;
+        Vector3 currentVel = enemy.currentVelocity;
         Vector3 newVelXz = Vector3.MoveTowards(
             new Vector3(currentVel.x, 0f, currentVel.z),
             new Vector3(targetVelocity.x, 0f, targetVelocity.z),
-            acceleration * deltaTime
+            acceleration * lodDeltaTime // 최적화된 시간을 곱해 보정
         );
 
-        enemy.rb.linearVelocity = new Vector3(newVelXz.x, 0f, newVelXz.z);
-        StabilizeVerticalPosition(enemy, enemy.cachedWaterY, deltaTime);
+        enemy.currentVelocity = new Vector3(newVelXz.x, 0f, newVelXz.z);
     }
 
-    private Vector3 CalculateSeparationVector(EnemyChaser self, Vector3 selfPos)
+    private Vector3 CalculateSeparationVector(EnemyChaser self, Vector3 selfPos, Transform playerTransform)
     {
         Vector2Int centerCell = WorldToGrid(selfPos);
         Vector3 softSeparation = Vector3.zero;
@@ -209,7 +216,7 @@ public class EnemyBatchManager : Singleton<EnemyBatchManager>
                 for (int i = 0; i < bucket.Count; i++)
                 {
                     EnemyChaser other = bucket[i];
-                    if (other == self) continue;
+                    if (other == self || other == null || other.status == null || !other.status.IsAlive) continue;
 
                     Vector3 diff = selfPos - other.cachedTransform.position;
                     diff.y = 0f;
@@ -246,11 +253,63 @@ public class EnemyBatchManager : Singleton<EnemyBatchManager>
             }
         }
 
-        // [핵심 3: 절대 평균(Average) 내지 않음]
-        // 평균을 내면 사방에서 밀 때 0이 되어 압사당함. 힘을 전부 더해서 압력을 누적시킴.
+        // 2. 플레이어와의 하드 충돌 방어 (OBB 기반 3D 직사각형 필드)
+        Vector3 localPos = playerTransform.InverseTransformPoint(selfPos);
+        Vector3 centeredLocalPos = localPos - _dynamicPlayerBoxCenter;
+        centeredLocalPos.y = 0f;
+
+        float extX = _dynamicPlayerBoxSize.x * 0.5f;
+        float extZ = _dynamicPlayerBoxSize.z * 0.5f;
+
+        Vector3 closestLocal = new Vector3(
+            Mathf.Clamp(centeredLocalPos.x, -extX, extX),
+            0f,
+            Mathf.Clamp(centeredLocalPos.z, -extZ, extZ)
+        );
+
+        Vector3 localDiff = centeredLocalPos - closestLocal;
+        float distToBoxSqr = localDiff.sqrMagnitude;
+
+        // [수정 핵심] 동적 버퍼 적용
+        float bufferSqr = _dynamicPlayerBoxBuffer * _dynamicPlayerBoxBuffer;
+
+        if (distToBoxSqr < bufferSqr)
+        {
+            float distToBox = Mathf.Sqrt(distToBoxSqr);
+            Vector3 pushLocalDir;
+            float penetration;
+
+            if (distToBox < 0.0001f)
+            {
+                float distToEdgeX = extX - Mathf.Abs(centeredLocalPos.x);
+                float distToEdgeZ = extZ - Mathf.Abs(centeredLocalPos.z);
+
+                if (distToEdgeX < distToEdgeZ)
+                {
+                    pushLocalDir = new Vector3(Mathf.Sign(centeredLocalPos.x), 0, 0);
+                    penetration = distToEdgeX + _dynamicPlayerBoxBuffer; // 동적 버퍼 적용
+                }
+                else
+                {
+                    pushLocalDir = new Vector3(0, 0, Mathf.Sign(centeredLocalPos.z));
+                    penetration = distToEdgeZ + _dynamicPlayerBoxBuffer; // 동적 버퍼 적용
+                }
+            }
+            else
+            {
+                pushLocalDir = localDiff / distToBox;
+                penetration = _dynamicPlayerBoxBuffer - distToBox; // 동적 버퍼 적용
+            }
+
+            Vector3 pushWorldDir = playerTransform.TransformDirection(pushLocalDir);
+
+            // [수정 핵심] 힘을 계산할 때도 동적 버퍼로 나눔
+            float pushForce = (penetration / _dynamicPlayerBoxBuffer) * hardCollisionWeight * 3.0f;
+            hardSeparation += pushWorldDir * pushForce;
+        }
+
         Vector3 totalSeparation = softSeparation + hardSeparation;
 
-        // 물리 엔진이 폭발하는 것을 막기 위해 최대 압력 한계선(Cap) 설정
         float maxAllowedForce = hardCollisionWeight * 1.5f;
         if (totalSeparation.sqrMagnitude > maxAllowedForce * maxAllowedForce)
         {
@@ -310,17 +369,18 @@ public class EnemyBatchManager : Singleton<EnemyBatchManager>
         if (moveDir.sqrMagnitude <= 0.001f) return;
 
         Quaternion lookRot = Quaternion.LookRotation(moveDir.normalized, Vector3.up);
-        enemy.rb.MoveRotation(Quaternion.Slerp(enemy.rb.rotation, lookRot, deltaTime * enemy.turnSpeed));
+        // [수정 핵심] rb.MoveRotation 대신 Transform.rotation Slerp 사용
+        enemy.cachedTransform.rotation = Quaternion.Slerp(enemy.cachedTransform.rotation, lookRot, deltaTime * enemy.turnSpeed);
     }
 
     private void StabilizeVerticalPosition(EnemyChaser enemy, float targetY, float deltaTime)
     {
-        Vector3 rbPos = enemy.rb.position;
-        float nextY = Mathf.Lerp(rbPos.y, targetY, deltaTime * waterHeightLerpSpeed);
-        rbPos.y = nextY;
-        enemy.rb.MovePosition(rbPos);
+        // [수정 핵심] rb.position 대신 Transform.position 조작
+        Vector3 pos = enemy.cachedTransform.position;
+        float nextY = Mathf.Lerp(pos.y, targetY, deltaTime * waterHeightLerpSpeed);
+        pos.y = nextY;
+        enemy.cachedTransform.position = pos;
     }
-
     private float CalculateWaterHeight(EnemyChaser enemy, Vector3 pos, bool highQuality)
     {
         HeightQuerySystem.Sampler sampler = highQuality ? _samplerHigh : _samplerLow;
@@ -338,6 +398,104 @@ public class EnemyBatchManager : Singleton<EnemyBatchManager>
 
         if (highQuality) return ((sampler.heightValues[0] + sampler.heightValues[1] + sampler.heightValues[2] + sampler.heightValues[3]) * 0.25f) + enemy.heightOffset;
         return sampler.heightValues[0] + enemy.heightOffset;
+    }
+    #endregion
+
+    #region 투사체용 공간 탐색
+    /// <summary>
+    /// 특정 좌표 반경 내에 있는 가장 가까운 적을 반환합니다. (물리 콜라이더 완벽 대체)
+    /// </summary>
+    public EnemyChaser GetClosestEnemyInRadius(Vector3 position, float radius)
+    {
+        float radiusSqr = radius * radius;
+        EnemyChaser closest = null;
+        float minSqr = float.MaxValue;
+
+        Vector2Int centerCell = WorldToGrid(position);
+        // radius를 그리드 크기로 나누어 탐색할 주변 셀 범위(보통 1~2)를 구함
+        int range = Mathf.CeilToInt(radius / Mathf.Max(0.0001f, _gridCellSize));
+
+        for (int x = -range; x <= range; x++)
+        {
+            for (int z = -range; z <= range; z++)
+            {
+                Vector2Int key = new Vector2Int(centerCell.x + x, centerCell.y + z);
+                if (!_spatialGrid.TryGetValue(key, out List<EnemyChaser> bucket)) continue;
+
+                for (int i = 0; i < bucket.Count; i++)
+                {
+                    EnemyChaser enemy = bucket[i];
+                    if (enemy == null || enemy.status == null || !enemy.status.IsAlive) continue;
+
+                    float sqr = (enemy.cachedTransform.position - position).sqrMagnitude;
+                    if (sqr <= radiusSqr && sqr < minSqr)
+                    {
+                        minSqr = sqr;
+                        closest = enemy;
+                    }
+                }
+            }
+        }
+        return closest;
+    }
+    #endregion
+
+    #region 광역 탐색 
+    /// <summary>
+    /// 반경 내의 모든 적을 탐색하여 결과 리스트에 담아 반환합니다. (GC 발생 0)
+    /// </summary>
+    public void GetEnemiesInRadius(Vector3 position, float radius, List<EnemyChaser> results)
+    {
+        results.Clear();
+        float radiusSqr = radius * radius;
+        Vector2Int centerCell = WorldToGrid(position);
+        int range = Mathf.CeilToInt(radius / Mathf.Max(0.0001f, _gridCellSize));
+
+        for (int x = -range; x <= range; x++)
+        {
+            for (int z = -range; z <= range; z++)
+            {
+                Vector2Int key = new Vector2Int(centerCell.x + x, centerCell.y + z);
+                if (!_spatialGrid.TryGetValue(key, out List<EnemyChaser> bucket)) continue;
+
+                for (int i = 0; i < bucket.Count; i++)
+                {
+                    EnemyChaser enemy = bucket[i];
+                    if (enemy == null || enemy.status == null || !enemy.status.IsAlive) continue;
+
+                    float sqr = (enemy.cachedTransform.position - position).sqrMagnitude;
+                    if (sqr <= radiusSqr)
+                    {
+                        results.Add(enemy);
+                    }
+                }
+            }
+        }
+    }
+    #endregion
+
+    #region 시각적 디버깅 (Gizmos)
+    private void OnDrawGizmos()
+    {
+        if (_playerTransform == null || !Application.isPlaying) return;
+
+        Vector3 worldCenter = _playerTransform.TransformPoint(_dynamicPlayerBoxCenter);
+        Gizmos.matrix = Matrix4x4.TRS(worldCenter, _playerTransform.rotation, Vector3.one);
+
+        // 1. 선체 물리 사이즈 (빨간색 3D 큐브)
+        Gizmos.color = Color.red;
+        Gizmos.DrawWireCube(Vector3.zero, _dynamicPlayerBoxSize);
+
+        // 2. 완충 지대 (노란색 3D 큐브)
+        Gizmos.color = Color.yellow;
+        Vector3 bufferSize = new Vector3(
+            _dynamicPlayerBoxSize.x + (_dynamicPlayerBoxBuffer * 2), // 동적 버퍼 두 배 합산
+            _dynamicPlayerBoxSize.y,
+            _dynamicPlayerBoxSize.z + (_dynamicPlayerBoxBuffer * 2)  // 동적 버퍼 두 배 합산
+        );
+        Gizmos.DrawWireCube(Vector3.zero, bufferSize);
+
+        Gizmos.matrix = Matrix4x4.identity;
     }
     #endregion
 }

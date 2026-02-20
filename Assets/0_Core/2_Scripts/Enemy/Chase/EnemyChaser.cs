@@ -12,27 +12,15 @@ public class EnemyChaser : MonoBehaviour
     public float heightOffset = 0.0f;
 
     [HideInInspector] public Transform cachedTransform;
-    [HideInInspector] public Rigidbody rb;
-    [HideInInspector] public Collider bodyCollider;
     [HideInInspector] public Enemy status;
     [HideInInspector] public float cachedWaterY;
+    [HideInInspector] public Vector3 currentVelocity;
 
     private void Awake()
     {
         cachedTransform = transform;
-        rb = GetComponent<Rigidbody>();
-        bodyCollider = GetComponent<Collider>();
         status = GetComponent<Enemy>();
-
-        if (rb != null)
-        {
-            rb.constraints |= RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationZ;
-            cachedWaterY = rb.position.y;
-        }
-        else
-        {
-            cachedWaterY = transform.position.y;
-        }
+        cachedWaterY = transform.position.y;
     }
 
     private void OnEnable()

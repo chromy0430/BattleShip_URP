@@ -8,6 +8,7 @@ public class Enemy : MonoBehaviour, IEnemy
 {
     [SerializeField] private int maxHealth = 100;
     [SerializeField] private int _Shield = 0;
+    [SerializeField] private float _attackRadius = 2.5f;
         
     public bool canAttack;
     public int CurrentHealth { get; private set; }
@@ -21,8 +22,6 @@ public class Enemy : MonoBehaviour, IEnemy
     public GameObject damageObject; // 데미지 폰트
     public GameObject wakeTrailObject;
 
-
-    [SerializeField] private Rigidbody _rb;
     private EnemyData _enemyData;    
     private TrailRenderer _wakeTrail;
     private bool _isAlive = false;
@@ -52,11 +51,7 @@ public class Enemy : MonoBehaviour, IEnemy
 
     private void Awake()
     {
-        //CurrentHealth = maxHealth;
-        //_isAlive = false;
         flickerFeedback = GetComponent<MMF_Player>();
-        _rb = GetComponent<Rigidbody>();
-
         if (wakeTrailObject != null)
         {
             _wakeTrail = wakeTrailObject.GetComponentInChildren<TrailRenderer>();            
@@ -82,8 +77,6 @@ public class Enemy : MonoBehaviour, IEnemy
         {
             RadarSystem.Instance.AddTarget(gameObject, _enemyData.MinimapIcon);
         }
-
-        EnableInterpolationDelay().Forget();
     }
 
     private void OnDisable()
@@ -105,16 +98,33 @@ public class Enemy : MonoBehaviour, IEnemy
         }
     }
 
-    private async UniTaskVoid EnableInterpolationDelay()
+    private void Update()
     {
-        if (_rb != null) _rb.interpolation = RigidbodyInterpolation.None;
+        if (!_isAlive || !canAttack || _isKnockbacked) return;
 
-        await UniTask.WaitForFixedUpdate();
-
-        if (_rb != null && _isAlive)
+        if (PlayerManager.Instance != null && PlayerManager.Instance.PlayerTransform != null)
         {
-            _rb.interpolation = RigidbodyInterpolation.Interpolate;
+            float distSqr = (transform.position - PlayerManager.Instance.PlayerTransform.position).sqrMagnitude;
+            if (distSqr <= _attackRadius * _attackRadius)
+            {
+                AttackPlayer();
+            }
         }
+    }
+
+    private void AttackPlayer()
+    {
+        canAttack = false;
+
+        // 플레이어에게 데미지 전달
+        PlayerCondition pc = PlayerManager.Instance.PlayerTransform.GetComponent<PlayerCondition>();
+        if (pc != null)
+        {
+            pc.TakeDamage(_enemyData.Damage);
+            PlayerManager.Instance.Damaged();
+        }
+
+        ResumeAttackAbility().Forget();
     }
 
     public void TakeDamage(int damage, out int finalDamage)
@@ -135,11 +145,9 @@ public class Enemy : MonoBehaviour, IEnemy
                 Base_Canvas.Instance.transform,
                 transform.position,
                 finalDamage.ToString()
-            //_stat.Damage.ToString()
             );
 
         CurrentHealth -= finalDamage;
-        //CurrentHealth -= damage;
         if (CurrentHealth <= 0)
         {
             Die();
@@ -159,17 +167,11 @@ public class Enemy : MonoBehaviour, IEnemy
 
         if (wakeTrailObject != null) wakeTrailObject.SetActive(false);
 
-        if (_rb != null)
-        {
-            _rb.interpolation = RigidbodyInterpolation.None;
-        }
-
         if (DropManager.Instance != null)
         {
             int reward = _enemyData != null ? _enemyData.ExpReward : 10;
             DropManager.Instance.SpawnDrops(this.transform.position, reward);
         }
-
 
         flickerFeedback?.ResetFeedbacks();
 
@@ -177,26 +179,16 @@ public class Enemy : MonoBehaviour, IEnemy
         {
             AddressableEnemyPoolManager.Instance.ReturnEnemy(this.gameObject, _enemyData);
         }
-        /*else
-        {
-            ObjectPoolManager.Instance.Return(this.gameObject);
-        }*/
-
-        //ObjectPoolManager.Instance.Return(this.gameObject);
     }
 
     public async UniTaskVoid ApplyKnockback(Vector3 force, float duration = 0.2f)
     {
-        if (!_isAlive || _rb == null) return;
+        if (!_isAlive) return;
 
         _isKnockbacked = true;
-        //_rb.linearVelocity = Vector3.zero; // 기존 속도 초기화
-        //force.y = 0;
-
         Vector3 knockbackVelocity = force;
         knockbackVelocity.y = 0;
-
-        float elapsed = 0f;
+        float elapsed = 0f;        
 
         while (elapsed < duration)
         {
@@ -206,35 +198,13 @@ public class Enemy : MonoBehaviour, IEnemy
             elapsed += dt;
 
             knockbackVelocity = Vector3.Lerp(knockbackVelocity, Vector3.zero, dt * 5.0f);
-            _rb.MovePosition(_rb.position + (knockbackVelocity * dt));
+            transform.position += knockbackVelocity * dt;
 
             await UniTask.WaitForFixedUpdate();
         }
-
-        /*_rb.AddForce(force, ForceMode.Impulse);
-
-        // duration 동안 대기 후 상태 해제
-        await UniTask.Delay(System.TimeSpan.FromSeconds(duration));*/
-
         _isKnockbacked = false; 
     }
 
-    private void OnCollisionEnter(Collision collision)
-    {
-        if (collision.collider.CompareTag("Player"))
-        {
-            collision.collider.TryGetComponent<PlayerCondition>(out PlayerCondition pc);
-
-            // 데미지 처리 후 플레이어 몸체 붉은색 표시 및 넉백 + 잠깐의 멈춤
-            if (canAttack)
-            {
-                canAttack = false;
-                pc.TakeDamage(_enemyData.Damage);
-                PlayerManager.Instance.Damaged();
-                ResumeAttackAbility().Forget();
-            }
-        }
-    }
     private async UniTaskVoid ResumeAttackAbility(float delay = 0.5f)
     {
         // UniTask.Delay는 비동기적으로 작동하며, 해당 시간만큼 대기합니다.

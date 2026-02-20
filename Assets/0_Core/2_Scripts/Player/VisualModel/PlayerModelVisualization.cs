@@ -1,11 +1,10 @@
 ﻿using MoreMountains.Feedbacks;
-using System.Runtime.CompilerServices;
+using MoreMountains.Tools;
 using UnityEngine;
 
 public class PlayerModelVisualization : MonoBehaviour
 {
     private GameObject shipModel;
-
     [SerializeField] MMF_Player modelFeedback;
 
     private void Start()
@@ -20,8 +19,12 @@ public class PlayerModelVisualization : MonoBehaviour
 
         if (modelFeedback == null) modelFeedback.GetComponent<MMF_Player>();
 
-        MMF_Flicker flickerFeedback = modelFeedback.GetFeedbackOfType<MMF_Flicker>();
-        flickerFeedback.BoundRenderer = ship.GetComponent<MeshRenderer>();
+        //MMF_Flicker flickerFeedback = modelFeedback.GetFeedbackOfType<MMF_Flicker>();
+        //flickerFeedback.BoundRenderer = ship.GetComponent<MeshRenderer>();
+
+        MMF_ShaderController shaderFeedback = modelFeedback.GetFeedbackOfType<MMF_ShaderController>();
+        shaderFeedback.TargetShaderController = ship.GetComponent<ShaderController>();
+
     }
 
     private void OnDisable()
