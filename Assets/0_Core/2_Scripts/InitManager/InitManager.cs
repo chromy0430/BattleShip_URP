@@ -1,8 +1,9 @@
-﻿using Cysharp.Threading.Tasks;
+﻿using BattleShip;
+using Cysharp.Threading.Tasks;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class InitManager : MonoBehaviour
+public class InitManager : StaticInstance<InitManager>
 {
     // 풀링용 리스트
     public List<BaseWeaponData> allWeaponDatas;
@@ -17,17 +18,9 @@ public class InitManager : MonoBehaviour
 
 
     #region 싱글톤
-    public static InitManager Instance { get; private set; }
-    private void Awake()
+    protected override void Awake()
     {
-        if (Instance == null)
-        {
-            Instance = this;
-        }
-        else
-        {
-            Destroy(this);
-        }
+        base.Awake();
     }
     #endregion
 

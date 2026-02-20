@@ -4,9 +4,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Serialization;
 
-public class DropManager : MonoBehaviour
-{
-    public static DropManager Instance { get; set; }
+public class DropManager : StaticInstance<DropManager>
+{   
 
     [Header("경험치 구체 설정 (100% 드랍)")]
     [FormerlySerializedAs("gemPrefab")]
@@ -34,16 +33,9 @@ public class DropManager : MonoBehaviour
     public List<BaseEquipmentData> _equipmentList;
     public List<BaseCargoData> _cargoList;
 
-    private void Awake()
+    protected override void Awake()
     {
-        if (Instance == null)
-        {
-            Instance = this;
-        }
-        else
-        {
-            Destroy(this.gameObject);
-        }
+        base.Awake();
     }
 
     /// <summary>

@@ -1,33 +1,25 @@
-﻿using System;
+﻿using BattleShip;
+using System;
 using UnityEngine;
 
 public delegate void OnExpChanged(float currentExp, float maxExp);
 
 
-public class PlayerExpManager : MonoBehaviour
+public class PlayerExpManager : StaticInstance<PlayerExpManager>
 {
-    public static PlayerExpManager Instance { get; private set; }
     public event OnExpChanged onExpChanged;
     public event Action<int> OnLevelUp;
     
 
     [Header("경험치 관련")]
     [SerializeField] private int baseExp = 10; // 첫 레벨업 경험치 (1레벨 필요 경험치)
-    [SerializeField] private float growthMultiplier = 1.2f; // 필요 경험치 지수 상승 
-    
+    [SerializeField] private float growthMultiplier = 1.2f; // 필요 경험치 지수 상승     
     [SerializeField] private int currentExp = 0; // 현재 경험치
     public int currentLevel = 0; // 현재 레벨
 
-    private void Awake()
+    protected override void Awake()
     {
-        if (Instance == null)
-        {
-            Instance = this;
-        }
-        else
-        {
-            Destroy(this);
-        }
+        base.Awake();
     }
 
     public int GetRequiredExp(int level)

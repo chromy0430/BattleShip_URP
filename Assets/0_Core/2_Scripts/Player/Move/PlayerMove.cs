@@ -4,12 +4,12 @@ using UnityEngine.InputSystem;
 [RequireComponent(typeof(Rigidbody))]
 public class PlayerMove : MonoBehaviour
 {
-    private PlayerStat _stat => PlayerDataLoad.playerData.CurrentPlayerStat;
+    private PlayerStat _stat => PlayerDataLoad.Instance.CurrentPlayerStat;
     private Rigidbody rb;
     public InputActionReference moveAction;
     public InputActionReference dashAction;
 
-    [Header("Movement")]
+    [Header("이동 관련")]
     [SerializeField] private float moveSpeed = 30f;
     [SerializeField] private float dashSpeed = 50f;
     [SerializeField] private float turnSpeed = 5f;
@@ -31,7 +31,7 @@ public class PlayerMove : MonoBehaviour
         dashAction.action.performed += context => dashOn = true;
         dashAction.action.canceled += context => dashOn = false;
 
-        if (PlayerDataLoad.playerData != null) PlayerDataLoad.playerData.OnStatUpdated += UpdateMoveStat;    
+        if (PlayerDataLoad.Instance != null) PlayerDataLoad.Instance.OnStatUpdated += UpdateMoveStat;    
     }
 
     private void OnDisable()
@@ -39,7 +39,7 @@ public class PlayerMove : MonoBehaviour
         moveAction.action.Disable();
         dashAction.action.Disable();
 
-        if (PlayerDataLoad.playerData != null) PlayerDataLoad.playerData.OnStatUpdated -= UpdateMoveStat;
+        if (PlayerDataLoad.Instance != null) PlayerDataLoad.Instance.OnStatUpdated -= UpdateMoveStat;
     }
 
     private void Awake()
@@ -49,7 +49,7 @@ public class PlayerMove : MonoBehaviour
     }
     private void Start()
     {
-        if (PlayerDataLoad.playerData == null)
+        if (PlayerDataLoad.Instance == null)
         {
             Debug.LogError("PlayerDataLoad가 없습니다!");
             return;

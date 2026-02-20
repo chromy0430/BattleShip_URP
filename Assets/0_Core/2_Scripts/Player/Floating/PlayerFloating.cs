@@ -37,9 +37,9 @@ public class PlayerFloating : MonoBehaviour, IWaterFloatTarget
     private void Start()
     {
         
-        if (PlayerDataLoad.playerData != null)
+        if (PlayerDataLoad.Instance != null)
         {            
-            shipData = PlayerDataLoad.playerData.shipData;
+            shipData = PlayerDataLoad.Instance.shipData;
             surfaceSize = shipData.BaseSurfaceSize;
             heightOffset = shipData.BaseHeightOffset;
             rollAmount = shipData.rollAmount;

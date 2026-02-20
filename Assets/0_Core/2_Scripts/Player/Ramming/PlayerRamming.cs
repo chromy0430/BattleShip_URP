@@ -1,17 +1,15 @@
-using UnityEngine;
+ï»¿using UnityEngine;
 
 public class PlayerRamming : MonoBehaviour
 {
     [SerializeField] PlayerMove playerMove;
 
-    [Header("Ramming System")]
-    [SerializeField] private float rammingThresholdSpeed = 20f; // Ãæ°¢ ¹ßµ¿ ÃÖ¼Ò ¼Óµµ
+    [Header("ì¶©ê° ê´€ë ¨")]
+    [SerializeField] private float rammingThresholdSpeed = 20f; // ì¶©ê° ë°œë™ ìµœì†Œ ì†ë„
     [SerializeField] private float rammingDamageMultiplier = 2f;
     [Range(0f, 1f)]
     [SerializeField] private float impactDirectionThreshold = 0.7f;
     [SerializeField] private float knockbackPower = 2f;
-
-
 
     private void Awake()
     {
@@ -20,13 +18,13 @@ public class PlayerRamming : MonoBehaviour
 
     private void OnCollisionEnter(Collision collision)
     {
-        // »ó´ë¹æ È®ÀÎ
+        // ìƒëŒ€ë°© í™•ì¸
         if (collision.gameObject.TryGetComponent<IEnemy>(out var enemy))
         {
-            // ¼Óµµ Ã¼Å©
+            // ì†ë„ ì²´í¬
             if (playerMove.currentSpeed >= rammingThresholdSpeed)
             {
-                // Á¤¸é Ãæµ¹ ÆÇÁ¤
+                // ì •ë©´ ì¶©ëŒ íŒì •
                 Vector3 collisionDir = (collision.transform.position - transform.position).normalized;
                 float dot = Vector3.Dot(transform.forward, collisionDir);
 
@@ -36,11 +34,11 @@ public class PlayerRamming : MonoBehaviour
                     enemy.TakeDamage(damage, out int finalDamage);
 
                     Vector3 knockbackDir = (collision.transform.position - transform.position).normalized;
-                    float knockbackStrength = playerMove.currentSpeed * knockbackPower; // ¼Óµµ ºñ·Ê Èû
+                    float knockbackStrength = playerMove.currentSpeed * knockbackPower; // ì†ë„ ë¹„ë¡€ í˜
 
                     enemy.ApplyKnockback(knockbackDir * knockbackStrength);
 
-                    Debug.Log($"[½Å·Ú] Ãæ°¢ ¼º°ø! ¹æÇâ ÀÏÄ¡µµ: {dot:F2}, ÃÖÁ¾ µ¥¹ÌÁö: {finalDamage}");
+                    Debug.Log($"[ì‹ ë¢°] ì¶©ê° ì„±ê³µ! ë°©í–¥ ì¼ì¹˜ë„: {dot:F2}, ìµœì¢… ë°ë¯¸ì§€: {finalDamage}");
                 }
             }
         }

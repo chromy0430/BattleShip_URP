@@ -12,7 +12,7 @@ public class PlayerModelVisualization : MonoBehaviour
     {
         if (PlayerManager.Instance != null) PlayerManager.Instance.getDamage += DamageFeedback;
 
-        shipModel = PlayerDataLoad.playerData.shipData.shipVisual;
+        shipModel = PlayerDataLoad.Instance.shipData.shipVisual;
 
         GameObject ship = Instantiate(shipModel, this.transform);
         ship.transform.localPosition = shipModel.transform.position;

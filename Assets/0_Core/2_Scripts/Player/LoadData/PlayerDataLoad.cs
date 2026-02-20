@@ -1,24 +1,15 @@
 ﻿using UnityEngine;
 using System;
-public class PlayerDataLoad : MonoBehaviour
+using BattleShip;
+public class PlayerDataLoad : StaticInstance<PlayerDataLoad>
 {
-    public static PlayerDataLoad playerData { get; set; }
-
     public BaseShipData shipData;
     public PlayerStat CurrentPlayerStat { get; private set; }
     public event Action OnStatUpdated;
 
-    private void Awake()
+    protected override void Awake()
     {
-        if(playerData == null)
-        {
-            playerData = this;
-        }
-        else
-        {
-            Destroy(this);
-            return;
-        }
+        base.Awake();
         
         if (shipData == null)   Debug.LogError("데이터가 없습니다.");
 

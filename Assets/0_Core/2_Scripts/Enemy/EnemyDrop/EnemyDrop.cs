@@ -3,11 +3,11 @@ using StylizedWater3;
 using UnityEngine;
 public class EnemyDrop : MonoBehaviour, IWaterFloatTarget
 {
-    [Header("Visual Settings")]
+    [Header("시각적 요소")]
     [SerializeField] private MeshRenderer _renderer;
     private Vector3 _baseScale;
 
-    [Header("Floating Settings")]
+    [Header("부력 관련")]
     public float heightOffset = 0.1f;
     public Vector2 surfaceSize = new Vector2(.5f, .5f);
     public int expAmount = 10;
@@ -75,7 +75,7 @@ public class EnemyDrop : MonoBehaviour, IWaterFloatTarget
     {
         if (PlayerManager.Instance != null)
         {
-            PlayerManager.Instance.RegisterCoin(this);
+            PlayerMagnet.Instance.RegisterCoin(this);
         }
 
         if (WaterBatchManager.Instance != null)
@@ -89,7 +89,7 @@ public class EnemyDrop : MonoBehaviour, IWaterFloatTarget
 
         if (PlayerManager.Instance != null)
         {
-            PlayerManager.Instance.UnregisterCoin(this);
+            PlayerMagnet.Instance.UnregisterCoin(this);
         }
 
         if (WaterBatchManager.Instance != null)

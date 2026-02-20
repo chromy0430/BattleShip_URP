@@ -6,9 +6,8 @@ using System.Linq;
 using UnityEngine;
 using ZLinq;
 
-public class UpgradeManager : MonoBehaviour
+public class UpgradeManager : StaticInstance<UpgradeManager>
 {
-    public static UpgradeManager Instance { get; private set; }
     public event Action onChangedWeaponStat;
 
     [Header("시작 무기")]
@@ -49,14 +48,9 @@ public class UpgradeManager : MonoBehaviour
     // 중복 실행 방지용 플래그
     private bool _isProcessing = false;
 
-    private void Awake()
+    protected override void Awake()
     {
-        if (Instance == null) Instance = this;
-        else
-        {
-            Destroy(gameObject);
-            return;
-        }
+        base.Awake();
 
         if (inputBlockerPanel != null) inputBlockerPanel.SetActive(false);
         if (cardParent != null) cardParent.gameObject.SetActive(false);
@@ -220,10 +214,10 @@ public class UpgradeManager : MonoBehaviour
         if (string.IsNullOrEmpty(data.relatedWeaponID))
         {
             // 통합 능력치 강화
-            if (PlayerDataLoad.playerData != null)
+            if (PlayerDataLoad.Instance != null)
             {
-                PlayerDataLoad.playerData.CurrentPlayerStat.AddBonus(data.targetStat, data.value);
-                PlayerDataLoad.playerData.UpdateStatAndNotify();
+                PlayerDataLoad.Instance.CurrentPlayerStat.AddBonus(data.targetStat, data.value);
+                PlayerDataLoad.Instance.UpdateStatAndNotify();
             }
         }
         else
@@ -410,9 +404,9 @@ public class UpgradeManager : MonoBehaviour
         if (currentCount >= data.maxCount) return false;
 
         // 스탯 Cap 체크
-        if (string.IsNullOrEmpty(data.relatedWeaponID) && PlayerDataLoad.playerData != null)
+        if (string.IsNullOrEmpty(data.relatedWeaponID) && PlayerDataLoad.Instance != null)
         {
-            if (PlayerDataLoad.playerData.CurrentPlayerStat.IsStatCapped(data.targetStat)) return false;
+            if (PlayerDataLoad.Instance.CurrentPlayerStat.IsStatCapped(data.targetStat)) return false;
         }
 
         return true;

@@ -2,30 +2,20 @@
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using System;
+using BattleShip;
 
 /// <summary>
 /// [수정]
 /// 게임 내 모든 GameObject(투사체, 이펙트, 적)를 풀링하여 관리하는 싱글톤 매니저입니다.
 /// 요청하신 RuntimeInitializeOnLoadMethod 싱글톤 패턴과 문자열 보간법($)을 적용합니다.
 /// </summary>
-public class ObjectPoolManager : MonoBehaviour
-{
-    public static ObjectPoolManager Instance { get; private set; }
+public class ObjectPoolManager : StaticInstance<ObjectPoolManager>
+{   
 
-    #region 싱글톤
-    
-    private void Awake()
+    #region 싱글톤    
+    protected override void Awake()
     {
-        if (Instance == null)
-        {
-            Instance = this;
-            return;
-        }
-        else
-        {
-            Destroy(this);
-        }
-
+        base.Awake();
     }
     #endregion
 

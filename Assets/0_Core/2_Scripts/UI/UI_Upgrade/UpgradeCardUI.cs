@@ -30,9 +30,9 @@ public class UpgradeCardUI : MonoBehaviour
         string finalDesc = data.GetDescription();
 
         // 디버그용, 후에 삭제 예정
-        if (string.IsNullOrEmpty(data.relatedWeaponID) && PlayerDataLoad.playerData != null)
+        if (string.IsNullOrEmpty(data.relatedWeaponID) && PlayerDataLoad.Instance != null)
         {
-            float currentVal = PlayerDataLoad.playerData.CurrentPlayerStat.GetCurrentStatValue(data.targetStat);
+            float currentVal = PlayerDataLoad.Instance.CurrentPlayerStat.GetCurrentStatValue(data.targetStat);
             finalDesc += $"\n<size=80%><color=#FFFF00>([디버그용] 현재 값 : {currentVal:F1})</color></size>";
         }
 

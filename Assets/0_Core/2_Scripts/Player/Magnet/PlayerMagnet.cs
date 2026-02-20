@@ -1,18 +1,32 @@
-﻿using UnityEngine;
+﻿using BattleShip;
+using System.Collections.Generic;
+using UnityEngine;
 
-public class PlayerMagnet : MonoBehaviour
-{
-    //private PlayerStat _stat => PlayerDataLoad.playerData.CurrentPlayerStat;
+public class PlayerMagnet : StaticInstance<PlayerMagnet>
+{    
+    [Header("획득 관련")]
+    [SerializeField] private float _collectionRadius = 1.5f;
+    private float _collectionRadiusSqr;
 
-    private Collider[] _coinBuffer = new Collider[50];
-    [Header("Local Magnet Settings")]
+    [Header("코인 자석 효과")]
     [SerializeField] private float _magnetRadius;
-    [SerializeField] private float _moveSpeed = 30.0f;
-    [SerializeField] private LayerMask _coinLayer;
+    [SerializeField] private float _coinMoveSpeed = 30.0f;
+    private float _magnetRadiusSqr;
 
-    public bool Doingmagnet = false;
+    [Header("자석 아이템 관련")]
+    [SerializeField] private float _magnetItemSpeed = 50.0f;
+    private bool _isMagnetItemActive = false;
+
+    private readonly List<EnemyDrop> _allCoins = new List<EnemyDrop>();
+    private readonly List<EnemyDrop> _magnetTargetCoins = new List<EnemyDrop>();
 
     private Transform _PlayerTransform;
+
+    protected override void Awake()
+    {
+        base.Awake();
+    }
+
     private void Start()
     {
         if (PlayerManager.Instance != null)
@@ -20,57 +34,158 @@ public class PlayerMagnet : MonoBehaviour
             _PlayerTransform = PlayerManager.Instance.PlayerTransform;
         }
 
-        if (PlayerDataLoad.playerData != null)
+        if (PlayerDataLoad.Instance != null)
         {
-            _magnetRadius = PlayerDataLoad.playerData.CurrentPlayerStat.shipMagnetRange;
-            PlayerDataLoad.playerData.OnStatUpdated += UpdateMagnetStat;
+            UpdateMagnetStat();
+            PlayerDataLoad.Instance.OnStatUpdated += UpdateMagnetStat;
         }
     }
 
     private void OnDisable()
     {
-        if (PlayerDataLoad.playerData != null) PlayerDataLoad.playerData.OnStatUpdated -= UpdateMagnetStat;
+        if (PlayerDataLoad.Instance != null) PlayerDataLoad.Instance.OnStatUpdated -= UpdateMagnetStat;
     }
 
     void Update()
     {
         if (_PlayerTransform == null) return;
 
-        // 평상시 근거리 자석 로직 (기존 유지)
-        PullNearbyItems();
+        if (_isMagnetItemActive)
+        {
+            ProcessMagnetItemCoins();
+        }
+
+
+        if (_allCoins.Count > 0)
+        {
+            ProcessNormalCoins();
+        }
     }
 
     #region 아이템 줍기
 
-    private void PullNearbyItems()
+    private void ProcessNormalCoins()
     {
-        if (Doingmagnet) return;
+        Vector3 playerPos = _PlayerTransform.position;
+        float deltaTime = Time.deltaTime;
 
-        int count = Physics.OverlapSphereNonAlloc(
-            _PlayerTransform.position,
-            _magnetRadius,
-            _coinBuffer,
-            _coinLayer
-        );
-
-        for (int i = 0; i < count; i++)
+        for (int i = _allCoins.Count - 1; i >= 0; i--)
         {
-            Collider col = _coinBuffer[i];
+            EnemyDrop coin = _allCoins[i];
 
-            // 코인이 이미 전역 자석에 이끌리고 있다면 중복 연산 방지 (선택 사항)
-            // 여기서는 단순히 이동만 시킴
-            col.transform.position = Vector3.MoveTowards(
-                col.transform.position,
-                _PlayerTransform.position,
-                _moveSpeed * Time.deltaTime
-            );
+            if (coin == null || !coin.gameObject.activeInHierarchy)
+            {
+                RemoveCoinFromList(_allCoins, i);
+                continue;
+            }
+
+            Vector3 coinPos = coin.transform.position;
+            float distSqr = (coinPos - playerPos).sqrMagnitude;
+
+            if (distSqr <= _collectionRadiusSqr)
+            {
+                RemoveCoinFromList(_allCoins, i);
+                ObjectPoolManager.Instance.Return(coin.gameObject);
+            }
+            else if (distSqr <= _magnetRadiusSqr)
+            {
+                coin.transform.position = Vector3.MoveTowards(coinPos, playerPos, _coinMoveSpeed * deltaTime);
+            }
         }
     }
+
+    private void ProcessMagnetItemCoins()
+    {
+        Vector3 playerPos = _PlayerTransform.position;
+        float deltaTime = Time.deltaTime;
+
+        for (int i = _magnetTargetCoins.Count - 1; i >= 0; i--)
+        {
+            EnemyDrop coin = _magnetTargetCoins[i];
+
+            if (coin == null || !coin.gameObject.activeInHierarchy)
+            {
+                RemoveCoinFromList(_magnetTargetCoins, i);
+                continue;
+            }
+
+            Vector3 coinPos = coin.transform.position;
+            float distSqr = (coinPos - playerPos).sqrMagnitude;
+
+            // 획득
+            if (distSqr <= _collectionRadiusSqr)
+            {
+                RemoveCoinFromList(_magnetTargetCoins, i);
+                ObjectPoolManager.Instance.Return(coin.gameObject);
+            }
+            else
+            {
+                coin.transform.position = Vector3.MoveTowards(coinPos, playerPos, _magnetItemSpeed * deltaTime);
+            }
+        }
+
+        if (_magnetTargetCoins.Count == 0)
+        {
+            _isMagnetItemActive = false;
+        }
+    }
+
     #endregion
+
+    #region 헬퍼 함수
+    private void RemoveCoinFromList(List<EnemyDrop> list, int index)
+    {
+        int lastIndex = list.Count - 1;
+        if (index != lastIndex)
+        {
+            list[index] = list[lastIndex];
+        }
+        list.RemoveAt(lastIndex);
+    }
+
+    public void RegisterCoin(EnemyDrop coin)
+    {
+        if (!_allCoins.Contains(coin) && !_magnetTargetCoins.Contains(coin))
+        {
+            _allCoins.Add(coin);
+        }
+    }
+
+    public void UnregisterCoin(EnemyDrop coin)
+    {
+        if (coin == null) return;
+
+        int indexAll = _allCoins.IndexOf(coin);
+        if (indexAll >= 0)
+        {
+            RemoveCoinFromList(_allCoins, indexAll);
+            return;
+        }
+
+        int indexMagnet = _magnetTargetCoins.IndexOf(coin);
+        if (indexMagnet >= 0) 
+        {
+            RemoveCoinFromList(_magnetTargetCoins, indexMagnet);
+        }
+    }
+
+    public void ActivateMagnetItem()
+    {
+        if (_allCoins.Count > 0)
+        {
+            _magnetTargetCoins.AddRange(_allCoins);
+            _allCoins.Clear();
+
+            _isMagnetItemActive = true;
+        }
+    }
 
     private void UpdateMagnetStat()
     {
         // 자석 범위 재할당
-        _magnetRadius = PlayerDataLoad.playerData.CurrentPlayerStat.GetTotalMagnetRange();//GetMagnetRange(_magnetRadius);
+        _collectionRadiusSqr = _collectionRadius * _collectionRadius;
+        _magnetRadius = PlayerDataLoad.Instance.CurrentPlayerStat.GetTotalMagnetRange();
+        _magnetRadiusSqr = _magnetRadius * _magnetRadius;
     }
+    #endregion    
 }

@@ -1,13 +1,10 @@
-﻿using UnityEngine;
+﻿using BattleShip;
+using UnityEngine;
 
-public class Base_Canvas : MonoBehaviour
+public class Base_Canvas : StaticInstance<Base_Canvas>
 {
-    public static Base_Canvas Instance {  get; private set; }
-    private void Awake()
+    protected override void Awake()
     {
-        if (Instance == null)
-        {
-            Instance = this;
-        }
+        base.Awake();
     }
 }

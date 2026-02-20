@@ -110,7 +110,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5895034854558281223, guid: 4a8280c5be5e1fc4fa9bbf1c2817ae1b, type: 3}
       propertyPath: heightOffset
-      value: -0.6
+      value: -0.8
       objectReference: {fileID: 0}
     - target: {fileID: 5895034854558281223, guid: 4a8280c5be5e1fc4fa9bbf1c2817ae1b, type: 3}
       propertyPath: stopDistance

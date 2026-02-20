@@ -77,9 +77,9 @@ public class AuraWeapon : MonoBehaviour
     private void DealDamageToAll()
     {
         int finalDamage = _stat.Damage;
-        if (PlayerDataLoad.playerData != null)
+        if (PlayerDataLoad.Instance != null)
         {
-            finalDamage = PlayerDataLoad.playerData.CurrentPlayerStat.GetFinalDamage(_stat.Damage);
+            finalDamage = PlayerDataLoad.Instance.CurrentPlayerStat.GetFinalDamage(_stat.Damage);
         }
 
         for (int i = _targetsInRange.Count - 1; i >= 0; i--)

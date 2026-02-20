@@ -5,24 +5,19 @@ using BattleShip;
 
 namespace BattleShip
 {
-    public class PlayerItemManager : MonoBehaviour
+    public class PlayerItemManager : StaticInstance<PlayerItemManager>
     {
-        public static PlayerItemManager Instance { get; private set; }
-
-        [Header("Status")]
-        // 장비 슬롯 5개 (null이면 비어있음)
+        [Header("장비 슬롯")]
         public BaseEquipmentData[] EquipmentSlots = new BaseEquipmentData[5];
 
-        // 각 장비 레벨 체크
         private int[] _equipmentLevels = new int[5];
 
-        // 획득한 화물 리스트 (중첩 가능하므로 리스트로 관리)
+        // 획득한 화물 리스트
         public List<BaseCargoData> CollectedCargo = new List<BaseCargoData>();
 
-        private void Awake()
+        protected override void Awake()
         {
-            if (Instance == null) Instance = this;
-            else Destroy(gameObject);
+            base.Awake();
         }
 
         // 외부에서 부유물 상자를 먹었을 때 호출 -> 연출 시작
@@ -185,13 +180,13 @@ namespace BattleShip
         // isAdding: true면 능력치 추가, false면 능력치 제거(장비 해제 시)
         private void ApplyStats(List<StatModifier> modifiers, bool isAdding)
         {
-            if (PlayerDataLoad.playerData == null)
+            if (PlayerDataLoad.Instance == null)
             {
                 Debug.LogWarning("PlayerDataLoad가 초기화되지 않아 스탯을 적용할 수 없습니다.");
                 return;
             }
 
-            var playerStat = PlayerDataLoad.playerData.CurrentPlayerStat;
+            var playerStat = PlayerDataLoad.Instance.CurrentPlayerStat;
             if (playerStat == null) return;
 
             foreach (var mod in modifiers)
@@ -265,7 +260,7 @@ namespace BattleShip
             }
 
             // [수정됨] 스탯 변경 후 이벤트 알림 (UI 갱신 등)
-            PlayerDataLoad.playerData.UpdateStatAndNotify();
+            PlayerDataLoad.Instance.UpdateStatAndNotify();
         }
     }
 }

@@ -5,7 +5,7 @@ namespace BattleShip
 {
     public class Thunder : MonoBehaviour
     {
-        [Header("Effect Settings")]
+        [Header("피드백 관련")]
         [SerializeField] private GameObject _lightningEffectPrefab; // 번개 이펙트 프리팹
         [SerializeField] private AudioClip _thunderSfx; // 천둥 소리
 

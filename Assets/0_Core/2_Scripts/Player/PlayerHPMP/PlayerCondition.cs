@@ -3,7 +3,7 @@ using System;
 
 public class PlayerCondition : MonoBehaviour
 {
-    [Header("상태 확인용 (ReadOnly)")]
+    [Header("상태 확인용")]
     [SerializeField] private int _currentHp;
     [SerializeField] private int _currentMp;
 
@@ -25,9 +25,9 @@ public class PlayerCondition : MonoBehaviour
     private void Start()
     {        
         // 게임 시작 시 최대치
-        if (PlayerDataLoad.playerData != null)
+        if (PlayerDataLoad.Instance != null)
         {
-            stat = PlayerDataLoad.playerData.CurrentPlayerStat;
+            stat = PlayerDataLoad.Instance.CurrentPlayerStat;
             
             _prevMaxHp = stat.GetFinalMaxHP();
             _prevMaxMp = stat.GetFinalMaxMP();
@@ -36,7 +36,7 @@ public class PlayerCondition : MonoBehaviour
             _currentMp = _prevMaxMp;
             
             // 이벤트 구독
-            PlayerDataLoad.playerData.OnStatUpdated += HandleStatUpdated;
+            PlayerDataLoad.Instance.OnStatUpdated += HandleStatUpdated;
 
             // UI 초기화
             NotifyHpChanged();
@@ -46,16 +46,16 @@ public class PlayerCondition : MonoBehaviour
 
     private void OnDisable()
     {
-        if (PlayerDataLoad.playerData != null)
+        if (PlayerDataLoad.Instance != null)
         {
-            PlayerDataLoad.playerData.OnStatUpdated -= HandleStatUpdated;
+            PlayerDataLoad.Instance.OnStatUpdated -= HandleStatUpdated;
         }
     }
 
     // 업그레이드로 최대 체력/마력이 늘어났을 때 호출됨
     private void HandleStatUpdated()
     {
-        var stat = PlayerDataLoad.playerData.CurrentPlayerStat;
+        var stat = PlayerDataLoad.Instance.CurrentPlayerStat;
         int newMaxHp = stat.GetFinalMaxHP();
         int newMaxMp = stat.GetFinalMaxMP();
 
@@ -112,7 +112,7 @@ public class PlayerCondition : MonoBehaviour
 
     public void Heal(int amount)
     {
-        int maxHp = PlayerDataLoad.playerData.CurrentPlayerStat.GetFinalMaxHP();
+        int maxHp = PlayerDataLoad.Instance.CurrentPlayerStat.GetFinalMaxHP();
         _currentHp = Mathf.Min(_currentHp + amount, maxHp);
         NotifyHpChanged();
     }
@@ -139,7 +139,7 @@ public class PlayerCondition : MonoBehaviour
 
     public void RestoreMana(int amount)
     {
-        int maxMp = PlayerDataLoad.playerData.CurrentPlayerStat.GetFinalMaxMP();
+        int maxMp = PlayerDataLoad.Instance.CurrentPlayerStat.GetFinalMaxMP();
         _currentMp = Mathf.Min(_currentMp + amount, maxMp);
         NotifyMpChanged();
     }
@@ -147,18 +147,18 @@ public class PlayerCondition : MonoBehaviour
 
     private void NotifyHpChanged()
     {
-        if (PlayerDataLoad.playerData?.CurrentPlayerStat != null)
+        if (PlayerDataLoad.Instance?.CurrentPlayerStat != null)
         {
-            int maxHp = PlayerDataLoad.playerData.CurrentPlayerStat.GetFinalMaxHP();
+            int maxHp = PlayerDataLoad.Instance.CurrentPlayerStat.GetFinalMaxHP();
             OnHpChanged?.Invoke(_currentHp, maxHp);
         }
     }
 
     private void NotifyMpChanged()
     {
-        if (PlayerDataLoad.playerData?.CurrentPlayerStat != null)
+        if (PlayerDataLoad.Instance?.CurrentPlayerStat != null)
         {
-            int maxMp = PlayerDataLoad.playerData.CurrentPlayerStat.GetFinalMaxMP();
+            int maxMp = PlayerDataLoad.Instance.CurrentPlayerStat.GetFinalMaxMP();
             OnMpChanged?.Invoke(_currentMp, maxMp);
         }
     }

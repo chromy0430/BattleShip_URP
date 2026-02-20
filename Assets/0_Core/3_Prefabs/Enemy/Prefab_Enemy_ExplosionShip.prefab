@@ -455,8 +455,8 @@ MonoBehaviour:
   turnSpeed: 5
   stopDistance: 2
   stopDistanceJitter: 1.25
-  surfaceSize: 1
-  heightOffset: -0.6
+  surfaceSize: 2
+  heightOffset: -0.8
   drawLocalDebugGizmo: 1
   drawDebugWhenSelectedOnly: 1
   debugCircleSegments: 48

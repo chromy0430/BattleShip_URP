@@ -1,4 +1,4 @@
-using TMPro;
+﻿using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -14,16 +14,16 @@ public class PlayerStatUIManager : MonoBehaviour
 
     private void Start()
     {
-        if (PlayerDataLoad.playerData != null)
+        if (PlayerDataLoad.Instance != null)
         {
-            PlayerDataLoad.playerData.OnStatUpdated += RefreshUI;
+            PlayerDataLoad.Instance.OnStatUpdated += RefreshUI;
             RefreshUI();
         }
     }
 
     private void RefreshUI()
     {
-        PlayerStat stat = PlayerDataLoad.playerData.CurrentPlayerStat;
+        PlayerStat stat = PlayerDataLoad.Instance.CurrentPlayerStat;
 
         if (stat.bonusMoveSpeed > 0)
         {

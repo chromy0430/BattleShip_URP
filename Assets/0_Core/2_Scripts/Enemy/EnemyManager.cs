@@ -1,29 +1,22 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
 using MoreMountains.Feedbacks;
+using BattleShip;
 
-public class EnemyManager : MonoBehaviour
+public class EnemyManager : StaticInstance<EnemyManager>
 {
     public GameObject m_EnemyDropPrefab;
 
     #region 싱글톤   
-    public static EnemyManager Instance { get; private set; }
-    private void Awake()
+    protected override void Awake()
     {
-        if (Instance == null)
-        {
-            Instance = this;
-            return;
-        }
-        else
-        {
-            Destroy(this);
-        }
+        base.Awake();
     }
+
     #endregion
+
     public IReadOnlyList<IEnemy> ActiveEnemies => _activeEnemies;
     private readonly List<IEnemy> _activeEnemies = new List<IEnemy>(); 
-    private readonly List<IEnemy> _enemiesToRemove = new List<IEnemy>();
 
     private bool _isBombKill = false;
 
@@ -63,29 +56,32 @@ public class EnemyManager : MonoBehaviour
 
     public void UnregisterEnemy(IEnemy enemy)
     {
-        if (enemy != null)
+        if (enemy == null || _isBombKill) return;
         {
-            if (_isBombKill) return;
-
-            _activeEnemies.Remove(enemy);
+            int index = _activeEnemies.IndexOf(enemy);
+            if (index >= 0)
+            {
+                int lastIndex = _activeEnemies.Count - 1;
+                _activeEnemies[index] = _activeEnemies[lastIndex];
+                _activeEnemies.RemoveAt(lastIndex);
+            }            
         }
     }
     public void CleanUpDeadEnemies()
     {
-        foreach (var enemy in _activeEnemies)
+        for (int i = _activeEnemies.Count - 1; i >= 0; i--)
         {
+            var enemy = _activeEnemies[i];
             if (enemy == null || !enemy.IsAlive)
             {
-                _enemiesToRemove.Add(enemy);
+                int lastIndex = _activeEnemies.Count - 1;
+                if (i != lastIndex)
+                {
+                    _activeEnemies[i] = _activeEnemies[lastIndex];
+                }
+                _activeEnemies.RemoveAt(lastIndex);
             }
         }
-
-        foreach (var enemy in _enemiesToRemove)
-        {
-            _activeEnemies.Remove(enemy);
-        }
-
-        _enemiesToRemove.Clear();
     }
     #endregion
 

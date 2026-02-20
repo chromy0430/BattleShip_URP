@@ -3,12 +3,11 @@ using UnityEngine.AddressableAssets;
 using UnityEngine.ResourceManagement.AsyncOperations;
 using UnityEngine.Pool;
 using System.Collections.Generic;
-using Cysharp.Threading.Tasks; // UniTask 활용 권장
+using Cysharp.Threading.Tasks;
+using BattleShip; // UniTask 활용 권장
 
-public class AddressableEnemyPoolManager : MonoBehaviour
+public class AddressableEnemyPoolManager : StaticInstance<AddressableEnemyPoolManager>
 {
-    public static AddressableEnemyPoolManager Instance { get; private set; }
-
     [System.Serializable]
     public struct SpawnWeightInfo
     {
@@ -25,10 +24,9 @@ public class AddressableEnemyPoolManager : MonoBehaviour
     // 로드된 프리팹 캐싱 (메모리 해제를 위해 들고 있음)
     private Dictionary<EnemyData, GameObject> _loadedPrefabs = new Dictionary<EnemyData, GameObject>();
 
-    private void Awake()
+    protected override void Awake()
     {
-        if (Instance == null) Instance = this;
-        else Destroy(gameObject);
+        base.Awake();
     }
 
     private void Start()

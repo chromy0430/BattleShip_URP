@@ -1367,7 +1367,7 @@ Camera:
     height: 1
   near clip plane: 0.3
   far clip plane: 3000
-  field of view: 60.000004
+  field of view: 70
   orthographic: 0
   orthographic size: 5
   m_Depth: -1
@@ -1597,32 +1597,12 @@ MonoBehaviour:
   nearUpdateInterval: 1
   mediumUpdateInterval: 1
   farUpdateInterval: 4
-  verticalMoveThreshold: 0.01
+  physicalRadius: 3
+  separationRadius: 10
+  separationWeight: 4
+  hardCollisionWeight: 15
+  acceleration: 30
   waterHeightLerpSpeed: 5
-  enableSeparation: 1
-  separationRadius: 3.2
-  separationStrength: 2.2
-  maxSeparationNeighbors: 6
-  fallbackPlayerRadius: 6.5
-  fallbackEnemyRadius: 1.1
-  ringPadding: 2.8
-  slotInfluenceDistance: 16
-  orbitAngularSpeed: 20
-  orbitSpeedMultiplier: 0.85
-  radialCorrectionStrength: 2
-  drawDebugGizmos: 1
-  drawAllEnemyDebug: 0
-  maxDebugEnemies: 8
-  debugMaxDistance: 35
-  gizmoHeightOffset: 0.15
-  separationRadiusColor: {r: 1, g: 0.45, b: 0.15, a: 1}
-  engageRadiusColor: {r: 0.2, g: 1, b: 0.9, a: 1}
-  slotTargetColor: {r: 0.95, g: 0.95, b: 0.2, a: 1}
-  velocityColor: {r: 0.45, g: 0.8, b: 1, a: 1}
-  overlapBoundaryColor: {r: 1, g: 0.2, b: 0.2, a: 1}
-  overlapBoundaryPadding: 1
-  moveSpeedMultiplier: 1
-  acceleration: 50
 --- !u!114 &360754106
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1645,7 +1625,7 @@ MonoBehaviour:
   intervalReductionPerMinute: 0.2
   maxSpawnCountBatch: 12
   countIncreasePerMinute: 1
-  maxActiveEnemies: 300
+  maxActiveEnemies: 400
   currentInterval: 0
   currentBatchCount: 0
   currentPlayTime: 0
@@ -1840,7 +1820,7 @@ Light:
   serializedVersion: 12
   m_Type: 1
   m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_Intensity: 2
+  m_Intensity: 3
   m_Range: 10
   m_SpotAngle: 30
   m_InnerSpotAngle: 21.80208
@@ -1883,7 +1863,7 @@ Light:
   m_LightShadowCasterMode: 0
   m_AreaSize: {x: 1, y: 1}
   m_BounceIntensity: 1
-  m_ColorTemperature: 5000
+  m_ColorTemperature: 6000
   m_UseColorTemperature: 1
   m_BoundingSphereOverride: {x: 0, y: 0, z: 0, w: 0}
   m_UseBoundingSphereOverride: 0
@@ -3063,8 +3043,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 704386980}
   serializedVersion: 2
-  m_LocalRotation: {x: -0.037403237, y: 0, z: 0, w: 0.9993003}
-  m_LocalPosition: {x: -10.64, y: -0.01249439, z: 14.52}
+  m_LocalRotation: {x: -0.024185598, y: 0, z: -0.0025881913, w: 0.9997042}
+  m_LocalPosition: {x: -10.64, y: -0.16410686, z: 14.52}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -5301,7 +5281,7 @@ MonoBehaviour:
     LookAtTarget: {fileID: 0}
     CustomLookAtTarget: 0
   Lens:
-    FieldOfView: 60.000004
+    FieldOfView: 70
     OrthographicSize: 5
     NearClipPlane: 0.3
     FarClipPlane: 3000
@@ -6971,8 +6951,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1751036400}
   serializedVersion: 2
-  m_LocalRotation: {x: -0.0024988032, y: 0, z: 0, w: 0.9999969}
-  m_LocalPosition: {x: -10.64, y: -0.012494132, z: 21.01}
+  m_LocalRotation: {x: 0, y: 0, z: -0.0045650764, w: 0.99998957}
+  m_LocalPosition: {x: -10.64, y: -0.04545281, z: 21.01}
   m_LocalScale: {x: 1, y: 2, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []

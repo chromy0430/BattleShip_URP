@@ -1,10 +1,10 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
 using StylizedWater3;
+using BattleShip;
 
-public class WaterBatchManager : MonoBehaviour
+public class WaterBatchManager : StaticInstance<WaterBatchManager>
 {
-    public static WaterBatchManager Instance { get; private set; }
 
     // 물 높이 로직 관련
     [SerializeField] private HeightQuerySystem.Interface heightInterface;
@@ -17,9 +17,10 @@ public class WaterBatchManager : MonoBehaviour
     private HeightQuerySystem.Sampler _lqSampler;
 
     Vector3 queryPos;
-    private void Awake()
+
+    protected override void Awake()
     {
-        Instance = this;
+        base.Awake();
 
         // 플레이어용
         _hqSampler = new HeightQuerySystem.Sampler();

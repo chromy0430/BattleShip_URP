@@ -67,9 +67,9 @@ public class Projectile : MonoBehaviour
         this.currentbound = 0;
         this._currentPierceCount = 0;
 
-        if (PlayerDataLoad.playerData != null)
+        if (PlayerDataLoad.Instance != null)
         {
-            _finalCachedDamage = PlayerDataLoad.playerData.CurrentPlayerStat.GetFinalDamage(data.Damage);
+            _finalCachedDamage = PlayerDataLoad.Instance.CurrentPlayerStat.GetFinalDamage(data.Damage);
         }
         else
         {

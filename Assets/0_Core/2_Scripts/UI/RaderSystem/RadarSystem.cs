@@ -1,11 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using BattleShip;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class RadarSystem : MonoBehaviour
+public class RadarSystem : StaticInstance<RadarSystem>
 {
-    public static RadarSystem Instance { get; set; }
-
     [Header("설정")]
     public float RadarDistance = 50f; // 탐지 범위
     public int initPoolSize = 500; // 초기화 풀링 생성
@@ -23,9 +22,9 @@ public class RadarSystem : MonoBehaviour
     // 재사용을 위한 풀
     private Queue<RectTransform> _iconPool = new Queue<RectTransform>();
 
-    private void Awake()
+    protected override void Awake()
     {
-        Instance = this;
+        base.Awake();
     }
 
     private void Start()
