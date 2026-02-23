@@ -5,20 +5,18 @@ using UnityEngine;
 using UnityEngine.Serialization;
 
 public class DropManager : StaticInstance<DropManager>
-{   
+{
+    // 맵에 존재하는 모든 경험치 리스트
+    public readonly List<EnemyDrop> activeDrops = new List<EnemyDrop>(1000);
 
     [Header("경험치 구체 설정 (100% 드랍)")]
     [FormerlySerializedAs("gemPrefab")]
     [SerializeField] private GameObject _expOrbPrefab;
-    [FormerlySerializedAs("gemLayer")]
-    [SerializeField] private LayerMask _expLayer;
     [SerializeField] private int _maxExpCount = 300;
-    private Collider[] _mergeBuffer = new Collider[5];
 
     [Header("부유물 상자 설정")]
     [SerializeField] private GameObject _lootBoxPrefab; // 상자 프리팹 (FieldItem 붙은거)
-    [Range(0f, 1f)]
-    [SerializeField] private float _lootDropChance = 0.1f; // 상자 드롭 확률 (기본 10%)
+    [SerializeField, Range(0f, 1f)] private float _lootDropChance = 0.1f; // 상자 드롭 확률 (기본 10%)
 
     [Tooltip("상자가 생성될 수면 위 높이 (부력 시스템 안정을 위한 초기값)")]
     [SerializeField] private float _spawnYHeight = 0f;
@@ -57,20 +55,18 @@ public class DropManager : StaticInstance<DropManager>
     {
         if (_expOrbPrefab == null) return;
 
-        // 풀링된 오브젝트 개수 확인
-        int currentActive = AddressablePoolManager.Instance.GetActiveCount(_expOrbPrefab);
+        // 경험치 구슬 개수 확인
+        int currentActive = activeDrops.Count;
 
         // 화면에 구체가 너무 많으면 병합(Merge) 시도
         if (currentActive > _maxExpCount)
         {
-            // 주변에 있는 경험치 구체 탐색
-            int count = Physics.OverlapSphereNonAlloc(position, 3f, _mergeBuffer, _expLayer);
-            if (count > 0)
+            float mergeDistSqr = 3f * 3f;
+            for (int i = 0; i < activeDrops.Count; i++)
             {
-                // 가장 가까운 구체 하나에 경험치 몰아주고 종료 (생성 X)
-                if (_mergeBuffer[0].TryGetComponent<EnemyDrop>(out var existingOrb))
+                if ((activeDrops[i].transform.position - position).sqrMagnitude < mergeDistSqr)
                 {
-                    existingOrb.AddExp(amount);
+                    activeDrops[i].AddExp(amount);
                     return;
                 }
             }
@@ -82,6 +78,18 @@ public class DropManager : StaticInstance<DropManager>
         if (newOrbObj.TryGetComponent<EnemyDrop>(out var dropItem))
         {
             dropItem.Initialize(amount);
+            activeDrops.Add(dropItem);
+        }
+    }
+
+    public void RemoveDrop(EnemyDrop drop)
+    {
+        int index = activeDrops.IndexOf(drop);
+        if (index >= 0)
+        {
+            int lastIndex = activeDrops.Count - 1;
+            activeDrops[index] = activeDrops[lastIndex];
+            activeDrops.RemoveAt(lastIndex);
         }
     }
 
@@ -95,22 +103,15 @@ public class DropManager : StaticInstance<DropManager>
 
         if (data != null)
         {
-            // 상자는 자주 생성되지 않으므로 Instantiate 사용 (필요 시 풀링으로 전환 가능)
-            // 높이 보정(_spawnYHeight) 적용
             Vector3 spawnPos = new Vector3(pos.x, _spawnYHeight, pos.z);
-
             GameObject box = Instantiate(_lootBoxPrefab, spawnPos, Quaternion.identity);
-
             // 데이터 주입
             FieldItem fieldItem = box.GetComponent<FieldItem>();
-            if (fieldItem != null)
-            {
-                fieldItem.Initialize(data);
-            }
+            fieldItem?.Initialize(data);            
         }
     }
 
-    // --- Helper Functions ---
+    #region 헬퍼 함수
     private ItemType GetRandomItemType()
     {
         int total = _weaponWeight + _equipmentWeight + _cargoWeight;
@@ -135,4 +136,5 @@ public class DropManager : StaticInstance<DropManager>
         }
         return null;
     }
+    #endregion
 }

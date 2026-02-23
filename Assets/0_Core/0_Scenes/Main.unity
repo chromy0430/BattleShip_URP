@@ -3626,10 +3626,13 @@ MonoBehaviour:
   allWeaponDatas:
   - {fileID: 11400000, guid: 5aaa673bce0663048a3ca3a6358572a7, type: 2}
   - {fileID: 11400000, guid: 6e2f02ad61df99e40876305ac88db82c, type: 2}
+  DamageFont: {fileID: 5998229489655625853, guid: 9d2d63e853c5b3449929068d2c01b2ab, type: 3}
   upgradeManager: {fileID: 1091732949}
   weaponUIManager: {fileID: 2005064517}
-  DamageFont: {fileID: 5998229489655625853, guid: 9d2d63e853c5b3449929068d2c01b2ab, type: 3}
   enemyManager: {fileID: 360754104}
+  playerManager: {fileID: 0}
+  dropManager: {fileID: 0}
+  playerMagnet: {fileID: 0}
 --- !u!114 &814857560
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7432,9 +7435,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DropManager
   _expOrbPrefab: {fileID: 3148682760232343163, guid: 0f5ddf61e6a3be54dba62e9f783aed4e, type: 3}
-  _expLayer:
-    serializedVersion: 2
-    m_Bits: 256
   _maxExpCount: 300
   _lootBoxPrefab: {fileID: 6160130576716244279, guid: 7bf8887cbcb25c94c88d43be1844949c, type: 3}
   _lootDropChance: 0.1

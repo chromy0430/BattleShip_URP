@@ -22,11 +22,13 @@ public class DamageTMP : MonoBehaviour
         fontOrgSize = m_Text.fontSize;
     }
 
-    public void Initialize(Transform parent, Vector3 pos, string temp, bool isPlayer = false)
+    public void Initialize(Transform parent, Vector3 pos, int amount, bool isPlayer = false)
     {
         transform.SetParent(parent);
 
-        m_Text.text = temp;
+        //m_Text.text = temp;
+        m_Text.SetText("{0}", amount);
+
 
         Vector3 screenPosition = Camera.main.WorldToScreenPoint(pos);
         rectTransform.position = screenPosition;

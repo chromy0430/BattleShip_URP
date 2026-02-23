@@ -93,7 +93,7 @@ public class PlayerCondition : MonoBehaviour
             (
                 Base_Canvas.Instance.transform,
                 transform.position + (transform.right * UnityEngine.Random.Range(-6, 6)) + (Vector3.up * 2.5f), 
-                finalDmg.ToString(),
+                finalDmg,
                 true
             //_stat.Damage.ToString()
             );

@@ -32,6 +32,8 @@ public class EnemyDrop : MonoBehaviour, IWaterFloatTarget
 
     private void UpdateVisual(bool playAnimation)
     {
+        return;
+
         float scaleMultiplier = 1f + Mathf.Log10(expAmount / 10f) * 0.5f;
         Vector3 targetScale = _baseScale * Mathf.Min(scaleMultiplier, 2.5f);
 
@@ -73,37 +75,20 @@ public class EnemyDrop : MonoBehaviour, IWaterFloatTarget
 
     private void OnEnable()
     {
-        if (PlayerManager.Instance != null)
-        {
-            PlayerMagnet.Instance.RegisterCoin(this);
-        }
-
+        // 부력 시스템(시각 효과) 등록만 수행
         if (WaterBatchManager.Instance != null)
         {
             WaterBatchManager.Instance.Register(this);
         }
     }
+
     private void OnDisable()
     {
         transform.DOKill();
 
-        if (PlayerManager.Instance != null)
-        {
-            PlayerMagnet.Instance.UnregisterCoin(this);
-        }
-
         if (WaterBatchManager.Instance != null)
         {
             WaterBatchManager.Instance.Unregister(this);
-        }
-    }
-
-    private void OnTriggerEnter(Collider other)
-    {
-        if (other.CompareTag("Player"))
-        {
-            PlayerExpManager.Instance.GetExp(expAmount);
-            AddressablePoolManager.Instance.Return(this.gameObject);            
         }
     }
 }

@@ -17,7 +17,7 @@ MonoBehaviour:
   Description: "\uCD08\uACE0\uC18D\uC73C\uB85C \uD50C\uB808\uC774\uC5B4 \uC8FC\uC704\uB97C
     \uB9F4\uB3CC\uBA70 \uAE30\uC2B5\uD55C\uB2E4."
   MoveSpeed: 12
-  TurnSpeed: 10
+  TurnSpeed: 14
   SizeRadius: 1
   Damage: 15
   DEF: 1

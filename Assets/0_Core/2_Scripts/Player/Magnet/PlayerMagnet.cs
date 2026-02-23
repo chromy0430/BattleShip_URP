@@ -16,9 +16,7 @@ public class PlayerMagnet : StaticInstance<PlayerMagnet>
     [Header("자석 아이템 관련")]
     [SerializeField] private float _magnetItemSpeed = 50.0f;
     private bool _isMagnetItemActive = false;
-
-    private readonly List<EnemyDrop> _allCoins = new List<EnemyDrop>();
-    private readonly List<EnemyDrop> _magnetTargetCoins = new List<EnemyDrop>();
+    private readonly List<EnemyDrop> _magnetTargetCoins = new List<EnemyDrop>(1000);
 
     private Transform _PlayerTransform;
 
@@ -48,7 +46,7 @@ public class PlayerMagnet : StaticInstance<PlayerMagnet>
 
     void Update()
     {
-        if (_PlayerTransform == null) return;
+        if (_PlayerTransform == null || DropManager.Instance == null) return;
 
         if (_isMagnetItemActive)
         {
@@ -56,7 +54,7 @@ public class PlayerMagnet : StaticInstance<PlayerMagnet>
         }
 
 
-        if (_allCoins.Count > 0)
+        if (DropManager.Instance.activeDrops.Count > 0)
         {
             ProcessNormalCoins();
         }
@@ -69,25 +67,23 @@ public class PlayerMagnet : StaticInstance<PlayerMagnet>
         Vector3 playerPos = _PlayerTransform.position;
         float deltaTime = Time.deltaTime;
 
-        for (int i = _allCoins.Count - 1; i >= 0; i--)
-        {
-            EnemyDrop coin = _allCoins[i];
+        var activeDrops = DropManager.Instance.activeDrops;
 
-            if (coin == null || !coin.gameObject.activeInHierarchy)
-            {
-                RemoveCoinFromList(_allCoins, i);
-                continue;
-            }
+        for (int i = activeDrops.Count - 1; i >= 0; i--)
+        {
+            EnemyDrop coin = activeDrops[i];
+            if (coin == null || !coin.gameObject.activeInHierarchy) continue;
 
             Vector3 coinPos = coin.transform.position;
             float distSqr = (coinPos - playerPos).sqrMagnitude;
 
-            if (distSqr <= _collectionRadiusSqr)
+            if (distSqr <= _collectionRadiusSqr) // 획득
             {
-                RemoveCoinFromList(_allCoins, i);
+                if (PlayerExpManager.Instance != null) PlayerExpManager.Instance.GetExp(coin.expAmount);
+                DropManager.Instance.RemoveDrop(coin);
                 AddressablePoolManager.Instance.Return(coin.gameObject);
             }
-            else if (distSqr <= _magnetRadiusSqr)
+            else if (distSqr <= _magnetRadiusSqr) // 자석 범위 내 끌림
             {
                 coin.transform.position = Vector3.MoveTowards(coinPos, playerPos, _coinMoveSpeed * deltaTime);
             }
@@ -143,39 +139,13 @@ public class PlayerMagnet : StaticInstance<PlayerMagnet>
         list.RemoveAt(lastIndex);
     }
 
-    public void RegisterCoin(EnemyDrop coin)
-    {
-        if (!_allCoins.Contains(coin) && !_magnetTargetCoins.Contains(coin))
-        {
-            _allCoins.Add(coin);
-        }
-    }
-
-    public void UnregisterCoin(EnemyDrop coin)
-    {
-        if (coin == null) return;
-
-        int indexAll = _allCoins.IndexOf(coin);
-        if (indexAll >= 0)
-        {
-            RemoveCoinFromList(_allCoins, indexAll);
-            return;
-        }
-
-        int indexMagnet = _magnetTargetCoins.IndexOf(coin);
-        if (indexMagnet >= 0) 
-        {
-            RemoveCoinFromList(_magnetTargetCoins, indexMagnet);
-        }
-    }
-
     public void ActivateMagnetItem()
     {
-        if (_allCoins.Count > 0)
+        var activeDrops = DropManager.Instance.activeDrops;
+        if (activeDrops.Count > 0)
         {
-            _magnetTargetCoins.AddRange(_allCoins);
-            _allCoins.Clear();
-
+            _magnetTargetCoins.AddRange(activeDrops);
+            activeDrops.Clear();
             _isMagnetItemActive = true;
         }
     }

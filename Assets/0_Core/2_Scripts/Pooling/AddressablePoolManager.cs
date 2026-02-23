@@ -179,11 +179,14 @@ public class AddressablePoolManager : StaticInstance<AddressablePoolManager>
 
     #endregion
 
-    public void CreatePool(GameObject prefab, int poolCount)
+    public void Prewarm(GameObject prefab, int count)
     {
-        if (prefab != null && poolCount > 0)
+        if (prefab == null) return;
+
+        if (!_pools.ContainsKey(prefab))
         {
-            CreatePoolInternal(prefab, prefab, poolCount);
+            _loadedPrefabs[prefab] = prefab;
+            CreatePoolInternal(prefab, prefab, count);
         }
     }
 

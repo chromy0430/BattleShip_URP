@@ -144,7 +144,7 @@ public class Enemy : MonoBehaviour, IEnemy
             (
                 Base_Canvas.Instance.transform,
                 transform.position,
-                finalDamage.ToString()
+                finalDamage
             );
 
         CurrentHealth -= finalDamage;

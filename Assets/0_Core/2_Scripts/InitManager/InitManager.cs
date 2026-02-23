@@ -7,20 +7,27 @@ public class InitManager : StaticInstance<InitManager>
 {
     // 풀링용 리스트
     public List<BaseWeaponData> allWeaponDatas;
+    // 풀링용 데미지 폰트
+    public GameObject DamageFont;
     //public List<GameObject> allEnemyPrefabs;
 
-    #region 의존성 주입
-    public UpgradeManager upgradeManager;
-    public WeaponUIManager weaponUIManager;
-    public GameObject DamageFont;
-    public EnemyManager enemyManager;
-    #endregion
+    [Header("UI Transition")]
+    public GameObject loadingPanel;
 
+    #region 의존성 주입 변수
+    public UpgradeManager upgradeManager;
+    public WeaponUIManager weaponUIManager;    
+    public EnemyManager enemyManager;
+    public PlayerManager playerManager;
+    public DropManager dropManager;
+    public PlayerMagnet playerMagnet;
+    #endregion    
 
     #region 싱글톤
     protected override void Awake()
     {
         base.Awake();
+        BootSequenceAsync().Forget();
     }
     #endregion
 
@@ -29,47 +36,50 @@ public class InitManager : StaticInstance<InitManager>
         weaponUIManager.RefreshAllSlots();
     }
 
-    private void Start()
+    private async UniTaskVoid BootSequenceAsync()
     {
-        #region 초기화 풀링
+        Debug.Log("[Init] 1. 시스템 매니저 할당 대기 중...");
+
+        // 1. 핵심 매니저들이 씬에 인스턴스화될 때까지 대기
+        await UniTask.WaitUntil(() =>
+            AddressablePoolManager.Instance != null &&
+            DropManager.Instance != null &&
+            PlayerMagnet.Instance != null
+        );
+
+        Debug.Log("[Init] 2. 어드레서블 로딩 대기 중...");
+
+        // 2. 어드레서블 데이터 100% 로드 대기
+        await UniTask.WaitUntil(() => AddressablePoolManager.Instance.IsReady);
+
+        Debug.Log("[Init] 3. 자원 프리웜(Prewarm) 시작");
+
+        // 3. 자석 등 모든 매니저가 보장된 상태에서 프리웜 가동 (Null 완벽 차단)
         InitializePooling();
 
-        if (upgradeManager != null)
+        if (loadingPanel != null)
         {
-            // 약간의 딜레이를 주어 다른 시스템(UI 등)이 모두 준비된 후 띄우는 것이 안전함
-            ShowSelectionDelayed().Forget();
-        }
-        else
-        {
-            Debug.Log("업그레이드 매니저 없음");
+            loadingPanel.SetActive(false);
         }
 
-            #endregion
-            #region UI 초기화
-            weaponUIManager.RefreshAllSlots();
-        #endregion
+        Debug.Log("[Init] 4. UI 렌더링 및 게임 시작");
+
+        if (weaponUIManager != null) weaponUIManager.RefreshAllSlots();
+        if (upgradeManager != null) upgradeManager.ShowStartingWeaponSelection();
     }
 
     private void InitializePooling()
     {
-        if (AddressablePoolManager.Instance != null)
+        foreach (var data in allWeaponDatas)
         {
-            foreach (var data in allWeaponDatas)
-            {
-                AddressablePoolManager.Instance.CreatePool(data.ProjectilePrefab, 500);
-                AddressablePoolManager.Instance.CreatePool(data.ShotEffect, 500);
-            }
-            AddressablePoolManager.Instance.CreatePool(DamageFont, 2000);
-            if (enemyManager != null)
-                AddressablePoolManager.Instance.CreatePool(enemyManager.m_EnemyDropPrefab, 1000);
+            if (data.ProjectilePrefab != null) AddressablePoolManager.Instance.Prewarm(data.ProjectilePrefab, 500);
+            if (data.ShotEffect != null) AddressablePoolManager.Instance.Prewarm(data.ShotEffect, 500);
         }
-    }
 
-    private async UniTaskVoid ShowSelectionDelayed()
-    {
-        // 0.1초 정도 대기 (Start 로직들이 꼬이지 않게 안전장치)
-        await UniTask.Delay(100);
-
-        upgradeManager.ShowStartingWeaponSelection();
+        if (DamageFont != null) AddressablePoolManager.Instance.Prewarm(DamageFont, 2000);
+        if (enemyManager != null && enemyManager.m_EnemyDropPrefab != null)
+        {
+            AddressablePoolManager.Instance.Prewarm(enemyManager.m_EnemyDropPrefab, 1000);
+        }    
     }
 }
