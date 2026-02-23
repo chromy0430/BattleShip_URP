@@ -12,10 +12,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ca52dc65c92791641abb4a20efacdf21, type: 3}
   m_Name: Rolling Ocean Swells
   m_EditorClassIdentifier: 
-  waveLengthMultiplier: 1
-  amplitudeMultiplier: 1.9
+  waveLengthMultiplier: 1.5
+  amplitudeMultiplier: 1.5
   steepnessMultiplier: 5
-  steepnessClamping: 1
+  steepnessClamping: 0.534
   waveLengthCurve:
     serializedVersion: 2
     m_Curve:
@@ -44,22 +44,31 @@ MonoBehaviour:
     serializedVersion: 2
     m_Curve:
     - serializedVersion: 3
-      time: 0
-      value: 1
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
+      time: -0.021781921
+      value: 0.75476074
+      inSlope: 4.6869125
+      outSlope: 4.6869125
+      tangentMode: 34
       weightedMode: 0
       inWeight: 0
-      outWeight: 0
+      outWeight: 0.33333334
     - serializedVersion: 3
-      time: 1
-      value: 1
-      inSlope: 0
-      outSlope: 0
+      time: 0.06491468
+      value: 1.1611001
+      inSlope: -6.2709613
+      outSlope: -6.2709613
       tangentMode: 0
       weightedMode: 0
-      inWeight: 0
+      inWeight: 0.33333334
+      outWeight: 0.057407815
+    - serializedVersion: 3
+      time: 1.6597044
+      value: 0.7760632
+      inSlope: -0.2414343
+      outSlope: -0.2414343
+      tangentMode: 34
+      weightedMode: 0
+      inWeight: 0.33333334
       outWeight: 0
     m_PreInfinity: 2
     m_PostInfinity: 2
@@ -100,30 +109,30 @@ MonoBehaviour:
     directionAngleVariation: 180
   layers:
   - enabled: 1
-    waveLength: 47.6
-    amplitude: 1.566
-    steepness: 0.466
+    waveLength: 90
+    amplitude: 0.54
+    steepness: 0.75
     mode: 0
-    direction: 0
+    direction: 45
     origin: {x: -22.71, y: -44.6}
-  - enabled: 1
-    waveLength: 40
-    amplitude: 0.462
+  - enabled: 0
+    waveLength: 90
+    amplitude: 0.00045000002
     steepness: 1
     mode: 0
-    direction: 44
+    direction: 0
     origin: {x: 0, y: 0}
-  - enabled: 1
-    waveLength: 6.4
-    amplitude: 0.07752722
+  - enabled: 0
+    waveLength: 0.4
+    amplitude: 0.00045000002
     steepness: 1
     mode: 0
     direction: 153
     origin: {x: 0, y: 0}
-  - enabled: 1
-    waveLength: 10.2
-    amplitude: 0.06234268
-    steepness: 0.769
+  - enabled: 0
+    waveLength: 0.4
+    amplitude: 0.00045000002
+    steepness: 0.001
     mode: 0
     direction: -69.329254
     origin: {x: 0, y: 0}
@@ -134,12 +143,12 @@ Texture2D:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: Default Wave Profile 1 Shader Parameters
+  m_Name: Rolling Ocean Swells Shader Parameters
   m_ImageContentsHash:
     serializedVersion: 2
     Hash: 00000000000000000000000000000000
   m_IsAlphaChannelOptional: 0
-  serializedVersion: 3
+  serializedVersion: 4
   m_Width: 4
   m_Height: 2
   m_CompleteImageSize: 64
@@ -168,7 +177,7 @@ Texture2D:
   m_ColorSpace: 0
   m_PlatformBlob: 
   image data: 64
-  _typelessdata: f341f3510000003c063b0051253a003cb73066465741003c952f1a49d7bc003cadcd93d10000a938000000000000003d000000000000003d000000000000b13b
+  _typelessdata: d8393858483a003c6809385800000000538bcd3857410000b58bcd38d7bc0000adcd93d100008043000000000000004500000000000000450000000000001f1d
   m_StreamData:
     serializedVersion: 2
     offset: 0

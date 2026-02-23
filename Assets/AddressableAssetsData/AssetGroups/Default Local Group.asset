@@ -15,8 +15,28 @@ MonoBehaviour:
   m_GroupName: Default Local Group
   m_GUID: 5edce1880350af84e91cce7bdb095f89
   m_SerializeEntries:
+  - m_GUID: 0f5ddf61e6a3be54dba62e9f783aed4e
+    m_Address: Assets/0_Core/3_Prefabs/Item/Drop.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 39e98b4be1c4d86409b20adc8ad57efa
+    m_Address: Assets/0_Core/3_Prefabs/Weapon/Prefab_AuraWeapon.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 7061685a04bff8a48ab2a4e5bb7b58e6
     m_Address: Assets/0_Core/3_Prefabs/Enemy/Prefab_Enemy_ExplosionShip.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 7bf8887cbcb25c94c88d43be1844949c
+    m_Address: Assets/0_Core/3_Prefabs/Item/Prefab_LootBox.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 8d09c2caabdf46e4a8c7353cbf061d19
+    m_Address: Assets/0_Core/3_Prefabs/Weapon/Prefab_Missile.prefab
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
@@ -25,8 +45,23 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 9b6b4e7a62699f9458a6976fbf74436a
+    m_Address: Assets/0_Core/3_Prefabs/Weapon/Prefab_Cannon.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 9d2d63e853c5b3449929068d2c01b2ab
+    m_Address: Assets/0_Core/3_Prefabs/UI/Prefab_DamageFont.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: a03c5a2621657ad498f26b7f749e6535
     m_Address: Assets/0_Core/3_Prefabs/Enemy/Prefab_Enemy_MineLayerShip_nothing.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: aa4445101d6138b4a9ab85f6e2f14c7a
+    m_Address: Assets/0_Core/3_Prefabs/Weapon/Prefab_Gun.prefab
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0

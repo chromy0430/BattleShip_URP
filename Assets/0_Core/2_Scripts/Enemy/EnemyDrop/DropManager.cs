@@ -58,7 +58,7 @@ public class DropManager : StaticInstance<DropManager>
         if (_expOrbPrefab == null) return;
 
         // 풀링된 오브젝트 개수 확인
-        int currentActive = ObjectPoolManager.Instance.GetActiveCount(_expOrbPrefab);
+        int currentActive = AddressablePoolManager.Instance.GetActiveCount(_expOrbPrefab);
 
         // 화면에 구체가 너무 많으면 병합(Merge) 시도
         if (currentActive > _maxExpCount)
@@ -76,7 +76,7 @@ public class DropManager : StaticInstance<DropManager>
             }
         }
 
-        var newOrbObj = ObjectPoolManager.Instance.Get(_expOrbPrefab);
+        var newOrbObj = AddressablePoolManager.Instance.Get(_expOrbPrefab);
         newOrbObj.transform.position = position;
 
         if (newOrbObj.TryGetComponent<EnemyDrop>(out var dropItem))

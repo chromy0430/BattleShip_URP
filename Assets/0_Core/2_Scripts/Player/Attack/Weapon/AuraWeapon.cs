@@ -4,7 +4,6 @@ using System.Collections.Generic;
 public class AuraWeapon : MonoBehaviour
 {
     private WeaponStat _stat;
-    private List<IEnemy> _targetsInRange = new List<IEnemy>();
     private float _tickTimer;
     private float _tickInterval;
 
@@ -14,6 +13,10 @@ public class AuraWeapon : MonoBehaviour
 
     [Tooltip("프리팹의 기본 스케일 (초기값 복원용)")]
     [SerializeField] private Vector3 _baseScale = new Vector3(25, 25, 25);
+
+    // 캐싱 버퍼
+    private readonly List<EnemyChaser> _targetsBuffer = new List<EnemyChaser>(128);
+    private float _actualHitRadius;
 
     // 무기 생성 시 스탯 주입
     public void Initialize(WeaponStat stat)
@@ -27,41 +30,15 @@ public class AuraWeapon : MonoBehaviour
         // Range 300 * 0.01 = 3배수
         float scaleMultiplier = stat.Range * _rangeToScaleRatio;
         transform.localScale = _baseScale * scaleMultiplier;
+
+        // 로컬 스케일 x의 절반을 실제 타격 반경으로 캐싱
+        _actualHitRadius = transform.localScale.x * 0.5f;
     }
 
     private void OnEnable()
     {
-        // 켜질 때 목록 초기화
-        _targetsInRange.Clear();
         _tickTimer = _tickInterval;
     }
-
-    #region 트리거 함수
-
-    // 트리거 진입
-    private void OnTriggerEnter(Collider other)
-    {
-        if (other.TryGetComponent(out IEnemy enemy))
-        {
-            if (enemy.IsAlive && !_targetsInRange.Contains(enemy))
-            {
-                _targetsInRange.Add(enemy);
-            }
-        }
-    }
-
-    // 트리거 이탈
-    private void OnTriggerExit(Collider other)
-    {
-        if (other.TryGetComponent(out IEnemy enemy))
-        {
-            if (_targetsInRange.Contains(enemy))
-            {
-                _targetsInRange.Remove(enemy);
-            }
-        }
-    }
-    #endregion
 
     private void Update()
     {
@@ -76,25 +53,27 @@ public class AuraWeapon : MonoBehaviour
 
     private void DealDamageToAll()
     {
+        if (EnemyBatchManager.Instance == null) return;
+
         int finalDamage = _stat.Damage;
         if (PlayerDataLoad.Instance != null)
         {
             finalDamage = PlayerDataLoad.Instance.CurrentPlayerStat.GetFinalDamage(_stat.Damage);
         }
 
-        for (int i = _targetsInRange.Count - 1; i >= 0; i--)
+        EnemyBatchManager.Instance.GetEnemiesInRadius(transform.position, _actualHitRadius, _targetsBuffer);
+
+        for (int i = _targetsBuffer.Count - 1; i >= 0; i--)
         {
-            var enemy = _targetsInRange[i];
+            Enemy enemyStatus = _targetsBuffer[i].status;
 
-            if (enemy == null || !enemy.IsAlive)
-            {
-                _targetsInRange.RemoveAt(i);
-                continue;
-            }
+            if (enemyStatus == null || !enemyStatus.IsAlive) continue;
 
-            Vector3 knockbackDir = (enemy.TargetTransform.position - transform.position).normalized;
-            enemy.TakeDamage(finalDamage, out int finalDmg);
-            enemy.ApplyKnockback(knockbackDir * 1.2f, 0.2f);
+            Vector3 knockbackDir = (enemyStatus.TargetTransform.position - transform.position).normalized;
+            knockbackDir.y = 0f;
+
+            enemyStatus.TakeDamage(finalDamage, out _);
+            enemyStatus.ApplyKnockback(knockbackDir * 1.2f, 0.2f).Forget();
         }
     }
 }

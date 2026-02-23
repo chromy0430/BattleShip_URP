@@ -52,16 +52,16 @@ public class InitManager : StaticInstance<InitManager>
 
     private void InitializePooling()
     {
-        if (ObjectPoolManager.Instance != null)
+        if (AddressablePoolManager.Instance != null)
         {
             foreach (var data in allWeaponDatas)
             {
-                ObjectPoolManager.Instance.CreatePool(data.ProjectilePrefab, 500);
-                ObjectPoolManager.Instance.CreatePool(data.ShotEffect, 500);
+                AddressablePoolManager.Instance.CreatePool(data.ProjectilePrefab, 500);
+                AddressablePoolManager.Instance.CreatePool(data.ShotEffect, 500);
             }
-            ObjectPoolManager.Instance.CreatePool(DamageFont, 2000);
+            AddressablePoolManager.Instance.CreatePool(DamageFont, 2000);
             if (enemyManager != null)
-                ObjectPoolManager.Instance.CreatePool(enemyManager.m_EnemyDropPrefab, 1000);
+                AddressablePoolManager.Instance.CreatePool(enemyManager.m_EnemyDropPrefab, 1000);
         }
     }
 

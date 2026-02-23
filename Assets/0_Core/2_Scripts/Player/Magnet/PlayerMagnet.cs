@@ -85,7 +85,7 @@ public class PlayerMagnet : StaticInstance<PlayerMagnet>
             if (distSqr <= _collectionRadiusSqr)
             {
                 RemoveCoinFromList(_allCoins, i);
-                ObjectPoolManager.Instance.Return(coin.gameObject);
+                AddressablePoolManager.Instance.Return(coin.gameObject);
             }
             else if (distSqr <= _magnetRadiusSqr)
             {
@@ -116,7 +116,7 @@ public class PlayerMagnet : StaticInstance<PlayerMagnet>
             if (distSqr <= _collectionRadiusSqr)
             {
                 RemoveCoinFromList(_magnetTargetCoins, i);
-                ObjectPoolManager.Instance.Return(coin.gameObject);
+                AddressablePoolManager.Instance.Return(coin.gameObject);
             }
             else
             {

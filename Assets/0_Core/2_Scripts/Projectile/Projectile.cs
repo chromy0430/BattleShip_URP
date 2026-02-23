@@ -94,7 +94,7 @@ public class Projectile : MonoBehaviour
 
             float deltaTime = Time.deltaTime;
 
-            // 1. 방향 및 속도 연산
+            // 방향 및 속도 연산
             if (_stat.IsHoming)
             {
                 if (currentbound > boundValue || (transform.position - _launcher.position).sqrMagnitude > maxRangeSqr * 1.44f)
@@ -128,10 +128,10 @@ public class Projectile : MonoBehaviour
                 currentSpeed += _stat.Acceleration * deltaTime;
             }
 
-            // 2. 이동 (Transform 직접 조작)
+            // 이동
             transform.position += direction * (currentSpeed * deltaTime);
 
-            // 3. 충돌 감지 (EnemyBatchManager의 공간 그리드 활용 - 콜라이더 대체)
+            // 충돌 감지
             if (EnemyBatchManager.Instance != null)
             {
                 EnemyChaser hitEnemyChaser = EnemyBatchManager.Instance.GetClosestEnemyInRadius(transform.position, hitRadius);
@@ -168,7 +168,7 @@ public class Projectile : MonoBehaviour
 
         if (_stat.shotEffect != null)
         {
-            var hitEffect = ObjectPoolManager.Instance.Get(_stat.shotEffect);
+            var hitEffect = AddressablePoolManager.Instance.Get(_stat.shotEffect);
             if (hitEffect != null) hitEffect.transform.position = transform.position;
         }
 
@@ -198,7 +198,7 @@ public class Projectile : MonoBehaviour
     #endregion
 
     #region 충돌 관련
-    /// <summary>
+    /*/// <summary>
     /// 충돌 감지 
     /// </summary>
     private void OnTriggerEnter(Collider other)
@@ -210,10 +210,10 @@ public class Projectile : MonoBehaviour
                 OnHitTarget(enemy);
             }
         }
-    }
+    }*/
     #endregion
 
-    #region 비활성화 
+    #region 반환 
     /// <summary>
     /// 모든 작업을 중지하고 오브젝트 풀에 반환
     /// </summary>
@@ -222,7 +222,7 @@ public class Projectile : MonoBehaviour
         _lifeTimeCts?.Cancel();
         _lifeTimeCts = null;
         transform.DOKill();
-        ObjectPoolManager.Instance.Return(this.gameObject);
+        AddressablePoolManager.Instance.Return(this.gameObject);
         transform.localScale = projectileSize;
     }
 

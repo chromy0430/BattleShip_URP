@@ -243,7 +243,7 @@ Material:
     - _PointSpotLightReflectionExp: 64
     - _PointSpotLightReflectionSharp: 0
     - _PointSpotLightReflectionSize: 0
-    - _PointSpotLightReflectionStrength: 10
+    - _PointSpotLightReflectionStrength: 2
     - _QueueOffset: 0
     - _ReceiveDynamicEffectsFoam: 1
     - _ReceiveDynamicEffectsHeight: 1
@@ -284,11 +284,11 @@ Material:
     - _SpecularReflectionsOn: 1
     - _Speed: 1
     - _SrcBlend: 1
-    - _SunReflectionDistortion: 0.593
+    - _SunReflectionDistortion: 0.5
     - _SunReflectionPerturbance: 1
     - _SunReflectionSharp: 0
-    - _SunReflectionSize: 0.907
-    - _SunReflectionStrength: 10
+    - _SunReflectionSize: 0.5
+    - _SunReflectionStrength: 1.5
     - _Surface: 0
     - _TEXTURE_INTERSECTIONOn: 0
     - _TessMax: 200
@@ -312,7 +312,7 @@ Material:
     - _WaveDistance: 0.97
     - _WaveDistortion: 0.5
     - _WaveFrequency: 1
-    - _WaveHeight: 0.621
+    - _WaveHeight: 0.5
     - _WaveMaxLayers: 64
     - _WaveNormalStr: 1.1
     - _WaveSpeed: 1
@@ -327,7 +327,7 @@ Material:
     - _BaseColor: {r: 0, g: 0.23651557, b: 0.47303113, a: 1}
     - _Color: {r: 0.5, g: 0.5, b: 0.5, a: 1}
     - _DepthMapBounds: {r: -402.3, g: -459.43, b: 0.0012693577, a: 0}
-    - _Direction: {r: 1, g: 1, b: 0, a: 0}
+    - _Direction: {r: -1, g: 1, b: 0, a: 0}
     - _DistanceFoamFadeDist: {r: 100, g: 350, b: 0, a: 0}
     - _DistanceNormalsFadeDist: {r: 10.526316, g: 92.10526, b: 0, a: 0}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}

@@ -92,7 +92,7 @@ public class EnemyManager : StaticInstance<EnemyManager>
     {
         Vector3 dropPos = deathPos;
         dropPos.y += 0.5f;
-        var dropitem = ObjectPoolManager.Instance.Get(m_EnemyDropPrefab);
+        var dropitem = AddressablePoolManager.Instance.Get(m_EnemyDropPrefab);
         dropitem.transform.position = dropPos;
         return dropitem;
     }

@@ -150,7 +150,7 @@ public class WeaponMount : MonoBehaviour
 
             fp.LookAt(target.TargetTransform);
 
-            GameObject projectileGO = ObjectPoolManager.Instance.Get(_runtimeStat.projectilePrefab);
+            GameObject projectileGO = AddressablePoolManager.Instance.Get(_runtimeStat.projectilePrefab);
             if (projectileGO == null) continue;
 
             projectileGO.transform.position = fp.position;
@@ -164,7 +164,7 @@ public class WeaponMount : MonoBehaviour
             else
             {
                 Debug.LogError($"{_runtimeStat.projectilePrefab.name} 프리팹에 Projectile.cs 스크립트가 없습니다.");
-                ObjectPoolManager.Instance.Return(projectileGO);
+                AddressablePoolManager.Instance.Return(projectileGO);
             }
         }
 

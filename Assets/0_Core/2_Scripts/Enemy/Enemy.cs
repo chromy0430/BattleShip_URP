@@ -139,7 +139,7 @@ public class Enemy : MonoBehaviour, IEnemy
 
         flickerFeedback?.PlayFeedbacks();
 
-        var damageFont = ObjectPoolManager.Instance.Get(damageObject);
+        var damageFont = AddressablePoolManager.Instance.Get(damageObject);
         damageFont.GetComponent<DamageTMP>().Initialize
             (
                 Base_Canvas.Instance.transform,
@@ -175,9 +175,9 @@ public class Enemy : MonoBehaviour, IEnemy
 
         flickerFeedback?.ResetFeedbacks();
 
-        if (_enemyData != null && AddressableEnemyPoolManager.Instance != null)
+        if (_enemyData != null && AddressablePoolManager.Instance != null)
         {
-            AddressableEnemyPoolManager.Instance.ReturnEnemy(this.gameObject, _enemyData);
+            AddressablePoolManager.Instance.ReturnEnemy(this.gameObject, _enemyData);
         }
     }
 

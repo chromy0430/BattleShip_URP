@@ -34,6 +34,6 @@ public class PooledParticleEffect : MonoBehaviour
         await UniTask.WaitUntil(() => !_ps.IsAlive(true), cancellationToken: token);
 
         // 파티클 재생이 끝나면 풀로 반환
-        ObjectPoolManager.Instance.Return(this.gameObject);
+        AddressablePoolManager.Instance.Return(this.gameObject);
     }
 }

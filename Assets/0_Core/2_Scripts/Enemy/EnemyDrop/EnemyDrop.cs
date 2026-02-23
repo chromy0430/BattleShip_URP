@@ -103,7 +103,7 @@ public class EnemyDrop : MonoBehaviour, IWaterFloatTarget
         if (other.CompareTag("Player"))
         {
             PlayerExpManager.Instance.GetExp(expAmount);
-            ObjectPoolManager.Instance.Return(this.gameObject);            
+            AddressablePoolManager.Instance.Return(this.gameObject);            
         }
     }
 }

@@ -88,7 +88,7 @@ public class PlayerCondition : MonoBehaviour
         int finalDmg = Mathf.Max(1, amount - (stat.shipDEF + stat.bonusDEF));
         _currentHp -= finalDmg;
 
-        var damageFont = ObjectPoolManager.Instance.Get(DamageFont);
+        var damageFont = AddressablePoolManager.Instance.Get(DamageFont);
         damageFont.GetComponent<DamageTMP>().Initialize
             (
                 Base_Canvas.Instance.transform,

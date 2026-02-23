@@ -6,10 +6,6 @@ public class EnemySpawnSystem : MonoBehaviour
 {
     [SerializeField] private PlayTimeUIManager playTime;
 
-    //[Header("Spawn Settings")]
-    //[Tooltip("테스트용 적 프리팹 (나중에 SO 데이터로 교체 예정)")]
-    //[SerializeField] private GameObject testEnemyPrefab;
-
     [Tooltip("적이 스폰될 반경")]
     [SerializeField] private float maxSpawnRadius = 25f;
 
@@ -64,6 +60,11 @@ public class EnemySpawnSystem : MonoBehaviour
     {
         if (playerTransform == null) return;
 
+        if (AddressablePoolManager.Instance == null || !AddressablePoolManager.Instance.IsReady)
+        {
+            return;
+        }
+
         /*if (playTime != null)
         {
             currentPlayTime = playTime.CurrentPlayTime;
@@ -101,7 +102,7 @@ public class EnemySpawnSystem : MonoBehaviour
         // 현재 프레임에서 소환해야 할 마리 수 확정
         int batchCount = currentBatchCount;
 
-        if (AddressableEnemyPoolManager.Instance == null) return;
+        if (AddressablePoolManager.Instance == null) return;
 
         for (int i = 0; i < batchCount; i++)
         {
@@ -136,20 +137,12 @@ public class EnemySpawnSystem : MonoBehaviour
             return;
         }
 
-        AddressableEnemyPoolManager.Instance.GetEnemy(selectedData, position, Quaternion.identity);
-
-        //GameObject enemyObj = ObjectPoolManager.Instance.Get(testEnemyPrefab);
-
-        /*if (enemyObj != null)
-        {
-            enemyObj.transform.position = position;
-            enemyObj.transform.rotation = Quaternion.identity;
-        }*/
+        AddressablePoolManager.Instance.GetEnemy(selectedData, position, Quaternion.identity);
     }
 
     private EnemyData GetWeightedRandomEnemy()
     {
-        var spawnList = AddressableEnemyPoolManager.Instance.stageEnemies;
+        var spawnList = AddressablePoolManager.Instance.stageEnemies;
 
         if (spawnList == null || spawnList.Count == 0) return null;
 
